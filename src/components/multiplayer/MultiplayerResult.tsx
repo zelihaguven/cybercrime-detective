@@ -32,8 +32,8 @@ export default function MultiplayerResult({ roomCode, playerId, onPlayAgain, onR
   const players = room ? Object.entries(room.players ?? {}) : [];
   const isHost = room?.players?.[playerId]?.isHost ?? false;
 
-  const handlePlayAgain = async () => {
-    if (isHost) await resetRoom(roomCode);
+  const handlePlayAgain = () => {
+    if (isHost) resetRoom(roomCode);
     onPlayAgain();
   };
 

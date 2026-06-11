@@ -11,6 +11,7 @@ export interface RoomPlayer {
 }
 
 export interface Room {
+  code: string;
   hostId: string;
   status: RoomStatus;
   selectedCase: 7 | 8;

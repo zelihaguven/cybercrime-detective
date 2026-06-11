@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { generateRoomCode, getOrCreatePlayerId } from '../../utils/roomCode';
+import { getOrCreatePlayerId } from '../../utils/roomCode';
 import { createRoom } from '../../utils/roomActions';
 
 interface Props {
@@ -20,9 +20,8 @@ export default function CreateRoom({ onRoomCreated, onBack }: Props) {
     setLoading(true);
     setError(null);
     try {
-      const code = await generateRoomCode();
       const playerId = getOrCreatePlayerId();
-      await createRoom(code, playerId, trimmed);
+      const { code } = await createRoom(playerId, trimmed);
       onRoomCreated(code);
     } catch {
       setError(t('mpErrorGeneric'));

@@ -2,17 +2,18 @@ import { useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { getOrCreatePlayerId } from '../../utils/roomCode';
 import { joinRoom } from '../../utils/roomActions';
+import type { UIKey } from '../../i18n/ui';
 
 interface Props {
   onRoomJoined: (code: string) => void;
   onBack: () => void;
 }
 
-const ERROR_KEYS: Record<string, Parameters<ReturnType<typeof useLanguage>['t']>[0]> = {
+const ERROR_KEYS: Record<string, UIKey> = {
   room_not_found: 'mpErrorNotFound',
-  room_expired: 'mpErrorExpired',
-  room_started: 'mpErrorStarted',
-  room_full: 'mpErrorFull',
+  room_expired:   'mpErrorExpired',
+  room_started:   'mpErrorStarted',
+  room_full:      'mpErrorFull',
 };
 
 export default function JoinRoom({ onRoomJoined, onBack }: Props) {
@@ -32,8 +33,7 @@ export default function JoinRoom({ onRoomJoined, onBack }: Props) {
       const playerId = getOrCreatePlayerId();
       const result = await joinRoom(code.trim(), playerId, name.trim());
       if (result.error) {
-        const key = ERROR_KEYS[result.error] ?? 'mpErrorGeneric';
-        setError(t(key));
+        setError(t(ERROR_KEYS[result.error] ?? 'mpErrorGeneric'));
         setLoading(false);
       } else {
         onRoomJoined(code.trim());

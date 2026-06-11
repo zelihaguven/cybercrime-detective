@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
-import { db } from '../firebase';
-import { ref, onValue, onDisconnect, update } from 'firebase/database';
-import type { Room, RoomPlayer } from '../types/room';
+import { socket } from '../socket';
+import type { Room } from '../types/room';
 
 interface UseRoomReturn {
   room: Room | null;
   loading: boolean;
   error: string | null;
-  myPlayer: RoomPlayer | null;
+  myPlayer: Room['players'][string] | null;
 }
 
 export function useRoom(roomCode: string | null, playerId: string): UseRoomReturn {
@@ -21,39 +20,41 @@ export function useRoom(roomCode: string | null, playerId: string): UseRoomRetur
       return;
     }
 
-    const roomRef = ref(db, `rooms/${roomCode}`);
-    const playerRef = ref(db, `rooms/${roomCode}/players/${playerId}/connected`);
+    if (!socket.connected) socket.connect();
 
-    // Mark connected; mark disconnected on network drop
-    update(ref(db, `rooms/${roomCode}/players/${playerId}`), { connected: true });
-    onDisconnect(playerRef).set(false);
+    const handleUpdate = (updated: Room) => {
+      if (updated.code === roomCode) {
+        setRoom(updated);
+        setLoading(false);
+        setError(null);
+      }
+    };
 
-    const unsub = onValue(
-      roomRef,
-      (snap) => {
-        if (!snap.exists()) {
-          setError('room_not_found');
-          setRoom(null);
-        } else {
-          setRoom(snap.val() as Room);
-          setError(null);
-        }
+    const handleConnectError = () => {
+      setError('connection_error');
+      setLoading(false);
+    };
+
+    socket.on('roomUpdate', handleUpdate);
+    socket.on('connect_error', handleConnectError);
+
+    // Fetch current state (covers the case where we navigate into an existing room)
+    socket.emit('getRoom', { code: roomCode }, (res: { room?: Room; error?: string }) => {
+      if (res.error) {
+        setError(res.error);
         setLoading(false);
-      },
-      () => {
-        setError('connection_error');
+      } else if (res.room) {
+        setRoom(res.room);
         setLoading(false);
-      },
-    );
+      }
+    });
 
     return () => {
-      unsub();
-      // Mark as disconnected on component unmount (clean navigation)
-      update(ref(db, `rooms/${roomCode}/players/${playerId}`), { connected: false });
+      socket.off('roomUpdate', handleUpdate);
+      socket.off('connect_error', handleConnectError);
     };
   }, [roomCode, playerId]);
 
   const myPlayer = room?.players?.[playerId] ?? null;
-
   return { room, loading, error, myPlayer };
 }

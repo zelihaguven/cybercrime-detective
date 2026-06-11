@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useRoom } from '../../hooks/useRoom';
 import { setSelectedCase, startGame } from '../../utils/roomActions';
@@ -29,19 +29,24 @@ export default function RoomLobby({ roomCode, playerId, onGameStarted, onLeave }
     });
   };
 
-  const handleCaseChange = async (caseId: 7 | 8) => {
+  useEffect(() => {
+    if (room?.phase === 'clue-review' && room?.status === 'active') {
+      onGameStarted();
+    }
+  }, [room?.phase, room?.status]);
+
+  const handleCaseChange = (caseId: 7 | 8) => {
     if (!isHost) return;
-    await setSelectedCase(roomCode, caseId);
+    setSelectedCase(roomCode, caseId);
   };
 
-  const handleStart = async () => {
+  const handleStart = () => {
     if (!isHost || playerCount < 2 || starting) return;
     setStarting(true);
     const level = LEVELS.find((l) => l.id === (room?.selectedCase ?? 7));
     if (!level) { setStarting(false); return; }
     const allClues = [...level.clues, ...level.bonusClues];
-    await startGame(roomCode, players.map(([id]) => id), allClues);
-    onGameStarted();
+    startGame(roomCode, players.map(([id]) => id), allClues);
   };
 
   if (loading) {

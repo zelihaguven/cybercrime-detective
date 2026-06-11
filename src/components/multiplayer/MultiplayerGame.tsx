@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useRoom } from '../../hooks/useRoom';
 import { setPlayerReady, advanceToAccusation, submitAccusation } from '../../utils/roomActions';
@@ -32,24 +32,27 @@ export default function MultiplayerGame({ roomCode, playerId, onResult, onLeave 
   const allReady = players.every(([, p]) => p.ready);
   const readyCount = players.filter(([, p]) => p.ready).length;
 
-  const handleReady = async () => {
+  useEffect(() => {
+    if (room?.phase === 'result') onResult();
+  }, [room?.phase]);
+
+  const handleReady = () => {
     if (markingReady || myPlayer?.ready) return;
     setMarkingReady(true);
-    await setPlayerReady(roomCode, playerId, true);
+    setPlayerReady(roomCode, playerId);
     setMarkingReady(false);
   };
 
-  const handleAdvanceToAccusation = async () => {
+  const handleAdvanceToAccusation = () => {
     if (!isHost || !allReady) return;
-    await advanceToAccusation(roomCode);
+    advanceToAccusation(roomCode);
   };
 
-  const handleSubmitAccusation = async () => {
+  const handleSubmitAccusation = () => {
     if (!isHost || !selectedAccusation || submitting || !level) return;
     setSubmitting(true);
     const correct = selectedAccusation === level.correctAnswer;
-    await submitAccusation(roomCode, selectedAccusation, correct);
-    onResult();
+    submitAccusation(roomCode, selectedAccusation, correct);
   };
 
   if (loading || !room || !level) {

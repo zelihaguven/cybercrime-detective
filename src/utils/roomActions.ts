@@ -1,61 +1,5 @@
-import { db } from '../firebase';
-import { ref, set, update, get } from 'firebase/database';
-import type { Room } from '../types/room';
+import { socket } from '../socket';
 import type { Clue } from '../types/game';
-
-const TWO_HOURS = 2 * 60 * 60 * 1000;
-
-export async function createRoom(code: string, hostId: string, hostName: string): Promise<void> {
-  const now = Date.now();
-  const room: Room = {
-    hostId,
-    status: 'waiting',
-    selectedCase: 7,
-    phase: 'lobby',
-    createdAt: now,
-    expiresAt: now + TWO_HOURS,
-    accusationResult: null,
-    players: {
-      [hostId]: {
-        name: hostName,
-        isHost: true,
-        clueIndices: [],
-        ready: false,
-        connected: true,
-        joinedAt: now,
-      },
-    },
-  };
-  await set(ref(db, `rooms/${code}`), room);
-}
-
-export async function joinRoom(
-  code: string,
-  playerId: string,
-  name: string,
-): Promise<{ error?: string }> {
-  const snap = await get(ref(db, `rooms/${code}`));
-  if (!snap.exists()) return { error: 'room_not_found' };
-  const room = snap.val() as Room;
-  if (Date.now() > room.expiresAt) return { error: 'room_expired' };
-  if (room.status !== 'waiting') return { error: 'room_started' };
-  const playerCount = Object.keys(room.players ?? {}).length;
-  if (playerCount >= 4) return { error: 'room_full' };
-
-  await update(ref(db, `rooms/${code}/players/${playerId}`), {
-    name,
-    isHost: false,
-    clueIndices: [],
-    ready: false,
-    connected: true,
-    joinedAt: Date.now(),
-  });
-  return {};
-}
-
-export async function setSelectedCase(code: string, caseId: 7 | 8): Promise<void> {
-  await update(ref(db, `rooms/${code}`), { selectedCase: caseId });
-}
 
 function shuffleIndices(n: number): number[] {
   const arr = Array.from({ length: n }, (_, i) => i);
@@ -66,61 +10,67 @@ function shuffleIndices(n: number): number[] {
   return arr;
 }
 
-export async function startGame(
-  code: string,
-  playerIds: string[],
-  allClues: Clue[],
-): Promise<void> {
-  const indices = shuffleIndices(allClues.length);
-  const distribution: Record<string, number[]> = {};
-  playerIds.forEach((id, i) => {
-    distribution[id] = indices.filter((_, idx) => idx % playerIds.length === i);
-  });
-
-  const updates: Record<string, unknown> = { 'status': 'active', 'phase': 'clue-review' };
-  playerIds.forEach((id) => {
-    updates[`players/${id}/clueIndices`] = distribution[id];
-    updates[`players/${id}/ready`] = false;
-  });
-  await update(ref(db, `rooms/${code}`), updates);
+function connect() {
+  if (!socket.connected) socket.connect();
 }
 
-export async function setPlayerReady(
+export function createRoom(
+  playerId: string,
+  playerName: string,
+): Promise<{ code: string }> {
+  return new Promise((resolve, reject) => {
+    connect();
+    socket.emit(
+      'createRoom',
+      { playerId, playerName },
+      (res: { code?: string; error?: string }) => {
+        if (res.error || !res.code) reject(new Error(res.error ?? 'unknown'));
+        else resolve({ code: res.code });
+      },
+    );
+  });
+}
+
+export function joinRoom(
   code: string,
   playerId: string,
-  ready: boolean,
-): Promise<void> {
-  await update(ref(db, `rooms/${code}/players/${playerId}`), { ready });
-}
-
-export async function advanceToAccusation(code: string): Promise<void> {
-  await update(ref(db, `rooms/${code}`), { phase: 'accusation' });
-}
-
-export async function submitAccusation(
-  code: string,
-  choice: string,
-  correct: boolean,
-): Promise<void> {
-  await update(ref(db, `rooms/${code}`), {
-    phase: 'result',
-    status: 'complete',
-    accusationResult: { choice, correct },
+  playerName: string,
+): Promise<{ error?: string }> {
+  return new Promise((resolve) => {
+    connect();
+    socket.emit(
+      'joinRoom',
+      { code, playerId, playerName },
+      (res: { error?: string }) => resolve(res),
+    );
   });
 }
 
-export async function resetRoom(code: string): Promise<void> {
-  const snap = await get(ref(db, `rooms/${code}/players`));
-  if (!snap.exists()) return;
-  const players = snap.val() as Room['players'];
-  const updates: Record<string, unknown> = {
-    status: 'waiting',
-    phase: 'lobby',
-    accusationResult: null,
-  };
-  Object.keys(players).forEach((id) => {
-    updates[`players/${id}/clueIndices`] = [];
-    updates[`players/${id}/ready`] = false;
+export function setSelectedCase(code: string, caseId: 7 | 8): void {
+  socket.emit('selectCase', { code, caseId });
+}
+
+export function startGame(code: string, playerIds: string[], allClues: Clue[]): void {
+  const indices = shuffleIndices(allClues.length);
+  const clueDistribution: Record<string, number[]> = {};
+  playerIds.forEach((id, i) => {
+    clueDistribution[id] = indices.filter((_, idx) => idx % playerIds.length === i);
   });
-  await update(ref(db, `rooms/${code}`), updates);
+  socket.emit('startGame', { code, clueDistribution });
+}
+
+export function setPlayerReady(code: string, playerId: string): void {
+  socket.emit('setReady', { code, playerId });
+}
+
+export function advanceToAccusation(code: string): void {
+  socket.emit('advanceToAccusation', { code });
+}
+
+export function submitAccusation(code: string, choice: string, correct: boolean): void {
+  socket.emit('submitAccusation', { code, choice, correct });
+}
+
+export function resetRoom(code: string): void {
+  socket.emit('resetRoom', { code });
 }
