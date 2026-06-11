@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { HandbookTerm } from '../types/game';
+import { useIsMobile } from '../utils/responsive';
 
 interface Props {
   terms: HandbookTerm[];
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export default function Handbook({ terms, onClose }: Props) {
+  const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
   const [selectedTerm, setSelectedTerm] = useState(0);
   const [pageFlipping, setPageFlipping] = useState(false);
@@ -28,6 +30,63 @@ export default function Handbook({ terms, onClose }: Props) {
   };
 
   const term = terms[selectedTerm];
+
+  if (isMobile) {
+    return (
+      <div className="absolute inset-0 z-50 flex flex-col" style={{ background: '#F5EDDA' }} onClick={handleClose}>
+        <div onClick={(e) => e.stopPropagation()} className="flex flex-col h-full">
+          {/* Term tabs - horizontal scroll */}
+          <div className="flex-shrink-0 overflow-x-auto" style={{ background: '#EDE4CC', borderBottom: '1px solid #C8B89A' }}>
+            <div className="flex gap-1 px-3 py-2" style={{ minWidth: 'max-content' }}>
+              {terms.map((t, i) => (
+                <button
+                  key={t.term}
+                  onClick={() => selectTerm(i)}
+                  className="font-detective px-3 py-1.5 whitespace-nowrap transition-all duration-200"
+                  style={{
+                    background: i === selectedTerm ? 'rgba(139,105,20,0.15)' : 'transparent',
+                    borderBottom: i === selectedTerm ? '2px solid #8B6914' : '2px solid transparent',
+                    color: i === selectedTerm ? '#5A3E08' : '#7A6040',
+                    fontSize: '0.7rem',
+                    letterSpacing: '0.05em',
+                  }}
+                >
+                  {t.term}
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* Content */}
+          <div
+            className="flex-1 overflow-y-auto px-5 py-5"
+            style={{
+              background: 'linear-gradient(to bottom, #F5EDDA, #EDE4CC)',
+              opacity: pageFlipping ? 0 : 1,
+              transition: 'opacity 0.2s ease',
+            }}
+          >
+            <div className="font-detective text-xs tracking-widest uppercase mb-2" style={{ color: '#8B6914', opacity: 0.6 }}>Cybersecurity Term</div>
+            <h2 className="font-detective mb-3" style={{ color: '#2A1A04', fontSize: '1.5rem', borderBottom: '2px solid rgba(139,105,20,0.3)', paddingBottom: '8px' }}>{term.term}</h2>
+            <p className="font-serif text-base leading-relaxed mb-5" style={{ color: '#3A2510', fontStyle: 'italic' }}>{term.oneLiner}</p>
+            <div className="mb-4">
+              <div className="font-detective text-xs tracking-widest uppercase mb-2" style={{ color: '#8B6914', opacity: 0.5, fontSize: '0.6rem' }}>Analogy</div>
+              <div className="font-sans text-sm leading-relaxed pl-3" style={{ color: '#4A3418', borderLeft: '2px solid rgba(139,105,20,0.3)', lineHeight: 1.7 }}>{term.analogy}</div>
+            </div>
+            <div>
+              <div className="font-detective text-xs tracking-widest uppercase mb-2" style={{ color: '#8B6914', opacity: 0.5, fontSize: '0.6rem' }}>In This Case</div>
+              <div className="font-sans text-sm leading-relaxed" style={{ color: '#3A2510', lineHeight: 1.7 }}>{term.inThisCase}</div>
+            </div>
+          </div>
+          {/* Close */}
+          <div className="flex-shrink-0 py-3 px-4 flex justify-center" style={{ background: '#EDE4CC', borderTop: '1px solid #C8B89A' }}>
+            <button onClick={handleClose} className="font-detective text-xs tracking-widest uppercase px-6 py-2" style={{ border: '1px solid rgba(245,166,35,0.4)', color: 'var(--accent)', background: 'transparent', letterSpacing: '0.2em' }}>
+              Close Handbook
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

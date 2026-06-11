@@ -1,11 +1,44 @@
 export type GameScreen =
   | 'title'
-  | 'case-select'
+  | 'detective-creation'
+  | 'intro-sequence'
+  | 'detective-office'
+  | 'case-briefing'
   | 'scene'
-  | 'evidence-board'
-  | 'handbook'
   | 'accusation'
-  | 'outcome';
+  | 'case-conclusion'
+  | 'all-cases-complete'
+  | 'case-select'; // legacy, unused
+
+export type DetectiveRank =
+  | 'Junior Investigator'
+  | 'Cyber Detective'
+  | 'Senior Investigator'
+  | 'Cybercrime Specialist'
+  | 'Chief Investigator';
+
+export interface CharacterAppearance {
+  skinTone: number;    // 0-4
+  hairStyle: number;   // 0-3
+  hairColor: number;   // 0-5
+  outfitColor: number; // 0-4
+}
+
+export interface Detective {
+  name: string;
+  avatar: number;      // = outfitColor (0-4), kept for accent color compat
+  badge: number;       // 0-2
+  specialty: number;   // 0-3
+  appearance: CharacterAppearance;
+  xp: number;
+  rank: DetectiveRank;
+  completedCases: number[];
+}
+
+export interface DialogueLine {
+  characterId: 'detective' | 'weber' | 'mia' | 'jonas' | 'narrator';
+  text: string;
+}
 
 export interface Clue {
   id: string;
@@ -14,13 +47,14 @@ export interface Clue {
   detail: string;
   type: 'photo' | 'note' | 'screenshot' | 'witness';
   icon: string;
-  x: number; // % from left in scene
-  y: number; // % from top in scene
-  hitW?: number; // hit box width %
-  hitH?: number; // hit box height %
+  x: number;
+  y: number;
+  hitW?: number;
+  hitH?: number;
   discovered: boolean;
-  boardX?: number; // position on evidence board
+  boardX?: number;
   boardY?: number;
+  detectiveComment?: string;
 }
 
 export interface HandbookTerm {
@@ -34,7 +68,17 @@ export interface Level {
   id: number;
   title: string;
   subtitle: string;
-  victim: { name: string; age: number; description: string };
+  caseType: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  victim: {
+    name: string;
+    age: number;
+    description: string;
+    background: string;
+    emoji: string;
+  };
+  location: string;
+  investigationLabel: string; // shown before investigation — does NOT reveal attack vector
   briefing: string;
   clues: Clue[];
   bonusClues: Clue[];
@@ -43,14 +87,18 @@ export interface Level {
   handbookTerms: HandbookTerm[];
   successOutcome: string;
   failureOutcome: string;
+  openingDialogue: DialogueLine[];
+  conclusionDialogue: DialogueLine[];
+  detectiveMemo: string;
+  xpReward: number;
 }
 
 export interface GameState {
   screen: GameScreen;
+  detective: Detective | null;
+  hasSeenIntro: boolean;
   currentLevel: number;
   discoveredClues: string[];
-  selectedClue: Clue | null;
-  accusationMade: boolean;
   accusationCorrect: boolean | null;
-  handbookUnlocked: string[];
+  pendingXP: number;
 }

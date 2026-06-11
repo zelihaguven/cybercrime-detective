@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import type { Clue } from '../types/game';
+import { useIsMobile } from '../utils/responsive';
 
 interface Props {
   clues: Clue[];
@@ -31,6 +32,7 @@ const CARD_W = 140;
 const CARD_H = 100;
 
 export default function EvidenceBoard({ clues, discoveredIds, onClose }: Props) {
+  const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -50,6 +52,51 @@ export default function EvidenceBoard({ clues, discoveredIds, onClose }: Props) 
     if (!pos) return { x: 0, y: 0 };
     return { x: pos.x + CARD_W / 2, y: pos.y + CARD_H / 2 };
   };
+
+  if (isMobile) {
+    return (
+      <div className="absolute inset-0 z-50 flex flex-col" style={{ background: 'rgba(4,3,2,0.97)' }}>
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 flex-shrink-0" style={{ borderBottom: '1px solid rgba(245,166,35,0.15)' }}>
+          <span className="font-detective text-xs tracking-widest uppercase" style={{ color: 'var(--accent)' }}>
+            Evidence Board
+          </span>
+          <div className="flex items-center gap-4">
+            <span className="font-detective text-xs" style={{ color: 'var(--text-muted)', opacity: 0.5 }}>
+              {discovered.length}/{clues.length}
+            </span>
+            <button onClick={handleClose} className="font-detective text-xs tracking-widest uppercase px-3 py-1" style={{ border: '1px solid rgba(245,166,35,0.3)', color: 'var(--accent)' }}>
+              Close ✕
+            </button>
+          </div>
+        </div>
+        {/* List */}
+        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+          {discovered.length === 0 && (
+            <div className="text-center py-12">
+              <div className="text-2xl mb-2">📌</div>
+              <div className="font-detective text-sm" style={{ color: 'rgba(245,166,35,0.3)' }}>No evidence yet</div>
+            </div>
+          )}
+          {discovered.map((clue) => {
+            const typeColor = ({ photo: '#7ABF6A', note: '#F5A623', screenshot: '#4A90D9', witness: '#B98FD4' } as Record<string, string>)[clue.type] ?? '#F5A623';
+            return (
+              <div key={clue.id} style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${typeColor}25`, padding: '12px 14px' }}>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="text-base">{clue.icon}</span>
+                  <div className="font-detective" style={{ color: typeColor, opacity: 0.7, fontSize: '0.58rem', letterSpacing: '0.12em' }}>
+                    {clue.type.toUpperCase()}
+                  </div>
+                </div>
+                <div className="font-detective mb-1" style={{ color: 'var(--text-primary)', fontSize: '0.78rem' }}>{clue.label}</div>
+                <div className="font-serif italic" style={{ color: 'var(--text-muted)', fontSize: '0.68rem', lineHeight: 1.55 }}>{clue.shortDesc}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

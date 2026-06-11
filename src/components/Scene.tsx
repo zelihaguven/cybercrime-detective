@@ -1,30 +1,44 @@
 import { useState, useEffect } from 'react';
-import type { Clue, Level } from '../types/game';
+import type { Clue, Level, Detective } from '../types/game';
+import { getDetectiveAvatarEmoji } from '../utils/detective';
+import { AVATAR_COLORS } from '../data/characters';
+import { useIsMobile } from '../utils/responsive';
 import KitchenScene from './KitchenScene';
 import GamingRoomScene from './GamingRoomScene';
+import PriyaHomeOfficeScene from './PriyaHomeOfficeScene';
+import CafeOfficeScene from './CafeOfficeScene';
+import SchoolITRoomScene from './SchoolITRoomScene';
+import TechCorpOfficeScene from './TechCorpOfficeScene';
 
 interface Props {
   level: Level;
   discoveredClues: string[];
+  detective?: Detective | null;
   onClueDiscovered: (clue: Clue) => void;
   onOpenBoard: () => void;
   onOpenHandbook: () => void;
   onAccuse: () => void;
+  onExit?: () => void;
 }
 
-export default function Scene({ level, discoveredClues, onClueDiscovered, onOpenBoard, onOpenHandbook, onAccuse }: Props) {
+export default function Scene({ level, discoveredClues, detective, onClueDiscovered, onOpenBoard, onOpenHandbook, onAccuse, onExit }: Props) {
+  const isMobile = useIsMobile();
   const [activeClue, setActiveClue] = useState<Clue | null>(null);
   const [zoomed, setZoomed] = useState(false);
   const [showHint, setShowHint] = useState(true);
   const [newPin, setNewPin] = useState<string | null>(null);
+  const [detectiveComment, setDetectiveComment] = useState<string | null>(null);
+  const [showMemo, setShowMemo] = useState(true);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   const allClues = [...level.clues, ...level.bonusClues];
   const found = discoveredClues.length;
   const required = level.clues.length;
 
   useEffect(() => {
-    const t = setTimeout(() => setShowHint(false), 3500);
-    return () => clearTimeout(t);
+    const t1 = setTimeout(() => setShowHint(false), 3500);
+    const t2 = setTimeout(() => setShowMemo(false), 5000);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
   const handleClueClick = (clue: Clue) => {
@@ -33,7 +47,11 @@ export default function Scene({ level, discoveredClues, onClueDiscovered, onOpen
     if (!discoveredClues.includes(clue.id)) {
       onClueDiscovered(clue);
       setNewPin(clue.id);
-      setTimeout(() => setNewPin(null), 2000);
+      setTimeout(() => setNewPin(null), 2500);
+      if (clue.detectiveComment) {
+        setDetectiveComment(clue.detectiveComment);
+        setTimeout(() => setDetectiveComment(null), 5000);
+      }
     }
   };
 
@@ -42,9 +60,11 @@ export default function Scene({ level, discoveredClues, onClueDiscovered, onOpen
     setZoomed(false);
   };
 
+  const avatarEmoji = detective ? getDetectiveAvatarEmoji(detective.avatar) : '🕵️';
+  const avatarColor = detective ? (AVATAR_COLORS[detective.avatar] ?? '#F5A623') : '#F5A623';
+
   return (
     <div className="relative w-full h-full overflow-hidden" style={{ background: '#0A0806' }}>
-
       {/* Scene background */}
       <div
         className="absolute inset-0 transition-all duration-700"
@@ -56,105 +76,170 @@ export default function Scene({ level, discoveredClues, onClueDiscovered, onOpen
       >
         {level.id === 1 && <KitchenScene />}
         {level.id === 2 && <GamingRoomScene />}
+        {level.id === 3 && <PriyaHomeOfficeScene />}
+        {level.id === 4 && <CafeOfficeScene />}
+        {level.id === 5 && <SchoolITRoomScene />}
+        {level.id === 6 && <TechCorpOfficeScene />}
 
-        {/* Atmospheric particles */}
         <AtmosphericParticles />
-
-        {/* Vignette */}
         <div className="vignette" />
         <div className="scanlines" />
         <div className="noise-overlay" />
 
-        {/* Morning light overlay */}
         <div
           className="absolute inset-0 pointer-events-none"
-          style={{
-            background: 'radial-gradient(ellipse at 22% 45%, rgba(255,230,160,0.06) 0%, transparent 55%)',
-          }}
+          style={{ background: 'radial-gradient(ellipse at 22% 45%, rgba(255,230,160,0.06) 0%, transparent 55%)' }}
         />
 
-        {/* Interactive hotspots */}
         {allClues.map((clue) => (
           <Hotspot
             key={clue.id}
             clue={clue}
             discovered={discoveredClues.includes(clue.id)}
             onClick={handleClueClick}
+            isMobile={isMobile}
           />
         ))}
       </div>
 
-      {/* HUD overlay (stays sharp) */}
+      {/* HUD */}
       <HUD
         level={level}
         found={found}
         required={required}
+        detective={detective}
         onOpenBoard={onOpenBoard}
         onOpenHandbook={onOpenHandbook}
         onAccuse={onAccuse}
+        onExitRequest={onExit ? () => setShowExitConfirm(true) : undefined}
         showHint={showHint}
         newPin={newPin}
+        isMobile={isMobile}
       />
 
-      {/* Clue inspection card */}
+      {/* Exit confirmation */}
+      {showExitConfirm && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(4,3,2,0.88)' }}>
+          <div style={{ background: '#14100A', border: '1px solid rgba(245,166,35,0.3)', padding: '28px 28px 24px', maxWidth: 360, width: '90%', boxShadow: '0 20px 60px rgba(0,0,0,0.8)' }}>
+            <div className="font-detective text-xs tracking-widest uppercase mb-3" style={{ color: 'rgba(245,166,35,0.5)', fontSize: '0.58rem' }}>
+              LEAVE INVESTIGATION?
+            </div>
+            <p className="font-serif italic text-sm mb-6" style={{ color: 'rgba(255,255,255,0.55)', lineHeight: 1.8 }}>
+              Clues found this session are not saved. You can reopen this case from the office at any time.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowExitConfirm(false)}
+                className="flex-1 font-detective text-xs tracking-widest uppercase py-2.5 transition-all duration-200"
+                style={{ border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.4)', background: 'transparent', letterSpacing: '0.15em' }}
+              >
+                Keep Going
+              </button>
+              <button
+                onClick={onExit}
+                className="flex-1 font-detective text-xs tracking-widest uppercase py-2.5 transition-all duration-200"
+                style={{ border: '1px solid rgba(224,90,71,0.5)', color: 'var(--danger)', background: 'rgba(224,90,71,0.06)', letterSpacing: '0.15em' }}
+              >
+                Return to Office
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Detective memo (first impression on entering scene) */}
+      {!isMobile && showMemo && level.detectiveMemo && (
+        <div
+          className="absolute pointer-events-none z-30 fade-in"
+          style={{
+            bottom: 80,
+            left: 24,
+            right: 24,
+            maxWidth: 480,
+            background: `${avatarColor}0A`,
+            border: `1px solid ${avatarColor}25`,
+            padding: '12px 16px',
+            opacity: showMemo ? 1 : 0,
+            transition: 'opacity 1.2s ease',
+          }}
+        >
+          <div className="flex items-start gap-2.5">
+            <span className="text-lg flex-shrink-0">{avatarEmoji}</span>
+            <div>
+              <div className="font-detective" style={{ color: avatarColor, fontSize: '0.55rem', letterSpacing: '0.2em', opacity: 0.65, marginBottom: 3 }}>
+                {detective ? `DET. ${detective.name.toUpperCase()} · INITIAL OBSERVATION` : 'DETECTIVE · INITIAL OBSERVATION'}
+              </div>
+              <p className="font-serif italic text-xs" style={{ color: 'rgba(255,255,255,0.55)', lineHeight: 1.75, fontSize: '0.75rem' }}>
+                "{level.detectiveMemo}"
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Detective commentary (appears when clue discovered) */}
+      {!isMobile && detectiveComment && !activeClue && (
+        <div
+          className="absolute z-40 fade-in pointer-events-none"
+          style={{
+            bottom: 80,
+            left: 24,
+            maxWidth: 400,
+            background: `${avatarColor}0C`,
+            border: `1px solid ${avatarColor}28`,
+            padding: '10px 14px',
+          }}
+        >
+          <div className="flex items-start gap-2">
+            <span className="text-base flex-shrink-0">{avatarEmoji}</span>
+            <p className="font-serif italic text-xs" style={{ color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, fontSize: '0.74rem' }}>
+              "{detectiveComment}"
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Clue card */}
       {activeClue && (
-        <ClueCard clue={activeClue} onClose={handleClose} isNew={newPin === activeClue.id} />
+        <ClueCard
+          clue={activeClue}
+          onClose={handleClose}
+          isNew={newPin === activeClue.id}
+          detective={detective}
+          isMobile={isMobile}
+        />
       )}
     </div>
   );
 }
 
-function Hotspot({ clue, discovered, onClick }: { clue: Clue; discovered: boolean; onClick: (c: Clue) => void }) {
+function Hotspot({ clue, discovered, onClick, isMobile }: { clue: Clue; discovered: boolean; onClick: (c: Clue) => void; isMobile: boolean }) {
   const [hovered, setHovered] = useState(false);
-
-  const w = clue.hitW ?? 6;
-  const h = clue.hitH ?? 8;
+  const w = isMobile ? Math.max((clue.hitW ?? 6) * 1.8, 14) : (clue.hitW ?? 6);
+  const h = isMobile ? Math.max((clue.hitH ?? 8) * 1.8, 14) : (clue.hitH ?? 8);
 
   return (
     <button
       className="absolute hotspot group"
-      style={{
-        left: `${clue.x - w / 2}%`,
-        top: `${clue.y - h / 2}%`,
-        width: `${w}%`,
-        height: `${h}%`,
-        background: 'transparent',
-        border: 'none',
-        cursor: 'pointer',
-      }}
+      style={{ left: `${clue.x - w / 2}%`, top: `${clue.y - h / 2}%`, width: `${w}%`, height: `${h}%`, background: 'transparent', border: 'none', cursor: 'pointer' }}
       onClick={() => onClick(clue)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Center dot — only visible on hover or when discovered */}
       <div
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-300 pointer-events-none"
         style={{
-          width: hovered ? 14 : 6,
-          height: hovered ? 14 : 6,
-          opacity: hovered ? 1 : (discovered ? 0.45 : 0),
-          background: discovered
-            ? `rgba(122,191,106,0.9)`
-            : `rgba(245,166,35,1)`,
-          boxShadow: hovered
-            ? discovered
-              ? '0 0 16px rgba(122,191,106,0.8)'
-              : '0 0 16px rgba(245,166,35,0.8)'
-            : 'none',
+          width: hovered ? 14 : (isMobile ? 10 : 6),
+          height: hovered ? 14 : (isMobile ? 10 : 6),
+          opacity: hovered ? 1 : (discovered ? 0.6 : (isMobile ? 0.4 : 0)),
+          background: discovered ? `rgba(122,191,106,0.9)` : `rgba(245,166,35,1)`,
+          boxShadow: hovered ? discovered ? '0 0 16px rgba(122,191,106,0.8)' : '0 0 16px rgba(245,166,35,0.8)' : (isMobile ? (discovered ? '0 0 8px rgba(122,191,106,0.5)' : '0 0 8px rgba(245,166,35,0.5)') : 'none'),
         }}
       />
-
-      {/* Tooltip label on hover */}
-      {hovered && (
+      {hovered && !isMobile && (
         <div
           className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 font-detective text-xs whitespace-nowrap px-3 py-1 rounded pointer-events-none z-30 fade-in"
-          style={{
-            background: 'rgba(10,8,6,0.92)',
-            border: '1px solid rgba(245,166,35,0.4)',
-            color: 'var(--accent)',
-            letterSpacing: '0.1em',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.6)',
-          }}
+          style={{ background: 'rgba(10,8,6,0.92)', border: '1px solid rgba(245,166,35,0.4)', color: 'var(--accent)', letterSpacing: '0.1em', boxShadow: '0 4px 20px rgba(0,0,0,0.6)' }}
         >
           {discovered && <span style={{ color: 'var(--success)' }}>✓ </span>}
           {clue.label}
@@ -165,118 +250,110 @@ function Hotspot({ clue, discovered, onClick }: { clue: Clue; discovered: boolea
 }
 
 function HUD({
-  level, found, required, onOpenBoard, onOpenHandbook, onAccuse, showHint, newPin,
+  level, found, required, detective, onOpenBoard, onOpenHandbook, onAccuse, onExitRequest, showHint, newPin, isMobile,
 }: {
-  level: Level;
-  found: number;
-  required: number;
-  onOpenBoard: () => void;
-  onOpenHandbook: () => void;
-  onAccuse: () => void;
-  showHint: boolean;
-  newPin: string | null;
+  level: Level; found: number; required: number; detective?: Detective | null;
+  onOpenBoard: () => void; onOpenHandbook: () => void; onAccuse: () => void;
+  onExitRequest?: () => void;
+  showHint: boolean; newPin: string | null; isMobile: boolean;
 }) {
   const canAccuse = found >= required;
 
   return (
     <>
-      {/* Top bar - case info */}
+      {/* Top bar */}
       <div
-        className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-6 py-4"
+        className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between"
         style={{
           background: 'linear-gradient(to bottom, rgba(10,8,6,0.9) 0%, transparent 100%)',
+          padding: isMobile ? '8px 12px' : '16px 24px',
         }}
       >
-        {/* Case label */}
-        <div>
-          <div className="font-detective text-xs tracking-[0.25em] uppercase" style={{ color: 'var(--accent)', opacity: 0.7 }}>
-            Case {String(level.id).padStart(2, '0')} — {level.title}
-          </div>
-          <div className="font-serif italic text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
-            Victim: {level.victim.name}, {level.victim.age} — {level.victim.description}
+        <div className="flex items-start gap-3">
+          {onExitRequest && (
+            <button
+              onClick={onExitRequest}
+              className="font-detective text-xs tracking-widest uppercase flex-shrink-0 transition-all duration-200"
+              style={{
+                color: 'rgba(255,255,255,0.3)',
+                letterSpacing: '0.18em',
+                fontSize: isMobile ? '0.55rem' : '0.6rem',
+                marginTop: isMobile ? 1 : 3,
+                padding: '2px 0',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = 'rgba(224,90,71,0.8)')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')}
+            >
+              ← {isMobile ? '' : 'OFFICE'}
+            </button>
+          )}
+          <div>
+            {!isMobile && detective && (
+              <div className="font-detective text-xs mb-0.5" style={{ color: 'rgba(245,166,35,0.45)', letterSpacing: '0.2em', fontSize: '0.58rem' }}>
+                Det. {detective.name} · {level.investigationLabel}
+              </div>
+            )}
+            <div className="font-detective text-xs tracking-[0.25em] uppercase" style={{ color: 'var(--accent)', opacity: detective ? 0.85 : 0.7, fontSize: isMobile ? '0.6rem' : undefined }}>
+              Case {String(level.id).padStart(2, '0')} — {level.title}
+            </div>
+            {!isMobile && (
+              <div className="font-serif italic text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                Victim: {level.victim.name}, {level.victim.age}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Clue counter */}
-        <div className="flex items-center gap-2">
-          {Array.from({ length: required }).map((_, i) => (
-            <div
-              key={i}
-              className="transition-all duration-500"
-              style={{
-                width: 10,
-                height: 10,
-                borderRadius: '50%',
-                background: i < found ? 'var(--accent)' : 'rgba(245,166,35,0.2)',
-                boxShadow: i < found ? '0 0 8px rgba(245,166,35,0.6)' : 'none',
-              }}
-            />
-          ))}
-          <span className="font-detective text-xs ml-2 tracking-widest" style={{ color: 'var(--text-muted)' }}>
-            {found}/{required} CLUES
+        {/* Clue indicator */}
+        {isMobile ? (
+          <span className="font-detective text-xs" style={{ color: 'var(--accent)', opacity: 0.8, fontSize: '0.7rem' }}>
+            {found}/{required}
           </span>
-        </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            {Array.from({ length: required }).map((_, i) => (
+              <div key={i} className="transition-all duration-500" style={{ width: 10, height: 10, borderRadius: '50%', background: i < found ? 'var(--accent)' : 'rgba(245,166,35,0.2)', boxShadow: i < found ? '0 0 8px rgba(245,166,35,0.6)' : 'none' }} />
+            ))}
+            <span className="font-detective text-xs ml-2 tracking-widest" style={{ color: 'var(--text-muted)' }}>
+              {found}/{required} CLUES
+            </span>
+          </div>
+        )}
       </div>
 
-      {/* Bottom action bar */}
+      {/* Bottom bar */}
       <div
-        className="absolute bottom-0 left-0 right-0 z-30 flex items-center justify-between px-6 py-4"
+        className="absolute bottom-0 left-0 right-0 z-30 flex items-center justify-between"
         style={{
           background: 'linear-gradient(to top, rgba(10,8,6,0.95) 0%, transparent 100%)',
+          padding: isMobile ? '8px 12px' : '16px 24px',
         }}
       >
-        {/* Left: scene name */}
-        <div className="font-detective text-xs tracking-widest uppercase" style={{ color: 'var(--text-muted)', opacity: 0.5 }}>
-          {level.id === 1 ? 'Freiburg, Germany — Tuesday Morning' : level.id === 2 ? 'Berlin, Germany — Friday Evening' : ''}
-        </div>
-
-        {/* Right: action buttons */}
-        <div className="flex items-center gap-3">
-          <HudButton onClick={onOpenHandbook} label="Handbook" icon="📓" />
-          <HudButton onClick={onOpenBoard} label="Evidence Board" icon="📌" highlight={!!newPin} />
-          {canAccuse && (
-            <HudButton
-              onClick={onAccuse}
-              label="Make Accusation"
-              icon="⚖"
-              danger
-            />
-          )}
+        {!isMobile && (
+          <div className="font-detective text-xs tracking-widest uppercase" style={{ color: 'var(--text-muted)', opacity: 0.5 }}>
+            {level.location}
+          </div>
+        )}
+        <div className={`flex items-center gap-2 ${isMobile ? 'w-full justify-end' : ''}`}>
+          <HudButton onClick={onOpenHandbook} label="Handbook" icon="📓" isMobile={isMobile} />
+          <HudButton onClick={onOpenBoard} label="Evidence Board" icon="📌" highlight={!!newPin} isMobile={isMobile} />
+          {canAccuse && <HudButton onClick={onAccuse} label="Make Accusation" icon="⚖" danger isMobile={isMobile} />}
         </div>
       </div>
 
-      {/* Hint banner */}
+      {/* Hint */}
       {showHint && (
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 text-center pointer-events-none fade-in"
-          style={{ opacity: showHint ? 1 : 0, transition: 'opacity 1s ease' }}
-        >
-          <div
-            className="font-detective text-sm tracking-widest uppercase px-8 py-4"
-            style={{
-              color: 'var(--text-muted)',
-              background: 'rgba(10,8,6,0.7)',
-              border: '1px solid rgba(245,166,35,0.15)',
-              letterSpacing: '0.2em',
-            }}
-          >
-            Click glowing objects to investigate
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 text-center pointer-events-none fade-in">
+          <div className="font-detective text-sm tracking-widest uppercase px-8 py-4" style={{ color: 'var(--text-muted)', background: 'rgba(10,8,6,0.7)', border: '1px solid rgba(245,166,35,0.15)', letterSpacing: '0.2em', fontSize: isMobile ? '0.6rem' : undefined }}>
+            {isMobile ? 'Tap glowing objects' : 'Click glowing objects to investigate'}
           </div>
         </div>
       )}
 
-      {/* New clue pinned notification */}
+      {/* New clue notification */}
       {newPin && (
-        <div
-          className="absolute top-20 right-6 z-40 pin-drop"
-          style={{
-            background: 'rgba(10,8,6,0.95)',
-            border: '1px solid rgba(245,166,35,0.6)',
-            padding: '10px 18px',
-            boxShadow: '0 0 30px rgba(245,166,35,0.2)',
-          }}
-        >
-          <span className="font-detective text-xs tracking-widest uppercase" style={{ color: 'var(--accent)' }}>
+        <div className="absolute top-20 right-6 z-40 pin-drop" style={{ background: 'rgba(10,8,6,0.95)', border: '1px solid rgba(245,166,35,0.6)', padding: isMobile ? '6px 10px' : '10px 18px', boxShadow: '0 0 30px rgba(245,166,35,0.2)' }}>
+          <span className="font-detective text-xs tracking-widest uppercase" style={{ color: 'var(--accent)', fontSize: isMobile ? '0.55rem' : undefined }}>
             📌 Evidence Added to Board
           </span>
         </div>
@@ -285,108 +362,132 @@ function HUD({
   );
 }
 
-function HudButton({
-  onClick, label, icon, highlight = false, danger = false,
-}: {
-  onClick: () => void;
-  label: string;
-  icon: string;
-  highlight?: boolean;
-  danger?: boolean;
-}) {
+function HudButton({ onClick, label, icon, highlight = false, danger = false, isMobile = false }: { onClick: () => void; label: string; icon: string; highlight?: boolean; danger?: boolean; isMobile?: boolean }) {
   const [hovered, setHovered] = useState(false);
-
   return (
     <button
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className={`font-detective text-xs tracking-widest uppercase px-4 py-2 transition-all duration-300 flex items-center gap-2 ${highlight ? 'glow-pulse' : ''}`}
+      className={`font-detective text-xs tracking-widest uppercase transition-all duration-300 flex items-center gap-1 ${highlight ? 'glow-pulse' : ''}`}
       style={{
-        border: `1px solid ${danger
-          ? hovered ? 'rgba(224,90,71,0.9)' : 'rgba(224,90,71,0.5)'
-          : hovered ? 'rgba(245,166,35,0.8)' : 'rgba(245,166,35,0.3)'}`,
-        background: danger
-          ? hovered ? 'rgba(224,90,71,0.2)' : 'rgba(224,90,71,0.05)'
-          : hovered ? 'rgba(245,166,35,0.1)' : 'rgba(10,8,6,0.6)',
+        border: `1px solid ${danger ? hovered ? 'rgba(224,90,71,0.9)' : 'rgba(224,90,71,0.5)' : hovered ? 'rgba(245,166,35,0.8)' : 'rgba(245,166,35,0.3)'}`,
+        background: danger ? hovered ? 'rgba(224,90,71,0.2)' : 'rgba(224,90,71,0.05)' : hovered ? 'rgba(245,166,35,0.1)' : 'rgba(10,8,6,0.6)',
         color: danger ? 'var(--danger)' : 'var(--accent)',
         letterSpacing: '0.15em',
         fontSize: '0.65rem',
+        padding: isMobile ? '8px 10px' : '8px 16px',
       }}
     >
-      <span>{icon}</span>
-      {label}
+      <span style={{ fontSize: isMobile ? '1rem' : undefined }}>{icon}</span>
+      {!isMobile && label}
     </button>
   );
 }
 
-function ClueCard({ clue, onClose, isNew }: { clue: Clue; onClose: () => void; isNew: boolean }) {
+function ClueCard({ clue, onClose, isNew, detective, isMobile }: { clue: Clue; onClose: () => void; isNew: boolean; detective?: Detective | null; isMobile: boolean }) {
   const [visible, setVisible] = useState(false);
   useEffect(() => { setTimeout(() => setVisible(true), 50); }, []);
 
-  const typeColor = {
-    photo: '#7ABF6A',
-    note: '#F5A623',
-    screenshot: '#4A90D9',
-    witness: '#B98FD4',
-  }[clue.type];
+  const typeColor = { photo: '#7ABF6A', note: '#F5A623', screenshot: '#4A90D9', witness: '#B98FD4' }[clue.type];
+  const typeLabel = { photo: 'Photograph', note: 'Field Note', screenshot: 'Digital Screenshot', witness: 'Witness Statement' }[clue.type];
+  const avatarEmoji = detective ? getDetectiveAvatarEmoji(detective.avatar) : null;
+  const avatarColor = detective ? (AVATAR_COLORS[detective.avatar] ?? '#F5A623') : '#F5A623';
 
-  const typeLabel = {
-    photo: 'Photograph',
-    note: 'Field Note',
-    screenshot: 'Digital Screenshot',
-    witness: 'Witness Statement',
-  }[clue.type];
-
-  return (
-    <div
-      className="absolute inset-0 z-50 flex items-center justify-center"
-      onClick={onClose}
-    >
-      {/* Backdrop */}
+  if (isMobile) {
+    return (
       <div
-        className="absolute inset-0 transition-opacity duration-500"
-        style={{ background: 'rgba(5,4,3,0.6)', opacity: visible ? 1 : 0 }}
-      />
-
-      {/* Card */}
-      <div
-        className="relative max-w-lg w-full mx-6 transition-all duration-500"
+        className="absolute inset-0 z-50"
         style={{
-          opacity: visible ? 1 : 0,
-          transform: visible ? 'translateY(0) scale(1)' : 'translateY(30px) scale(0.96)',
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          top: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
         }}
-        onClick={(e) => e.stopPropagation()}
+        onClick={onClose}
       >
-        {/* Card body */}
+        <div className="absolute inset-0 transition-opacity duration-500" style={{ background: 'rgba(5,4,3,0.65)', opacity: visible ? 1 : 0 }} />
         <div
           style={{
+            position: 'relative',
+            maxHeight: '80vh',
+            overflowY: 'auto',
             background: 'linear-gradient(135deg, #14100A 0%, #0E0C08 100%)',
             border: `1px solid ${typeColor}40`,
-            boxShadow: `0 20px 60px rgba(0,0,0,0.8), 0 0 40px ${typeColor}15`,
+            borderRadius: '12px 12px 0 0',
+            boxShadow: `0 -10px 40px rgba(0,0,0,0.8), 0 0 40px ${typeColor}15`,
+            opacity: visible ? 1 : 0,
+            transform: visible ? 'translateY(0)' : 'translateY(40px)',
+            transition: 'opacity 0.3s ease, transform 0.3s ease',
           }}
+          onClick={(e) => e.stopPropagation()}
         >
-          {/* Card header */}
-          <div
-            className="px-6 py-4 flex items-center justify-between"
-            style={{ borderBottom: `1px solid ${typeColor}25`, background: `${typeColor}08` }}
-          >
+          {/* Header */}
+          <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: `1px solid ${typeColor}25`, background: `${typeColor}08` }}>
             <div>
-              <div className="font-detective text-xs tracking-widest uppercase mb-1" style={{ color: typeColor, opacity: 0.7 }}>
-                {typeLabel}
-              </div>
-              <h3 className="font-detective text-lg" style={{ color: 'var(--text-primary)' }}>
-                {clue.label}
-              </h3>
+              <div className="font-detective tracking-widest uppercase mb-0.5" style={{ color: typeColor, opacity: 0.7, fontSize: '0.55rem' }}>{typeLabel}</div>
+              <h3 className="font-detective" style={{ color: 'var(--text-primary)', fontSize: '0.95rem' }}>{clue.label}</h3>
+            </div>
+            <div className="text-2xl">{clue.icon}</div>
+          </div>
+
+          {/* Short desc */}
+          <div className="px-4 py-2.5 font-serif italic" style={{ color: 'var(--text-muted)', borderBottom: `1px solid rgba(255,255,255,0.05)`, fontSize: '0.75rem' }}>
+            "{clue.shortDesc}"
+          </div>
+
+          {/* Detail */}
+          <div className="px-4 py-3">
+            <p className="font-sans leading-relaxed" style={{ color: 'var(--text-primary)', lineHeight: 1.75, fontSize: '0.78rem' }}>
+              {clue.detail}
+            </p>
+          </div>
+
+          {/* Footer */}
+          <div className="px-4 py-3 flex items-center justify-between" style={{ borderTop: `1px solid rgba(255,255,255,0.05)` }}>
+            {isNew ? (
+              <span className="font-detective tracking-widest uppercase" style={{ color: 'var(--success)', fontSize: '0.55rem' }}>✓ Pinned to Board</span>
+            ) : (
+              <span className="font-detective tracking-widest uppercase" style={{ color: 'var(--text-muted)', opacity: 0.4, fontSize: '0.55rem' }}>Previously Examined</span>
+            )}
+            <button
+              onClick={onClose}
+              className="font-detective tracking-widest uppercase px-4 py-2 transition-all duration-200"
+              style={{ border: '1px solid rgba(245,166,35,0.3)', color: 'var(--accent)', background: 'transparent', fontSize: '0.65rem' }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="absolute inset-0 z-50 flex items-center justify-center" onClick={onClose}>
+      <div className="absolute inset-0 transition-opacity duration-500" style={{ background: 'rgba(5,4,3,0.65)', opacity: visible ? 1 : 0 }} />
+
+      <div
+        className="relative max-w-lg w-full mx-6 transition-all duration-500"
+        style={{ opacity: visible ? 1 : 0, transform: visible ? 'translateY(0) scale(1)' : 'translateY(30px) scale(0.96)' }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div style={{ background: 'linear-gradient(135deg, #14100A 0%, #0E0C08 100%)', border: `1px solid ${typeColor}40`, boxShadow: `0 20px 60px rgba(0,0,0,0.8), 0 0 40px ${typeColor}15` }}>
+          {/* Header */}
+          <div className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: `1px solid ${typeColor}25`, background: `${typeColor}08` }}>
+            <div>
+              <div className="font-detective text-xs tracking-widest uppercase mb-1" style={{ color: typeColor, opacity: 0.7 }}>{typeLabel}</div>
+              <h3 className="font-detective text-lg" style={{ color: 'var(--text-primary)' }}>{clue.label}</h3>
             </div>
             <div className="text-3xl">{clue.icon}</div>
           </div>
 
           {/* Short desc */}
-          <div
-            className="px-6 py-3 font-serif italic text-sm"
-            style={{ color: 'var(--text-muted)', borderBottom: `1px solid rgba(255,255,255,0.05)` }}
-          >
+          <div className="px-6 py-3 font-serif italic text-sm" style={{ color: 'var(--text-muted)', borderBottom: `1px solid rgba(255,255,255,0.05)` }}>
             "{clue.shortDesc}"
           </div>
 
@@ -397,28 +498,40 @@ function ClueCard({ clue, onClose, isNew }: { clue: Clue; onClose: () => void; i
             </p>
           </div>
 
+          {/* Detective observation */}
+          {clue.detectiveComment && (
+            <div
+              className="px-6 py-3 mx-6 mb-4"
+              style={{
+                background: `${avatarColor}08`,
+                border: `1px solid ${avatarColor}20`,
+              }}
+            >
+              <div className="flex items-start gap-2">
+                {avatarEmoji && <span className="text-base flex-shrink-0">{avatarEmoji}</span>}
+                <div>
+                  <div className="font-detective mb-1.5" style={{ color: avatarColor, fontSize: '0.52rem', letterSpacing: '0.2em', opacity: 0.65 }}>
+                    {detective ? `DET. ${detective.name.toUpperCase()}` : 'DETECTIVE'} · OBSERVATION
+                  </div>
+                  <p className="font-serif italic text-xs" style={{ color: 'rgba(255,255,255,0.6)', lineHeight: 1.75, fontSize: '0.74rem' }}>
+                    "{clue.detectiveComment}"
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Footer */}
-          <div
-            className="px-6 py-3 flex items-center justify-between"
-            style={{ borderTop: `1px solid rgba(255,255,255,0.05)` }}
-          >
+          <div className="px-6 py-3 flex items-center justify-between" style={{ borderTop: `1px solid rgba(255,255,255,0.05)` }}>
             {isNew ? (
-              <span className="font-detective text-xs tracking-widest uppercase" style={{ color: 'var(--success)' }}>
-                ✓ Pinned to Evidence Board
-              </span>
+              <span className="font-detective text-xs tracking-widest uppercase" style={{ color: 'var(--success)' }}>✓ Pinned to Evidence Board</span>
             ) : (
-              <span className="font-detective text-xs tracking-widest uppercase" style={{ color: 'var(--text-muted)', opacity: 0.4 }}>
-                Previously Examined
-              </span>
+              <span className="font-detective text-xs tracking-widest uppercase" style={{ color: 'var(--text-muted)', opacity: 0.4 }}>Previously Examined</span>
             )}
             <button
               onClick={onClose}
               className="font-detective text-xs tracking-widest uppercase px-4 py-1.5 transition-all duration-200"
-              style={{
-                border: '1px solid rgba(245,166,35,0.3)',
-                color: 'var(--accent)',
-                background: 'transparent',
-              }}
+              style={{ border: '1px solid rgba(245,166,35,0.3)', color: 'var(--accent)', background: 'transparent' }}
             >
               Close
             </button>

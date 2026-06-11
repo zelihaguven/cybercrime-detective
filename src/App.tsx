@@ -1,41 +1,95 @@
 import { useState, useCallback } from 'react';
-import type { GameScreen, GameState, Clue } from './types/game';
+import type { GameScreen, GameState, Clue, Detective } from './types/game';
 import { LEVELS, getLevelById } from './data/levels';
+import { getRank } from './utils/detective';
+
 import TitleScreen from './components/TitleScreen';
+import DetectiveCreation from './components/DetectiveCreation';
+import IntroSequence from './components/IntroSequence';
+import DetectiveOffice from './components/DetectiveOffice';
+import CaseBriefing from './components/CaseBriefing';
 import Scene from './components/Scene';
 import EvidenceBoard from './components/EvidenceBoard';
 import Handbook from './components/Handbook';
 import AccusationScreen from './components/AccusationScreen';
-import OutcomeScreen from './components/OutcomeScreen';
-import CaseSelect from './components/CaseSelect';
+import CaseConclusion from './components/CaseConclusion';
+import AllCasesComplete from './components/AllCasesComplete';
 
-const initialState = (): GameState => ({
-  screen: 'title',
-  currentLevel: 1,
-  discoveredClues: [],
-  selectedClue: null,
-  accusationMade: false,
-  accusationCorrect: null,
-  handbookUnlocked: [],
-});
+const STORAGE_DETECTIVE = 'ciu-detective-v1';
+const STORAGE_INTRO = 'ciu-intro-v1';
+
+function loadDetective(): Detective | null {
+  try {
+    const s = localStorage.getItem(STORAGE_DETECTIVE);
+    if (!s) return null;
+    const d = JSON.parse(s);
+    if (!d.appearance) d.appearance = { skinTone: 2, hairStyle: 1, hairColor: 1, outfitColor: d.avatar ?? 0 };
+    if (d.specialty === undefined) d.specialty = 0;
+    return d;
+  } catch { return null; }
+}
+function saveDetective(d: Detective) {
+  localStorage.setItem(STORAGE_DETECTIVE, JSON.stringify(d));
+}
+function loadHasSeenIntro(): boolean {
+  try { return localStorage.getItem(STORAGE_INTRO) === 'true'; }
+  catch { return false; }
+}
+
+const init = (): GameState => {
+  const detective = loadDetective();
+  const hasSeenIntro = loadHasSeenIntro();
+  return {
+    screen: detective && hasSeenIntro ? 'detective-office' : 'title',
+    detective,
+    hasSeenIntro,
+    currentLevel: 1,
+    discoveredClues: [],
+    accusationCorrect: null,
+    pendingXP: 0,
+  };
+};
 
 export default function App() {
-  const [state, setState] = useState<GameState>(initialState);
+  const [state, setState] = useState<GameState>(init);
   const [overlay, setOverlay] = useState<'board' | 'handbook' | null>(null);
 
-  const setScreen = (screen: GameScreen) =>
-    setState((s) => ({ ...s, screen }));
+  const go = useCallback((screen: GameScreen) => setState((s) => ({ ...s, screen })), []);
 
-  const startLevel = useCallback((levelId: number) => {
-    setState((s) => ({
-      ...s,
-      screen: 'scene',
-      currentLevel: levelId,
-      discoveredClues: [],
-      selectedClue: null,
-      accusationMade: false,
-      accusationCorrect: null,
-    }));
+  // Title → check for existing detective
+  const handleNewGame = useCallback(() => {
+    go('detective-creation');
+  }, [go]);
+
+  const handleContinue = useCallback(() => {
+    go(state.detective ? 'detective-office' : 'detective-creation');
+  }, [state.detective, go]);
+
+  // Detective created → intro (first time) or office (returning)
+  const handleDetectiveCreated = useCallback((detective: Detective) => {
+    saveDetective(detective);
+    setState((s) => ({ ...s, detective, screen: 'intro-sequence' }));
+  }, []);
+
+  const handleIntroComplete = useCallback(() => {
+    localStorage.setItem(STORAGE_INTRO, 'true');
+    setState((s) => ({ ...s, hasSeenIntro: true, screen: 'detective-office' }));
+  }, []);
+
+  const handleNewDetective = useCallback(() => {
+    localStorage.removeItem(STORAGE_DETECTIVE);
+    localStorage.removeItem(STORAGE_INTRO);
+    setState((s) => ({ ...s, screen: 'title', detective: null, hasSeenIntro: false, currentLevel: 1, discoveredClues: [], accusationCorrect: null, pendingXP: 0 }));
+  }, []);
+
+  // Office → case briefing
+  const handleSelectCase = useCallback((levelId: number) => {
+    setState((s) => ({ ...s, currentLevel: levelId, screen: 'case-briefing' }));
+  }, []);
+
+  // Briefing → scene
+  const handleBeginInvestigation = useCallback(() => {
+    setState((s) => ({ ...s, screen: 'scene', discoveredClues: [], accusationCorrect: null, pendingXP: 0 }));
     setOverlay(null);
   }, []);
 
@@ -46,28 +100,58 @@ export default function App() {
     });
   }, []);
 
+  // Accusation → calculate XP → conclusion
   const handleAccusation = useCallback((answerId: string) => {
     const level = getLevelById(state.currentLevel);
     if (!level) return;
     const correct = answerId === level.correctAnswer;
-    setState((s) => ({
-      ...s,
-      screen: 'outcome',
-      accusationMade: true,
-      accusationCorrect: correct,
-    }));
+
+    const requiredIds = level.clues.map((c) => c.id);
+    const bonusIds = level.bonusClues.map((c) => c.id);
+    const foundAll = requiredIds.every((id) => state.discoveredClues.includes(id));
+    const foundBonus = bonusIds.filter((id) => state.discoveredClues.includes(id)).length;
+
+    let xp = 20;
+    if (correct) xp += level.xpReward ?? 50;
+    if (foundAll) xp += 30;
+    xp += foundBonus * 10;
+
+    // Save progress immediately on correct accusation — don't wait for conclusion dismiss
+    if (correct && state.detective) {
+      const newXP = state.detective.xp + xp;
+      const completedCases = state.detective.completedCases.includes(state.currentLevel)
+        ? state.detective.completedCases
+        : [...state.detective.completedCases, state.currentLevel];
+      const updated = { ...state.detective, xp: newXP, rank: getRank(newXP), completedCases };
+      saveDetective(updated);
+      setState((s) => ({ ...s, detective: updated, screen: 'case-conclusion', accusationCorrect: correct, pendingXP: xp }));
+    } else {
+      setState((s) => ({ ...s, screen: 'case-conclusion', accusationCorrect: correct, pendingXP: xp }));
+    }
     setOverlay(null);
-  }, [state.currentLevel]);
+  }, [state.currentLevel, state.discoveredClues, state.detective]);
+
+  // Conclusion → office (XP already saved in handleAccusation)
+  const handleConclusionComplete = useCallback(() => {
+    if (!state.detective) { go('detective-office'); return; }
+    const allComplete = state.accusationCorrect && LEVELS.every(l => state.detective!.completedCases.includes(l.id));
+    go(allComplete ? 'all-cases-complete' : 'detective-office');
+  }, [state.detective, state.accusationCorrect, go]);
+
+  const handleRetry = useCallback(() => {
+    setState((s) => ({ ...s, screen: 'scene', discoveredClues: [], accusationCorrect: null, pendingXP: 0 }));
+    setOverlay(null);
+  }, []);
 
   const level = getLevelById(state.currentLevel) ?? LEVELS[0];
 
   return (
     <div className="relative overflow-hidden font-sans" style={{ width: '100vw', height: '100vh' }}>
-      {/* Screen transitions */}
+
       <ScreenLayer active={state.screen === 'title'}>
         <TitleScreen
-          onNewGame={() => setScreen('case-select')}
-          onCaseSelect={() => setScreen('case-select')}
+          onNewGame={handleNewGame}
+          onCaseSelect={handleContinue}
           onHandbook={() => {
             setState((s) => ({ ...s, screen: 'scene', currentLevel: 1 }));
             setOverlay('handbook');
@@ -75,21 +159,48 @@ export default function App() {
         />
       </ScreenLayer>
 
-      <ScreenLayer active={state.screen === 'case-select'}>
-        <CaseSelect
-          onSelect={(id) => startLevel(id)}
-          onBack={() => setScreen('title')}
-        />
+      <ScreenLayer active={state.screen === 'detective-creation'}>
+        <DetectiveCreation onComplete={handleDetectiveCreated} />
+      </ScreenLayer>
+
+      <ScreenLayer active={state.screen === 'intro-sequence'}>
+        {state.detective && (
+          <IntroSequence detective={state.detective} onComplete={handleIntroComplete} />
+        )}
+      </ScreenLayer>
+
+      <ScreenLayer active={state.screen === 'detective-office'}>
+        {state.detective && (
+          <DetectiveOffice
+            detective={state.detective}
+            levels={LEVELS}
+            onSelectCase={handleSelectCase}
+            onNewDetective={handleNewDetective}
+          />
+        )}
+      </ScreenLayer>
+
+      <ScreenLayer active={state.screen === 'case-briefing'}>
+        {state.detective && (
+          <CaseBriefing
+            level={level}
+            detective={state.detective}
+            onBegin={handleBeginInvestigation}
+            onBack={() => go('detective-office')}
+          />
+        )}
       </ScreenLayer>
 
       <ScreenLayer active={state.screen === 'scene'}>
         <Scene
           level={level}
           discoveredClues={state.discoveredClues}
+          detective={state.detective}
           onClueDiscovered={handleClueDiscovered}
           onOpenBoard={() => setOverlay('board')}
           onOpenHandbook={() => setOverlay('handbook')}
-          onAccuse={() => setScreen('accusation')}
+          onAccuse={() => go('accusation')}
+          onExit={() => go('detective-office')}
         />
         {overlay === 'board' && (
           <EvidenceBoard
@@ -99,10 +210,7 @@ export default function App() {
           />
         )}
         {overlay === 'handbook' && (
-          <Handbook
-            terms={level.handbookTerms}
-            onClose={() => setOverlay(null)}
-          />
+          <Handbook terms={level.handbookTerms} onClose={() => setOverlay(null)} />
         )}
       </ScreenLayer>
 
@@ -110,6 +218,7 @@ export default function App() {
         <Scene
           level={level}
           discoveredClues={state.discoveredClues}
+          detective={state.detective}
           onClueDiscovered={handleClueDiscovered}
           onOpenBoard={() => setOverlay('board')}
           onOpenHandbook={() => setOverlay('handbook')}
@@ -118,20 +227,33 @@ export default function App() {
         <AccusationScreen
           level={level}
           onSubmit={handleAccusation}
-          onCancel={() => setScreen('scene')}
+          onCancel={() => go('scene')}
         />
       </ScreenLayer>
 
-      <ScreenLayer active={state.screen === 'outcome'}>
-        <OutcomeScreen
-          level={level}
-          correct={state.accusationCorrect ?? false}
-          discoveredCount={state.discoveredClues.length}
-          onReplay={() => startLevel(state.currentLevel)}
-          onTitle={() => setScreen('title')}
-          onNewCase={() => setScreen('case-select')}
-        />
+      <ScreenLayer active={state.screen === 'case-conclusion'}>
+        {state.detective && (
+          <CaseConclusion
+            level={level}
+            detective={state.detective}
+            correct={state.accusationCorrect ?? false}
+            xpEarned={state.pendingXP}
+            discoveredCount={state.discoveredClues.length}
+            onComplete={handleConclusionComplete}
+            onRetry={handleRetry}
+          />
+        )}
       </ScreenLayer>
+
+      <ScreenLayer active={state.screen === 'all-cases-complete'}>
+        {state.detective && (
+          <AllCasesComplete
+            detective={state.detective}
+            onComplete={() => go('detective-office')}
+          />
+        )}
+      </ScreenLayer>
+
     </div>
   );
 }
@@ -139,12 +261,8 @@ export default function App() {
 function ScreenLayer({ active, children }: { active: boolean; children: React.ReactNode }) {
   return (
     <div
-      className="absolute inset-0 transition-opacity duration-500"
-      style={{
-        opacity: active ? 1 : 0,
-        pointerEvents: active ? 'auto' : 'none',
-        zIndex: active ? 1 : 0,
-      }}
+      className="absolute inset-0 transition-opacity duration-200"
+      style={{ opacity: active ? 1 : 0, pointerEvents: active ? 'auto' : 'none', zIndex: active ? 1 : 0 }}
     >
       {children}
     </div>

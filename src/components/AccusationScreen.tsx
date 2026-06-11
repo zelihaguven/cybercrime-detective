@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { Level } from '../types/game';
+import { useIsMobile } from '../utils/responsive';
 
 interface Props {
   level: Level;
@@ -8,16 +9,22 @@ interface Props {
 }
 
 export default function AccusationScreen({ level, onSubmit, onCancel }: Props) {
+  const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
-  const [confirming, setConfirming] = useState(false);
+
+  // Shuffle once per mount — stable within session, different each new game
+  const shuffledOptions = useMemo(
+    () => [...level.accusationOptions].sort(() => Math.random() - 0.5),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [level.id]
+  );
 
   useEffect(() => { setTimeout(() => setOpen(true), 60); }, []);
 
   const handleSubmit = () => {
     if (!selected) return;
-    setConfirming(true);
-    setTimeout(() => onSubmit(selected), 800);
+    onSubmit(selected);
   };
 
   const handleCancel = () => {
@@ -27,39 +34,40 @@ export default function AccusationScreen({ level, onSubmit, onCancel }: Props) {
 
   return (
     <div
-      className="absolute inset-0 z-50 flex items-center justify-center"
+      className="absolute inset-0 z-50 flex items-center justify-center overflow-y-auto"
       style={{ background: 'rgba(4,3,2,0.92)' }}
     >
       <div
-        className="relative transition-all duration-600 w-full max-w-2xl mx-6"
+        className="relative transition-all duration-600 w-full max-w-2xl mx-6 my-4"
         style={{
           opacity: open ? 1 : 0,
           transform: open ? 'translateY(0)' : 'translateY(40px)',
         }}
       >
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className={`text-center ${isMobile ? 'mb-5' : 'mb-8'}`}>
           <div className="font-detective text-xs tracking-[0.4em] uppercase mb-3" style={{ color: 'var(--accent)', opacity: 0.7 }}>
             — Final Deduction —
           </div>
-          <h2 className="font-detective text-4xl mb-3" style={{ color: 'var(--text-primary)' }}>
+          <h2 className={`font-detective mb-3 ${isMobile ? 'text-2xl' : 'text-4xl'}`} style={{ color: 'var(--text-primary)' }}>
             Make Your Accusation
           </h2>
-          <p className="font-serif italic text-sm" style={{ color: 'var(--text-muted)' }}>
+          <p className="font-serif italic text-sm" style={{ color: 'var(--text-muted)', fontSize: isMobile ? '0.78rem' : undefined }}>
             Review the evidence. Choose the attack vector that best explains what happened to {level.victim.name}.
           </p>
         </div>
 
         {/* Victim summary */}
         <div
-          className="mb-6 px-5 py-4"
+          className="mb-6"
           style={{
             background: 'rgba(245,166,35,0.05)',
             border: '1px solid rgba(245,166,35,0.15)',
+            padding: isMobile ? '10px 12px' : '16px 20px',
           }}
         >
           <div className="flex items-start gap-4">
-            <div className="text-3xl">👵</div>
+            <div className="text-3xl">{level.victim.emoji}</div>
             <div>
               <div className="font-detective text-sm mb-1" style={{ color: 'var(--accent)' }}>
                 {level.victim.name}, {level.victim.age}
@@ -76,7 +84,7 @@ export default function AccusationScreen({ level, onSubmit, onCancel }: Props) {
 
         {/* Options */}
         <div className="space-y-3 mb-6">
-          {level.accusationOptions.map((option) => (
+          {shuffledOptions.map((option) => (
             <button
               key={option.id}
               onClick={() => setSelected(option.id)}
@@ -142,7 +150,7 @@ export default function AccusationScreen({ level, onSubmit, onCancel }: Props) {
 
           <button
             onClick={handleSubmit}
-            disabled={!selected || confirming}
+            disabled={!selected}
             className="font-detective text-xs tracking-widest uppercase px-8 py-3 transition-all duration-300"
             style={{
               border: selected ? '1px solid rgba(245,166,35,0.8)' : '1px solid rgba(245,166,35,0.2)',
@@ -151,10 +159,10 @@ export default function AccusationScreen({ level, onSubmit, onCancel }: Props) {
               boxShadow: selected ? '0 0 20px rgba(245,166,35,0.15)' : 'none',
               letterSpacing: '0.2em',
               cursor: selected ? 'pointer' : 'not-allowed',
-              opacity: confirming ? 0.6 : 1,
+              opacity: 1,
             }}
           >
-            {confirming ? 'Filing Report...' : 'Submit Accusation ⚖'}
+            Submit Accusation ⚖
           </button>
         </div>
       </div>
