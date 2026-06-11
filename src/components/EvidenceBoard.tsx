@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import type { Clue } from '../types/game';
 import { useIsMobile } from '../utils/responsive';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface Props {
   clues: Clue[];
@@ -33,6 +34,7 @@ const CARD_H = 100;
 
 export default function EvidenceBoard({ clues, discoveredIds, onClose }: Props) {
   const isMobile = useIsMobile();
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -59,14 +61,14 @@ export default function EvidenceBoard({ clues, discoveredIds, onClose }: Props) 
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 flex-shrink-0" style={{ borderBottom: '1px solid rgba(245,166,35,0.15)' }}>
           <span className="font-detective text-xs tracking-widest uppercase" style={{ color: 'var(--accent)' }}>
-            Evidence Board
+            {t('evidenceBoardTitle')}
           </span>
           <div className="flex items-center gap-4">
             <span className="font-detective text-xs" style={{ color: 'var(--text-muted)', opacity: 0.5 }}>
               {discovered.length}/{clues.length}
             </span>
             <button onClick={handleClose} className="font-detective text-xs tracking-widest uppercase px-3 py-1" style={{ border: '1px solid rgba(245,166,35,0.3)', color: 'var(--accent)' }}>
-              Close ✕
+              {t('boardClose')}
             </button>
           </div>
         </div>
@@ -75,7 +77,7 @@ export default function EvidenceBoard({ clues, discoveredIds, onClose }: Props) 
           {discovered.length === 0 && (
             <div className="text-center py-12">
               <div className="text-2xl mb-2">📌</div>
-              <div className="font-detective text-sm" style={{ color: 'rgba(245,166,35,0.3)' }}>No evidence yet</div>
+              <div className="font-detective text-sm" style={{ color: 'rgba(245,166,35,0.3)' }}>{t('boardNoEvidence')}</div>
             </div>
           )}
           {discovered.map((clue) => {
@@ -133,15 +135,12 @@ export default function EvidenceBoard({ clues, discoveredIds, onClose }: Props) 
           >
             <div>
               <span className="font-detective text-xs tracking-[0.3em] uppercase" style={{ color: 'var(--accent)', opacity: 0.8 }}>
-                Investigation Board
-              </span>
-              <span className="font-detective text-xs ml-4" style={{ color: 'var(--text-muted)', opacity: 0.5 }}>
-                Case 01 — The Morning Message
+                {t('evidenceBoardTitle')}
               </span>
             </div>
             <div className="flex items-center gap-4">
               <span className="font-detective text-xs tracking-widest" style={{ color: 'var(--text-muted)', opacity: 0.5 }}>
-                {discovered.length} of {clues.length} EVIDENCE ITEMS
+                {discovered.length} / {clues.length} {t('boardEvidenceItems')}
               </span>
               <button
                 onClick={handleClose}
@@ -152,7 +151,7 @@ export default function EvidenceBoard({ clues, discoveredIds, onClose }: Props) 
                   background: 'transparent',
                 }}
               >
-                Close ✕
+                {t('boardClose')}
               </button>
             </div>
           </div>
@@ -163,10 +162,10 @@ export default function EvidenceBoard({ clues, discoveredIds, onClose }: Props) 
               <div className="text-center">
                 <div className="font-detective text-2xl mb-3" style={{ color: 'rgba(245,166,35,0.2)' }}>📌</div>
                 <div className="font-detective text-sm tracking-widest uppercase" style={{ color: 'rgba(245,166,35,0.3)' }}>
-                  No evidence collected yet
+                  {t('boardNoEvidenceCollected')}
                 </div>
                 <div className="font-serif italic text-xs mt-2" style={{ color: 'rgba(245,166,35,0.2)' }}>
-                  Investigate the scene to pin clues here
+                  {t('boardInvestigateHint')}
                 </div>
               </div>
             </div>
@@ -225,10 +224,10 @@ export default function EvidenceBoard({ clues, discoveredIds, onClose }: Props) 
           <div
             className="absolute bottom-3 right-4 flex items-center gap-4 z-20"
           >
-            <LegendItem color="#F5A623" label="Field Note" />
-            <LegendItem color="#4A90D9" label="Screenshot" />
-            <LegendItem color="#7ABF6A" label="Photograph" />
-            <LegendItem color="#B98FD4" label="Statement" />
+            <LegendItem color="#F5A623" label={t('boardFieldNote')} />
+            <LegendItem color="#4A90D9" label={t('boardScreenshot')} />
+            <LegendItem color="#7ABF6A" label={t('boardPhotograph')} />
+            <LegendItem color="#B98FD4" label={t('boardStatement')} />
           </div>
         </div>
       </div>

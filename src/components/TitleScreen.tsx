@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import type { Lang } from '../types/game';
 
 interface Props {
   onNewGame: () => void;
@@ -9,7 +8,7 @@ interface Props {
 }
 
 export default function TitleScreen({ onNewGame, onCaseSelect, onHandbook }: Props) {
-  const { lang, setLang, t } = useLanguage();
+  const { t } = useLanguage();
   const [phase, setPhase] = useState(0);
 
   useEffect(() => {
@@ -92,26 +91,6 @@ export default function TitleScreen({ onNewGame, onCaseSelect, onHandbook }: Pro
           className="flex flex-col gap-3 items-center w-full max-w-xs transition-all duration-700"
           style={{ opacity: phase >= 3 ? 1 : 0, transform: phase >= 3 ? 'translateY(0)' : 'translateY(20px)' }}
         >
-          {/* Language selector */}
-          <div className="flex gap-2 mb-1">
-            {(['en', 'de'] as Lang[]).map((l) => (
-              <button
-                key={l}
-                onClick={() => setLang(l)}
-                className="font-detective text-xs tracking-widest uppercase px-4 py-2 transition-all duration-200"
-                style={{
-                  border: `1px solid ${lang === l ? 'rgba(245,166,35,0.7)' : 'rgba(245,166,35,0.18)'}`,
-                  background: lang === l ? 'rgba(245,166,35,0.12)' : 'transparent',
-                  color: lang === l ? 'var(--accent)' : 'rgba(245,166,35,0.4)',
-                  letterSpacing: '0.2em',
-                  fontSize: '0.65rem',
-                }}
-              >
-                {l.toUpperCase()}
-              </button>
-            ))}
-          </div>
-
           <TitleButton onClick={onNewGame} primary label={t('newInvestigation')} icon="◈" />
           <TitleButton onClick={onCaseSelect} label={t('caseSelection')} icon="⊡" />
           <TitleButton onClick={onHandbook} label={t('detectiveHandbook')} icon="⊞" />

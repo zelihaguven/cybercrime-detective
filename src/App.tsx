@@ -3,6 +3,7 @@ import type { GameScreen, GameState, Clue, Detective } from './types/game';
 import { LEVELS, getLevelById } from './data/levels';
 import { getRank } from './utils/detective';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
+import LangToggle from './components/LangToggle';
 
 import TitleScreen from './components/TitleScreen';
 import DetectiveCreation from './components/DetectiveCreation';
@@ -157,6 +158,7 @@ function AppInner() {
 
   return (
     <div className="app-root relative overflow-hidden font-sans" style={{ width: '100vw' }}>
+      <LangToggle />
 
       <ScreenLayer active={state.screen === 'title'}>
         <TitleScreen

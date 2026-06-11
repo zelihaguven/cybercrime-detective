@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import type { Detective, CharacterAppearance } from '../types/game';
 import { SPECIALTIES } from '../data/characters';
 import { useIsMobile } from '../utils/responsive';
+import { useLanguage } from '../contexts/LanguageContext';
+
+const SPECIALTY_KEYS = ['specialty0', 'specialty1', 'specialty2', 'specialty3'] as const;
 import CharacterSVG, {
   SKIN_COLORS,
   HAIR_COLORS,
@@ -59,6 +62,7 @@ const DEFAULT_APPEARANCE: CharacterAppearance = {
 
 export default function DetectiveCreation({ onComplete }: Props) {
   const isMobile = useIsMobile();
+  const { t } = useLanguage();
   const [name, setName] = useState('');
   const [badge, setBadge] = useState(0);
   const [specialty, setSpecialty] = useState(0);
@@ -102,10 +106,10 @@ export default function DetectiveCreation({ onComplete }: Props) {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="font-detective text-xs tracking-[0.45em] mb-2" style={{ color: 'rgba(245,166,35,0.45)' }}>
-            CYBERCRIME INVESTIGATION UNIT · BERLIN
+            {t('ciuBerlin')}
           </div>
           <h1 className="font-detective" style={{ color: 'var(--text-primary)', letterSpacing: '0.06em', fontSize: isMobile ? '1.6rem' : '2.25rem' }}>
-            Create Your Detective
+            {t('createDetective')}
           </h1>
         </div>
 
@@ -126,13 +130,13 @@ export default function DetectiveCreation({ onComplete }: Props) {
 
             {/* Section label */}
             <div className="font-detective text-xs mb-4" style={{ color: 'rgba(245,166,35,0.55)', letterSpacing: '0.35em' }}>
-              APPEARANCE
+              {t('appearance')}
             </div>
 
             {/* Skin tone */}
             <div className="mb-5">
               <div className="font-detective mb-2" style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.58rem', letterSpacing: '0.2em' }}>
-                SKIN TONE
+                {t('skinTone')}
               </div>
               <div className="flex gap-2.5">
                 {SKIN_COLORS.map((col, i) => (
@@ -158,7 +162,7 @@ export default function DetectiveCreation({ onComplete }: Props) {
             {/* Hair style */}
             <div className="mb-5">
               <div className="font-detective mb-2" style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.58rem', letterSpacing: '0.2em' }}>
-                HAIR STYLE
+                {t('hairStyle')}
               </div>
               <div className="flex gap-2">
                 {HAIR_STYLE_NAMES.map((label, i) => (
@@ -183,7 +187,7 @@ export default function DetectiveCreation({ onComplete }: Props) {
             {/* Hair color */}
             <div className="mb-5">
               <div className="font-detective mb-2" style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.58rem', letterSpacing: '0.2em' }}>
-                HAIR COLOR
+                {t('hairColor')}
               </div>
               <div className="flex gap-2.5">
                 {HAIR_COLORS.map((col, i) => (
@@ -209,7 +213,7 @@ export default function DetectiveCreation({ onComplete }: Props) {
             {/* Outfit */}
             <div className="mb-6">
               <div className="font-detective mb-2" style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.58rem', letterSpacing: '0.2em' }}>
-                OUTFIT
+                {t('outfitColor')}
               </div>
               <div className="flex gap-2">
                 {OUTFIT_COLORS_HEX.map((col, i) => (
@@ -251,14 +255,14 @@ export default function DetectiveCreation({ onComplete }: Props) {
             {/* Name input */}
             <div>
               <label className="block font-detective text-xs tracking-widest uppercase mb-2" style={{ color: 'rgba(245,166,35,0.6)' }}>
-                Detective Name
+                {t('yourName')}
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter' && canProceed) handleBegin(); }}
-                placeholder="Enter your name..."
+                placeholder={t('namePlaceholder')}
                 maxLength={24}
                 className="w-full px-4 py-3 font-detective text-sm tracking-wider outline-none transition-all duration-200"
                 style={{
@@ -272,7 +276,7 @@ export default function DetectiveCreation({ onComplete }: Props) {
               />
               {name.length > 0 && name.trim().length < 2 && (
                 <p className="mt-1.5 font-detective" style={{ color: 'var(--danger)', fontSize: '0.62rem', letterSpacing: '0.08em' }}>
-                  Name requires at least 2 characters.
+                  {t('nameMinError')}
                 </p>
               )}
             </div>
@@ -283,7 +287,7 @@ export default function DetectiveCreation({ onComplete }: Props) {
             {/* Specialty */}
             <div>
               <label className="block font-detective text-xs tracking-widest uppercase mb-3" style={{ color: 'rgba(245,166,35,0.6)' }}>
-                Specialty
+                {t('specialty')}
               </label>
               <div className="grid grid-cols-2 gap-2">
                 {SPECIALTIES.map((spec, i) => {
@@ -305,7 +309,7 @@ export default function DetectiveCreation({ onComplete }: Props) {
                           className="font-detective"
                           style={{ color: sel ? accent : 'rgba(255,255,255,0.42)', fontSize: '0.57rem', letterSpacing: '0.1em', marginBottom: 2 }}
                         >
-                          {spec.label.toUpperCase()}
+                          {t(SPECIALTY_KEYS[i]).toUpperCase()}
                         </div>
                         <div
                           className="font-serif italic"
@@ -323,7 +327,7 @@ export default function DetectiveCreation({ onComplete }: Props) {
             {/* Badge */}
             <div>
               <label className="block font-detective text-xs tracking-widest uppercase mb-3" style={{ color: 'rgba(245,166,35,0.6)' }}>
-                Badge Style
+                {t('badge')}
               </label>
               <div className="flex gap-2.5">
                 {BADGE_NAMES.map((badgeName, i) => {
@@ -364,7 +368,7 @@ export default function DetectiveCreation({ onComplete }: Props) {
               }}
             >
               <div className="font-detective mb-3" style={{ color: 'rgba(255,255,255,0.18)', fontSize: '0.48rem', letterSpacing: '0.28em' }}>
-                CYBERCRIME INVESTIGATION UNIT · BERLIN
+                {t('ciuBerlin')}
               </div>
               <div className="flex items-center gap-4">
                 <div style={{ flexShrink: 0 }}>
@@ -378,13 +382,13 @@ export default function DetectiveCreation({ onComplete }: Props) {
                     {name.trim() || '— — —'}
                   </div>
                   <div className="font-detective mb-1.5" style={{ color: accent, opacity: 0.7, fontSize: '0.55rem', letterSpacing: '0.1em' }}>
-                    {SPECIALTIES[specialty].icon} {SPECIALTIES[specialty].label.toUpperCase()}
+                    {SPECIALTIES[specialty].icon} {t(SPECIALTY_KEYS[specialty]).toUpperCase()}
                   </div>
                   <div className="font-detective" style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.48rem', letterSpacing: '0.18em' }}>
-                    RANK: JUNIOR INVESTIGATOR
+                    {t('rankJuniorCard')}
                   </div>
                   <div className="font-detective mt-0.5" style={{ color: '#7ABF6A', fontSize: '0.48rem', letterSpacing: '0.15em' }}>
-                    ● ACTIVE
+                    {t('activeStatus')}
                   </div>
                 </div>
                 <div className="w-9 h-9 flex-shrink-0" style={{ filter: `drop-shadow(0 0 6px ${accent}40)` }}>
@@ -407,10 +411,10 @@ export default function DetectiveCreation({ onComplete }: Props) {
                 boxShadow: canProceed ? `0 0 32px ${accent}14` : 'none',
               }}
             >
-              Begin Investigation
+              {t('beginInvestigation')}
             </button>
             <p className="text-center font-detective" style={{ color: 'rgba(255,255,255,0.15)', fontSize: '0.55rem', letterSpacing: '0.1em' }}>
-              or press Enter
+              {t('orPressEnter')}
             </p>
           </div>
         </div>

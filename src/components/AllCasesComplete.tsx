@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Detective } from '../types/game';
-import { LEVELS } from '../data/levels';
+import { LEVELS, getLevelById } from '../data/levels';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getRankColor, getRankProgress } from '../utils/detective';
 import { OUTFIT_ACCENT_COLORS } from './CharacterSVG';
@@ -12,7 +12,7 @@ interface Props {
 }
 
 export default function AllCasesComplete({ detective, onComplete }: Props) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [mounted, setMounted] = useState(false);
   const [stampVisible, setStampVisible] = useState(false);
   const [casesVisible, setCasesVisible] = useState(false);
@@ -43,7 +43,7 @@ export default function AllCasesComplete({ detective, onComplete }: Props) {
 
       {/* Header label */}
       <div className="absolute top-6 left-8 font-detective text-xs" style={{ color: 'rgba(122,191,106,0.4)', letterSpacing: '0.3em', fontSize: '0.6rem' }}>
-        CYBERCRIME INVESTIGATION UNIT · BERLIN · FINAL REPORT
+        {t('finalReportHeader')}
       </div>
 
       <div className="relative z-10 w-full max-w-3xl mx-auto px-6 py-8">
@@ -115,32 +115,35 @@ export default function AllCasesComplete({ detective, onComplete }: Props) {
 
         {/* Case grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-7">
-          {LEVELS.map((level, i) => (
-            <div
-              key={level.id}
-              style={{
-                background: 'rgba(122,191,106,0.04)',
-                border: '1px solid rgba(122,191,106,0.2)',
-                padding: '12px 14px',
-                transition: `opacity 0.4s ease ${i * 90}ms, transform 0.4s ease ${i * 90}ms`,
-                opacity: casesVisible ? 1 : 0,
-                transform: casesVisible ? 'translateY(0)' : 'translateY(10px)',
-              }}
-            >
-              <div className="flex items-center justify-between mb-1.5">
-                <div className="font-detective" style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.5rem', letterSpacing: '0.22em' }}>
-                  CASE {String(level.id).padStart(2, '0')}
+          {LEVELS.map((level, i) => {
+            const l = getLevelById(level.id, lang) ?? level;
+            return (
+              <div
+                key={level.id}
+                style={{
+                  background: 'rgba(122,191,106,0.04)',
+                  border: '1px solid rgba(122,191,106,0.2)',
+                  padding: '12px 14px',
+                  transition: `opacity 0.4s ease ${i * 90}ms, transform 0.4s ease ${i * 90}ms`,
+                  opacity: casesVisible ? 1 : 0,
+                  transform: casesVisible ? 'translateY(0)' : 'translateY(10px)',
+                }}
+              >
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="font-detective" style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.5rem', letterSpacing: '0.22em' }}>
+                    {t('caseLabel')} {String(level.id).padStart(2, '0')}
+                  </div>
+                  <span style={{ color: '#7ABF6A', fontSize: '0.75rem' }}>✓</span>
                 </div>
-                <span style={{ color: '#7ABF6A', fontSize: '0.75rem' }}>✓</span>
+                <div className="font-detective" style={{ color: 'rgba(255,255,255,0.72)', letterSpacing: '0.04em', fontSize: '0.65rem', lineHeight: 1.35 }}>
+                  {l.title}
+                </div>
+                <div className="font-detective mt-1" style={{ color: 'rgba(255,255,255,0.28)', fontSize: '0.5rem', letterSpacing: '0.1em' }}>
+                  {l.caseType}
+                </div>
               </div>
-              <div className="font-detective" style={{ color: 'rgba(255,255,255,0.72)', letterSpacing: '0.04em', fontSize: '0.65rem', lineHeight: 1.35 }}>
-                {level.title}
-              </div>
-              <div className="font-detective mt-1" style={{ color: 'rgba(255,255,255,0.28)', fontSize: '0.5rem', letterSpacing: '0.1em' }}>
-                {level.caseType}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Closing message + CTA */}

@@ -7,7 +7,7 @@ import { useIsMobile } from '../utils/responsive';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const DIFFICULTY_COLORS = { easy: '#7ABF6A', medium: '#F5A623', hard: '#E05A47' };
-const DIFFICULTY_LABELS = { easy: 'ENTRY LEVEL', medium: 'INTERMEDIATE', hard: 'ADVANCED' };
+const DIFFICULTY_LABEL_KEYS = { easy: 'difficultyEasy' as const, medium: 'difficultyMedium' as const, hard: 'difficultyHard' as const };
 
 interface Props {
   detective: Detective;
@@ -164,9 +164,9 @@ export default function DetectiveOffice({ detective, levels, onSelectCase, onNew
           {/* Stats */}
           <div className="space-y-3 mb-8">
             {[
-              { label: 'CASES SOLVED', value: detective.completedCases.length, color: '#7ABF6A' },
-              { label: 'OPEN CASES', value: levels.length - detective.completedCases.length, color: '#E05A47' },
-              { label: 'TOTAL XP', value: detective.xp, color: rankColor },
+              { label: t('casesSolved'), value: detective.completedCases.length, color: '#7ABF6A' },
+              { label: t('openCasesLabel'), value: levels.length - detective.completedCases.length, color: '#E05A47' },
+              { label: t('totalXP'), value: detective.xp, color: rankColor },
             ].map(({ label, value, color }) => (
               <div key={label} className="flex justify-between items-center">
                 <span className="font-detective" style={{ color: 'rgba(255,255,255,0.28)', fontSize: '0.55rem', letterSpacing: '0.15em' }}>{label}</span>
@@ -177,7 +177,7 @@ export default function DetectiveOffice({ detective, levels, onSelectCase, onNew
 
           {/* Unit members */}
           <div className="mt-auto">
-            <div className="font-detective mb-3" style={{ color: 'rgba(255,255,255,0.18)', fontSize: '0.52rem', letterSpacing: '0.2em' }}>UNIT ON DUTY</div>
+            <div className="font-detective mb-3" style={{ color: 'rgba(255,255,255,0.18)', fontSize: '0.52rem', letterSpacing: '0.2em' }}>{t('unitOnDuty')}</div>
             {[
               { emoji: '🧔', name: 'Weber', color: '#5B8DD9' },
               { emoji: '👩‍💻', name: 'Mia', color: '#7ABF6A' },
@@ -217,7 +217,7 @@ export default function DetectiveOffice({ detective, levels, onSelectCase, onNew
           >
             <div>
               <h2 className="font-detective text-2xl" style={{ color: 'var(--text-primary)', letterSpacing: '0.06em' }}>
-                Investigation Board
+                {t('investigationBoard')}
               </h2>
               <p className="font-serif italic text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
                 {detective.completedCases.length} of {levels.length} cases closed · {levels.length - detective.completedCases.length} active
@@ -285,7 +285,7 @@ export default function DetectiveOffice({ detective, levels, onSelectCase, onNew
                 >
                   <div className="text-center">
                     <div className="text-2xl mb-2 opacity-10">🔒</div>
-                    <div className="font-detective" style={{ color: 'rgba(255,255,255,0.08)', fontSize: '0.6rem', letterSpacing: '0.25em' }}>CLASSIFIED</div>
+                    <div className="font-detective" style={{ color: 'rgba(255,255,255,0.08)', fontSize: '0.6rem', letterSpacing: '0.25em' }}>{t('classified')}</div>
                   </div>
                 </div>
               ))}
@@ -310,6 +310,7 @@ interface CaseCardProps {
 
 function CaseCard({ level, solved, locked, isNext, isSelected, onClick, onOpen, diffColor }: CaseCardProps) {
   const [hovered, setHovered] = useState(false);
+  const { t } = useLanguage();
 
   const accentColor = solved ? '#7ABF6A' : locked ? '#333' : isNext ? '#F5A623' : '#999';
 
@@ -372,7 +373,7 @@ function CaseCard({ level, solved, locked, isNext, isSelected, onClick, onOpen, 
               opacity: locked ? 0.4 : 1,
             }}
           >
-            {DIFFICULTY_LABELS[level.difficulty]}
+            {t(DIFFICULTY_LABEL_KEYS[level.difficulty])}
           </div>
         </div>
 
@@ -389,7 +390,7 @@ function CaseCard({ level, solved, locked, isNext, isSelected, onClick, onOpen, 
           <span className="text-base">{locked ? '❓' : level.victim.emoji}</span>
           <div>
             <div className="font-detective" style={{ color: locked ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.6)', fontSize: '0.6rem', letterSpacing: '0.1em' }}>
-              {locked ? 'VICTIM UNKNOWN' : level.victim.name.toUpperCase()}
+              {locked ? t('victimUnknown') : level.victim.name.toUpperCase()}
             </div>
             <div className="font-detective" style={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.52rem', letterSpacing: '0.08em' }}>
               {locked ? '— — —' : `${level.victim.age} · ${level.investigationLabel}`}
@@ -408,7 +409,7 @@ function CaseCard({ level, solved, locked, isNext, isSelected, onClick, onOpen, 
           }}
         >
           <div className="font-detective" style={{ color: accentColor, fontSize: '0.58rem', letterSpacing: '0.18em' }}>
-            {locked ? '🔒 LOCKED' : solved ? '✓ CASE CLOSED' : isNext ? '● ACTIVE' : '○ PENDING'}
+            {locked ? t('caseLockedStatus') : solved ? t('caseSolvedStatus') : isNext ? t('caseActive') : t('casePending')}
           </div>
           {!locked && (
             <div className="font-detective" style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.52rem', letterSpacing: '0.1em' }}>

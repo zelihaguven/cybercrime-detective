@@ -67,7 +67,7 @@ export default function Handbook({ terms, onClose }: Props) {
               transition: 'opacity 0.2s ease',
             }}
           >
-            <div className="font-detective text-xs tracking-widest uppercase mb-2" style={{ color: '#8B6914', opacity: 0.6 }}>Cybersecurity Term</div>
+            <div className="font-detective text-xs tracking-widest uppercase mb-2" style={{ color: '#8B6914', opacity: 0.6 }}>{t('handbookTermLabel')}</div>
             <h2 className="font-detective mb-3" style={{ color: '#2A1A04', fontSize: '1.5rem', borderBottom: '2px solid rgba(139,105,20,0.3)', paddingBottom: '8px' }}>{term.term}</h2>
             <p className="font-serif text-base leading-relaxed mb-5" style={{ color: '#3A2510', fontStyle: 'italic' }}>{term.oneLiner}</p>
             <div className="mb-4">
@@ -172,7 +172,7 @@ export default function Handbook({ terms, onClose }: Props) {
                 className="font-serif italic text-xs"
                 style={{ color: '#6B4F10', opacity: 0.6 }}
               >
-                — Cybercrime Glossary —
+                {t('handbookGlossary')}
               </div>
             </div>
 

@@ -3,6 +3,7 @@ import { CHARACTERS } from '../data/characters';
 import type { CharacterAppearance, DialogueLine } from '../types/game';
 import CharacterSVG from './CharacterSVG';
 import { useIsMobile } from '../utils/responsive';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface Props {
   lines: DialogueLine[];
@@ -14,6 +15,7 @@ interface Props {
 
 export default function DialogueBox({ lines, detectiveName, detectiveEmoji, detectiveAppearance, onComplete }: Props) {
   const isMobile = useIsMobile();
+  const { t } = useLanguage();
   const [lineIndex, setLineIndex] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
   const [isTyping, setIsTyping] = useState(true);
@@ -147,7 +149,7 @@ export default function DialogueBox({ lines, detectiveName, detectiveEmoji, dete
         {/* Footer */}
         <div className="px-5 py-2 flex items-center justify-between" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
           <span className="font-detective text-xs" style={{ color: isDone ? accent : 'rgba(255,255,255,0.25)', letterSpacing: '0.18em', fontSize: '0.6rem', opacity: isDone ? 0.7 : 0.5 }}>
-            {isDone && isLast ? 'CONTINUE →' : isDone ? 'NEXT →' : 'CLICK TO SKIP'}
+            {isDone && isLast ? t('dialogueContinue') : isDone ? t('dialogueNext') : t('dialogueSkip')}
           </span>
           <span className="font-detective text-xs" style={{ color: 'rgba(255,255,255,0.15)', letterSpacing: '0.1em', fontSize: '0.6rem' }}>
             {lineIndex + 1} / {lines.length}

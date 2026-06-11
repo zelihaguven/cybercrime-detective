@@ -4,6 +4,7 @@ import DialogueBox from './DialogueBox';
 import { getDetectiveAvatarEmoji, getRank, getRankProgress, getRankColor } from '../utils/detective';
 import { OUTFIT_ACCENT_COLORS } from './CharacterSVG';
 import CharacterSVG from './CharacterSVG';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface Props {
   level: Level;
@@ -18,6 +19,7 @@ interface Props {
 type Phase = 'results' | 'dialogue' | 'done';
 
 export default function CaseConclusion({ level, detective, correct, xpEarned, discoveredCount, onComplete, onRetry }: Props) {
+  const { t } = useLanguage();
   const [phase, setPhase] = useState<Phase>('results');
   const [stampVisible, setStampVisible] = useState(false);
   const [displayXP, setDisplayXP] = useState(0);
@@ -61,7 +63,7 @@ export default function CaseConclusion({ level, detective, correct, xpEarned, di
         <div className="scanlines absolute inset-0 pointer-events-none opacity-30" />
         <div className="noise-overlay absolute inset-0 pointer-events-none" />
         <div className="absolute top-6 left-8 font-detective text-xs" style={{ color: 'rgba(245,166,35,0.4)', letterSpacing: '0.3em', fontSize: '0.6rem' }}>
-          CASE {String(level.id).padStart(2, '0')} · DEBRIEF
+          {t('caseLabel')} {String(level.id).padStart(2, '0')} · {t('debrief')}
         </div>
         <DialogueBox
           lines={level.conclusionDialogue}
@@ -82,10 +84,10 @@ export default function CaseConclusion({ level, detective, correct, xpEarned, di
         <div className="noise-overlay absolute inset-0 pointer-events-none" />
         <div className="relative z-10 text-center">
           <div className="font-detective text-4xl mb-2" style={{ color: correct ? '#7ABF6A' : '#E05A47', letterSpacing: '0.15em' }}>
-            {correct ? 'Case Closed.' : 'Incorrect Conclusion.'}
+            {correct ? t('conclusionCaseClosed') : t('conclusionIncorrect')}
           </div>
           <p className="font-serif italic text-sm mb-8" style={{ color: 'var(--text-muted)' }}>
-            {correct ? 'Your report has been filed.' : 'Return to the scene. Review your evidence.'}
+            {correct ? t('conclusionFiled') : t('conclusionRetryMsg')}
           </p>
           <div className="flex gap-4 justify-center">
             <button
@@ -93,7 +95,7 @@ export default function CaseConclusion({ level, detective, correct, xpEarned, di
               className="font-detective text-sm tracking-widest uppercase px-8 py-3 transition-all duration-300"
               style={{ background: 'rgba(245,166,35,0.1)', border: '1px solid rgba(245,166,35,0.5)', color: 'var(--accent)', letterSpacing: '0.25em' }}
             >
-              Return to Office
+              {t('returnToOfficeConclusion')}
             </button>
             {!correct && (
               <button
@@ -101,7 +103,7 @@ export default function CaseConclusion({ level, detective, correct, xpEarned, di
                 className="font-detective text-sm tracking-widest uppercase px-8 py-3 transition-all duration-300"
                 style={{ background: 'rgba(224,90,71,0.08)', border: '1px solid rgba(224,90,71,0.4)', color: 'var(--danger)', letterSpacing: '0.25em' }}
               >
-                Reinvestigate
+                {t('conclusionReinvestigate')}
               </button>
             )}
           </div>
@@ -136,7 +138,7 @@ export default function CaseConclusion({ level, detective, correct, xpEarned, di
               transform: stampVisible ? 'scale(1) rotate(-5deg)' : 'scale(1.3) rotate(-5deg)',
             }}
           >
-            {correct ? 'CASE CLOSED' : 'INCORRECT'}
+            {correct ? t('caseClosed') : t('wrongCall')}
           </div>
           {correct && (
             <p className="mt-2 font-detective text-xs" style={{ color: 'rgba(255,255,255,0.25)', letterSpacing: '0.2em', fontSize: '0.6rem' }}>
@@ -156,11 +158,11 @@ export default function CaseConclusion({ level, detective, correct, xpEarned, di
                   : <span className="text-3xl">{avatarEmoji}</span>}
                 <div>
                   <div className="font-detective text-sm" style={{ color: 'var(--text-primary)' }}>Det. {detective.name}</div>
-                  <div className="font-detective text-xs" style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.58rem', letterSpacing: '0.12em' }}>INVESTIGATION COMPLETE</div>
+                  <div className="font-detective text-xs" style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.58rem', letterSpacing: '0.12em' }}>{t('investigationComplete')}</div>
                 </div>
               </div>
               <div className="text-right">
-                <div className="font-detective" style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.52rem', letterSpacing: '0.2em', marginBottom: 2 }}>XP EARNED</div>
+                <div className="font-detective" style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.52rem', letterSpacing: '0.2em', marginBottom: 2 }}>{t('xpEarned')}</div>
                 <div className="font-detective text-3xl" style={{ color: avatarColor, letterSpacing: '0.04em' }}>
                   +{displayXP}
                 </div>
@@ -170,9 +172,9 @@ export default function CaseConclusion({ level, detective, correct, xpEarned, di
             {/* Stats row */}
             <div className="grid grid-cols-3 gap-3 mb-5">
               {[
-                { label: 'VERDICT', value: '✓ CORRECT', color: '#7ABF6A' },
-                { label: 'CLUES', value: `${discoveredCount} / ${level.clues.length + level.bonusClues.length}`, color: '#F5A623' },
-                { label: 'ATTACK TYPE', value: level.caseType, color: 'rgba(255,255,255,0.55)' },
+                { label: t('verdictLabel'), value: t('verdictCorrect'), color: '#7ABF6A' },
+                { label: t('cluesFound'), value: `${discoveredCount} / ${level.clues.length + level.bonusClues.length}`, color: '#F5A623' },
+                { label: t('attackTypeLabel'), value: level.caseType, color: 'rgba(255,255,255,0.55)' },
               ].map(({ label, value, color }) => (
                 <div key={label} style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', padding: '10px 12px', textAlign: 'center' }}>
                   <div className="font-detective" style={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.5rem', letterSpacing: '0.18em', marginBottom: 4 }}>{label}</div>
@@ -188,11 +190,11 @@ export default function CaseConclusion({ level, detective, correct, xpEarned, di
                   <span className="font-detective" style={{ color: newRankColor, fontSize: '0.62rem', letterSpacing: '0.12em' }}>{newRank}</span>
                   {rankChanged && (
                     <span className="font-detective px-1.5 py-0.5" style={{ background: `${newRankColor}20`, border: `1px solid ${newRankColor}40`, color: newRankColor, fontSize: '0.5rem', letterSpacing: '0.15em' }}>
-                      ↑ RANK UP
+                      {t('rankUpLabel')}
                     </span>
                   )}
                 </div>
-                <span className="font-detective" style={{ color: 'rgba(255,255,255,0.28)', fontSize: '0.58rem' }}>{newXP} XP total</span>
+                <span className="font-detective" style={{ color: 'rgba(255,255,255,0.28)', fontSize: '0.58rem' }}>{newXP} {t('xpTotal')}</span>
               </div>
               <div style={{ height: 4, background: 'rgba(255,255,255,0.07)', borderRadius: 2 }}>
                 <div
@@ -211,7 +213,7 @@ export default function CaseConclusion({ level, detective, correct, xpEarned, di
         ) : (
           /* Wrong answer card */
           <div style={{ background: 'rgba(224,90,71,0.04)', border: '1px solid rgba(224,90,71,0.18)', padding: '20px' }}>
-            <div className="font-detective text-xs mb-3" style={{ color: 'rgba(224,90,71,0.6)', letterSpacing: '0.22em', fontSize: '0.6rem' }}>DETECTIVE NOTES</div>
+            <div className="font-detective text-xs mb-3" style={{ color: 'rgba(224,90,71,0.6)', letterSpacing: '0.22em', fontSize: '0.6rem' }}>{t('detectiveNotesLabel')}</div>
             <p className="font-serif italic text-sm" style={{ color: 'rgba(255,255,255,0.65)', lineHeight: 1.85 }}>
               {level.failureOutcome}
             </p>
@@ -229,7 +231,7 @@ export default function CaseConclusion({ level, detective, correct, xpEarned, di
                 onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(245,166,35,0.16)')}
                 onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(245,166,35,0.1)')}
               >
-                Debrief with Team →
+                {t('debriefWithTeam')}
               </button>
               <button
                 onClick={onComplete}
@@ -238,7 +240,7 @@ export default function CaseConclusion({ level, detective, correct, xpEarned, di
                 onMouseEnter={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.6)')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')}
               >
-                Skip to Office
+                {t('skipToOffice')}
               </button>
             </>
           ) : (
@@ -248,14 +250,14 @@ export default function CaseConclusion({ level, detective, correct, xpEarned, di
                 className="flex-1 font-detective text-sm tracking-widest uppercase py-3.5 transition-all duration-300"
                 style={{ background: 'rgba(224,90,71,0.08)', border: '1px solid rgba(224,90,71,0.4)', color: 'var(--danger)', letterSpacing: '0.22em' }}
               >
-                Reinvestigate →
+                {t('reinvestigate')}
               </button>
               <button
                 onClick={onComplete}
                 className="font-detective text-xs tracking-widest uppercase px-5 py-3 transition-all duration-200"
                 style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.18em', fontSize: '0.62rem' }}
               >
-                Abandon
+                {t('abandonCase')}
               </button>
             </>
           )}

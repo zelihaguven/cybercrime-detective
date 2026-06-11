@@ -172,7 +172,7 @@ export default function Scene({ level, discoveredClues, detective, onClueDiscove
             <span className="text-lg flex-shrink-0">{avatarEmoji}</span>
             <div>
               <div className="font-detective" style={{ color: avatarColor, fontSize: '0.55rem', letterSpacing: '0.2em', opacity: 0.65, marginBottom: 3 }}>
-                {detective ? `DET. ${detective.name.toUpperCase()} · INITIAL OBSERVATION` : 'DETECTIVE · INITIAL OBSERVATION'}
+                {detective ? `DET. ${detective.name.toUpperCase()} · ${t('sceneInitialObs')}` : `DETECTIVE · ${t('sceneInitialObs')}`}
               </div>
               <p className="font-serif italic text-xs" style={{ color: 'rgba(255,255,255,0.55)', lineHeight: 1.75, fontSize: '0.75rem' }}>
                 "{level.detectiveMemo}"
@@ -321,7 +321,7 @@ function HUD({
               <div key={i} className="transition-all duration-500" style={{ width: 10, height: 10, borderRadius: '50%', background: i < found ? 'var(--accent)' : 'rgba(245,166,35,0.2)', boxShadow: i < found ? '0 0 8px rgba(245,166,35,0.6)' : 'none' }} />
             ))}
             <span className="font-detective text-xs ml-2 tracking-widest" style={{ color: 'var(--text-muted)' }}>
-              {found}/{required} CLUES
+              {found}/{required} {t('sceneCluesHUD')}
             </span>
           </div>
         )}
@@ -351,7 +351,7 @@ function HUD({
       {showHint && (
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 text-center pointer-events-none fade-in">
           <div className="font-detective text-sm tracking-widest uppercase px-8 py-4" style={{ color: 'var(--text-muted)', background: 'rgba(10,8,6,0.7)', border: '1px solid rgba(245,166,35,0.15)', letterSpacing: '0.2em', fontSize: isMobile ? '0.6rem' : undefined }}>
-            {isMobile ? 'Tap glowing objects' : 'Click glowing objects to investigate'}
+            {isMobile ? t('sceneTapHint') : t('sceneClickHint')}
           </div>
         </div>
       )}
@@ -360,7 +360,7 @@ function HUD({
       {newPin && (
         <div className="absolute top-20 right-6 z-40 pin-drop" style={{ background: 'rgba(10,8,6,0.95)', border: '1px solid rgba(245,166,35,0.6)', padding: isMobile ? '6px 10px' : '10px 18px', boxShadow: '0 0 30px rgba(245,166,35,0.2)' }}>
           <span className="font-detective text-xs tracking-widest uppercase" style={{ color: 'var(--accent)', fontSize: isMobile ? '0.55rem' : undefined }}>
-            📌 Evidence Added to Board
+            {t('sceneEvidencePinned')}
           </span>
         </div>
       )}
@@ -394,9 +394,10 @@ function HudButton({ onClick, label, icon, highlight = false, danger = false, is
 function ClueCard({ clue, onClose, isNew, detective, isMobile }: { clue: Clue; onClose: () => void; isNew: boolean; detective?: Detective | null; isMobile: boolean }) {
   const [visible, setVisible] = useState(false);
   useEffect(() => { setTimeout(() => setVisible(true), 50); }, []);
+  const { t } = useLanguage();
 
   const typeColor = { photo: '#7ABF6A', note: '#F5A623', screenshot: '#4A90D9', witness: '#B98FD4' }[clue.type];
-  const typeLabel = { photo: 'Photograph', note: 'Field Note', screenshot: 'Digital Screenshot', witness: 'Witness Statement' }[clue.type];
+  const typeLabel = { photo: t('boardPhotograph'), note: t('boardFieldNote'), screenshot: t('boardScreenshot'), witness: t('boardStatement') }[clue.type];
   const avatarEmoji = detective ? getDetectiveAvatarEmoji(detective.avatar) : null;
   const avatarColor = detective ? (AVATAR_COLORS[detective.avatar] ?? '#F5A623') : '#F5A623';
 
@@ -456,16 +457,16 @@ function ClueCard({ clue, onClose, isNew, detective, isMobile }: { clue: Clue; o
           {/* Footer */}
           <div className="px-4 py-3 flex items-center justify-between" style={{ borderTop: `1px solid rgba(255,255,255,0.05)` }}>
             {isNew ? (
-              <span className="font-detective tracking-widest uppercase" style={{ color: 'var(--success)', fontSize: '0.55rem' }}>✓ Pinned to Board</span>
+              <span className="font-detective tracking-widest uppercase" style={{ color: 'var(--success)', fontSize: '0.55rem' }}>{t('scenePinnedMobile')}</span>
             ) : (
-              <span className="font-detective tracking-widest uppercase" style={{ color: 'var(--text-muted)', opacity: 0.4, fontSize: '0.55rem' }}>Previously Examined</span>
+              <span className="font-detective tracking-widest uppercase" style={{ color: 'var(--text-muted)', opacity: 0.4, fontSize: '0.55rem' }}>{t('scenePreviousExamined')}</span>
             )}
             <button
               onClick={onClose}
               className="font-detective tracking-widest uppercase px-4 py-2 transition-all duration-200"
               style={{ border: '1px solid rgba(245,166,35,0.3)', color: 'var(--accent)', background: 'transparent', fontSize: '0.65rem' }}
             >
-              Close
+              {t('sceneClose')}
             </button>
           </div>
         </div>
@@ -517,7 +518,7 @@ function ClueCard({ clue, onClose, isNew, detective, isMobile }: { clue: Clue; o
                 {avatarEmoji && <span className="text-base flex-shrink-0">{avatarEmoji}</span>}
                 <div>
                   <div className="font-detective mb-1.5" style={{ color: avatarColor, fontSize: '0.52rem', letterSpacing: '0.2em', opacity: 0.65 }}>
-                    {detective ? `DET. ${detective.name.toUpperCase()}` : 'DETECTIVE'} · OBSERVATION
+                    {detective ? `DET. ${detective.name.toUpperCase()}` : 'DETECTIVE'} · {t('sceneObservation')}
                   </div>
                   <p className="font-serif italic text-xs" style={{ color: 'rgba(255,255,255,0.6)', lineHeight: 1.75, fontSize: '0.74rem' }}>
                     "{clue.detectiveComment}"
@@ -530,16 +531,16 @@ function ClueCard({ clue, onClose, isNew, detective, isMobile }: { clue: Clue; o
           {/* Footer */}
           <div className="px-6 py-3 flex items-center justify-between" style={{ borderTop: `1px solid rgba(255,255,255,0.05)` }}>
             {isNew ? (
-              <span className="font-detective text-xs tracking-widest uppercase" style={{ color: 'var(--success)' }}>✓ Pinned to Evidence Board</span>
+              <span className="font-detective text-xs tracking-widest uppercase" style={{ color: 'var(--success)' }}>{t('scenePinnedBoard')}</span>
             ) : (
-              <span className="font-detective text-xs tracking-widest uppercase" style={{ color: 'var(--text-muted)', opacity: 0.4 }}>Previously Examined</span>
+              <span className="font-detective text-xs tracking-widest uppercase" style={{ color: 'var(--text-muted)', opacity: 0.4 }}>{t('scenePreviousExamined')}</span>
             )}
             <button
               onClick={onClose}
               className="font-detective text-xs tracking-widest uppercase px-4 py-1.5 transition-all duration-200"
               style={{ border: '1px solid rgba(245,166,35,0.3)', color: 'var(--accent)', background: 'transparent' }}
             >
-              Close
+              {t('sceneClose')}
             </button>
           </div>
         </div>

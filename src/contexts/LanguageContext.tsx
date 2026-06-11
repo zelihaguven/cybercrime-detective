@@ -12,12 +12,12 @@ const Ctx = createContext<LangCtx>({ lang: 'en', setLang: () => {}, t: (k) => k 
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>(() => {
-    try { return (localStorage.getItem('ciu-lang') as Lang) ?? 'en'; }
+    try { return (localStorage.getItem('ciu-detective-language') as Lang) ?? 'en'; }
     catch { return 'en'; }
   });
 
   const setLang = useCallback((l: Lang) => {
-    localStorage.setItem('ciu-lang', l);
+    localStorage.setItem('ciu-detective-language', l);
     setLangState(l);
   }, []);
 

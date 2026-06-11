@@ -1,21 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import DialogueBox from './DialogueBox';
 import type { Detective, DialogueLine } from '../types/game';
 import { getDetectiveAvatarEmoji } from '../utils/detective';
 import CharacterSVG, { OUTFIT_ACCENT_COLORS } from './CharacterSVG';
 import { useIsMobile } from '../utils/responsive';
+import { useLanguage } from '../contexts/LanguageContext';
 
-const INTRO_LINES: DialogueLine[] = [
-  { characterId: 'narrator', text: 'Berlin · Cybercrime Investigation Unit · 08:42 AM' },
-  { characterId: 'narrator', text: 'Rain against the windows. Cold coffee on the desk. Six open cases.' },
-  { characterId: 'weber', text: "You must be the new transfer. I'm Chief Inspector Weber. We've been expecting you." },
-  { characterId: 'weber', text: "Six cases are waiting. Six victims. Each one fell for a different form of cybercrime — and none of them saw it coming." },
-  { characterId: 'mia', text: "Oh! You're finally here. I'm Mia — digital forensics. When you find evidence in the field, I'll help you make sense of it. The technical side is my job." },
-  { characterId: 'weber', text: "Your role is straightforward, {detective}. You investigate crime scenes. You collect evidence. You pin it to your board. When you're ready — you name the attack. Make it stick." },
-  { characterId: 'jonas', text: "Jonas. I'm your field officer. I secure scenes, recover devices, talk to witnesses. Whatever I leave behind — it matters. Read it carefully." },
-  { characterId: 'weber', text: "One more thing. These aren't exercises. Every case here represents real victims. Real damage. We solve them — then we publish the findings. Prevention starts in this room." },
-  { characterId: 'detective', text: "Understood. I'm ready." },
-  { characterId: 'weber', text: "Then the board is yours, {detective}. The first case is already waiting." },
+const INTRO_CHARACTER_IDS: DialogueLine['characterId'][] = [
+  'narrator', 'narrator', 'weber', 'weber', 'mia', 'weber', 'jonas', 'weber', 'detective', 'weber',
 ];
 
 interface Props {
@@ -25,7 +17,13 @@ interface Props {
 
 export default function IntroSequence({ detective, onComplete }: Props) {
   const isMobile = useIsMobile();
+  const { t } = useLanguage();
   const [mounted, setMounted] = useState(false);
+
+  const introLines: DialogueLine[] = useMemo(() => INTRO_CHARACTER_IDS.map((characterId, i) => ({
+    characterId,
+    text: t(`introLine${i}` as Parameters<typeof t>[0]),
+  })), [t]);
 
   useEffect(() => { setTimeout(() => setMounted(true), 200); }, []);
 
@@ -112,7 +110,7 @@ export default function IntroSequence({ detective, onComplete }: Props) {
       <div className="noise-overlay absolute inset-0 pointer-events-none" />
 
       <DialogueBox
-        lines={INTRO_LINES}
+        lines={introLines}
         detectiveName={detective.name}
         detectiveEmoji={getDetectiveAvatarEmoji(detective.avatar)}
         detectiveAppearance={detective.appearance}

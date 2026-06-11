@@ -122,7 +122,7 @@ export default function CaseBriefing({ level, detective, onBegin, onBack }: Prop
                   {level.victim.emoji}
                 </div>
                 <div className="flex-1">
-                  <div className="font-detective text-xs mb-1" style={{ color: 'rgba(245,166,35,0.5)', letterSpacing: '0.2em', fontSize: '0.58rem' }}>VICTIM</div>
+                  <div className="font-detective text-xs mb-1" style={{ color: 'rgba(245,166,35,0.5)', letterSpacing: '0.2em', fontSize: '0.58rem' }}>{t('victimLabel')}</div>
                   <div className="font-detective text-lg" style={{ color: 'var(--text-primary)', letterSpacing: '0.06em' }}>{level.victim.name}</div>
                   <div className="font-detective text-xs mt-0.5" style={{ color: 'var(--text-muted)', letterSpacing: '0.1em', fontSize: '0.65rem' }}>
                     {level.victim.age} yrs · {level.victim.description}
@@ -142,7 +142,7 @@ export default function CaseBriefing({ level, detective, onBegin, onBack }: Prop
                 padding: '16px',
               }}
             >
-              <div className="font-detective text-xs mb-2" style={{ color: 'rgba(245,166,35,0.55)', letterSpacing: '0.22em', fontSize: '0.58rem' }}>INCIDENT SUMMARY</div>
+              <div className="font-detective text-xs mb-2" style={{ color: 'rgba(245,166,35,0.55)', letterSpacing: '0.22em', fontSize: '0.58rem' }}>{t('incidentSummary')}</div>
               <p className="font-sans text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.75)', lineHeight: 1.8, fontSize: '0.8rem' }}>
                 {level.briefing}
               </p>
@@ -157,7 +157,7 @@ export default function CaseBriefing({ level, detective, onBegin, onBack }: Prop
                 {[
                   { label: t('investigationDetails'), value: level.investigationLabel },
                   { label: t('location'), value: level.location },
-                  { label: 'EVIDENCE', value: `${level.clues.length} items` },
+                  { label: t('evidenceCount'), value: `${level.clues.length} items` },
                   { label: t('difficulty'), value: t(DIFFICULTY_LABEL_KEYS[level.difficulty]), color: diffColor },
                 ].map(({ label, value, color }) => (
                   <div key={label}>
@@ -183,8 +183,8 @@ export default function CaseBriefing({ level, detective, onBegin, onBack }: Prop
                   ? <CharacterSVG appearance={detective.appearance} size={32}/>
                   : <span className="text-lg">{avatarEmoji}</span>}
                 <div>
-                  <div className="font-detective" style={{ color: 'rgba(245,166,35,0.55)', fontSize: '0.55rem', letterSpacing: '0.2em' }}>DETECTIVE {detective.name.toUpperCase()}</div>
-                  <div className="font-detective" style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.5rem', letterSpacing: '0.15em' }}>INITIAL ASSESSMENT</div>
+                  <div className="font-detective" style={{ color: 'rgba(245,166,35,0.55)', fontSize: '0.55rem', letterSpacing: '0.2em' }}>DET. {detective.name.toUpperCase()}</div>
+                  <div className="font-detective" style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.5rem', letterSpacing: '0.15em' }}>{t('initialAssessment')}</div>
                 </div>
               </div>
               <p className="font-serif italic text-sm" style={{ color: 'rgba(255,255,255,0.55)', lineHeight: 1.8, fontSize: '0.78rem' }}>
@@ -207,7 +207,7 @@ export default function CaseBriefing({ level, detective, onBegin, onBack }: Prop
                 onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(245,166,35,0.16)'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(245,166,35,0.1)'; }}
               >
-                Receive Briefing →
+                {t('receiveBriefing')}
               </button>
               <button
                 onClick={onBegin}
@@ -222,7 +222,7 @@ export default function CaseBriefing({ level, detective, onBegin, onBack }: Prop
                 onMouseEnter={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.3)'; }}
               >
-                Skip Briefing · Go Straight to Scene
+                {t('skipBriefing')}
               </button>
             </div>
           </div>
