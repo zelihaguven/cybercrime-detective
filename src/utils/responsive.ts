@@ -13,15 +13,23 @@ export function useIsMobile() {
 }
 
 export function useIsLandscape() {
-  const [landscape, setLandscape] = useState(() =>
+  const check = () =>
     typeof window !== 'undefined'
       ? window.innerWidth > window.innerHeight && window.innerHeight < 500
-      : false
-  );
+      : false;
+
+  const [landscape, setLandscape] = useState(check);
+
   useEffect(() => {
-    const fn = () => setLandscape(window.innerWidth > window.innerHeight && window.innerHeight < 500);
-    window.addEventListener('resize', fn);
-    return () => window.removeEventListener('resize', fn);
+    // orientationchange fires before resize on Android Chrome
+    const onOrient = () => setTimeout(() => setLandscape(check()), 100);
+    const onResize = () => setLandscape(check());
+    window.addEventListener('orientationchange', onOrient);
+    window.addEventListener('resize', onResize);
+    return () => {
+      window.removeEventListener('orientationchange', onOrient);
+      window.removeEventListener('resize', onResize);
+    };
   }, []);
   return landscape;
 }

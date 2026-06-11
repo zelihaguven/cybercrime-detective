@@ -41,6 +41,12 @@ body {
   position: relative;
 }
 
+/* App root: 100vh fallback for Android Chrome < 108, 100dvh for modern browsers */
+.app-root {
+  height: 100vh;
+  height: 100dvh;
+}
+
 /* Fonts */
 .font-detective {
   font-family: 'Special Elite', cursive;

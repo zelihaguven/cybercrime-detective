@@ -156,7 +156,7 @@ function AppInner() {
   const level = getLevelById(state.currentLevel, lang) ?? LEVELS[0];
 
   return (
-    <div className="relative overflow-hidden font-sans" style={{ width: '100vw', height: '100dvh' }}>
+    <div className="app-root relative overflow-hidden font-sans" style={{ width: '100vw' }}>
 
       <ScreenLayer active={state.screen === 'title'}>
         <TitleScreen
