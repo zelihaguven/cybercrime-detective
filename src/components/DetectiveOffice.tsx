@@ -20,10 +20,6 @@ export default function DetectiveOffice({ detective, levels, onSelectCase, onNew
   const isMobile = useIsMobile();
   const { t } = useLanguage();
   const [selected, setSelected] = useState<number | null>(null);
-  const [mounted, setMounted] = useState(false);
-
-  // Slight delay for entrance animation
-  useState(() => { setTimeout(() => setMounted(true), 80); });
 
   const { progress } = getRankProgress(detective.xp);
   const rankColor = getRankColor(detective.rank);

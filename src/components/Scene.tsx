@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Clue, Level, Detective } from '../types/game';
+import type { UIKey } from '../i18n/ui';
 import { getDetectiveAvatarEmoji } from '../utils/detective';
 import { AVATAR_COLORS } from '../data/characters';
 import { useIsMobile, useIsLandscape } from '../utils/responsive';
@@ -261,7 +262,7 @@ function HUD({
   onOpenBoard: () => void; onOpenHandbook: () => void; onAccuse: () => void;
   onExitRequest?: () => void;
   showHint: boolean; newPin: string | null; isMobile: boolean; isLandscape: boolean;
-  t: (key: string) => string;
+  t: (key: UIKey) => string;
 }) {
   const canAccuse = found >= required;
 

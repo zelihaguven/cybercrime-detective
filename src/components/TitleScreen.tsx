@@ -5,9 +5,10 @@ interface Props {
   onNewGame: () => void;
   onCaseSelect: () => void;
   onHandbook: () => void;
+  onMultiplayer?: () => void;
 }
 
-export default function TitleScreen({ onNewGame, onCaseSelect, onHandbook }: Props) {
+export default function TitleScreen({ onNewGame, onCaseSelect, onHandbook, onMultiplayer }: Props) {
   const { t } = useLanguage();
   const [phase, setPhase] = useState(0);
 
@@ -94,6 +95,9 @@ export default function TitleScreen({ onNewGame, onCaseSelect, onHandbook }: Pro
           <TitleButton onClick={onNewGame} primary label={t('newInvestigation')} icon="◈" />
           <TitleButton onClick={onCaseSelect} label={t('caseSelection')} icon="⊡" />
           <TitleButton onClick={onHandbook} label={t('detectiveHandbook')} icon="⊞" />
+          {onMultiplayer && (
+            <TitleButton onClick={onMultiplayer} label={t('multiplayerMode')} icon="⊗" />
+          )}
         </div>
 
         {/* Bottom credit */}

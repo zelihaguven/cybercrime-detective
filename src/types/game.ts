@@ -10,7 +10,13 @@ export type GameScreen =
   | 'accusation'
   | 'case-conclusion'
   | 'all-cases-complete'
-  | 'case-select'; // legacy, unused
+  | 'case-select'   // legacy, unused
+  | 'mp-modal'
+  | 'mp-create'
+  | 'mp-join'
+  | 'mp-lobby'
+  | 'mp-game'
+  | 'mp-result';
 
 export type DetectiveRank =
   | 'Junior Investigator'

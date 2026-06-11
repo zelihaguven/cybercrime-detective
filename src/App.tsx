@@ -16,6 +16,13 @@ import Handbook from './components/Handbook';
 import AccusationScreen from './components/AccusationScreen';
 import CaseConclusion from './components/CaseConclusion';
 import AllCasesComplete from './components/AllCasesComplete';
+import MultiplayerModal from './components/multiplayer/MultiplayerModal';
+import CreateRoom from './components/multiplayer/CreateRoom';
+import JoinRoom from './components/multiplayer/JoinRoom';
+import RoomLobby from './components/multiplayer/RoomLobby';
+import MultiplayerGame from './components/multiplayer/MultiplayerGame';
+import MultiplayerResult from './components/multiplayer/MultiplayerResult';
+import { getOrCreatePlayerId } from './utils/roomCode';
 
 const STORAGE_DETECTIVE = 'ciu-detective-v1';
 const STORAGE_INTRO = 'ciu-intro-v1';
@@ -64,6 +71,10 @@ function AppInner() {
   const { lang } = useLanguage();
   const [state, setState] = useState<GameState>(init);
   const [overlay, setOverlay] = useState<'board' | 'handbook' | null>(null);
+
+  // Multiplayer state
+  const [mpRoomCode, setMpRoomCode] = useState<string | null>(null);
+  const [mpPlayerId] = useState<string>(getOrCreatePlayerId);
 
   const go = useCallback((screen: GameScreen) => setState((s) => ({ ...s, screen })), []);
 
@@ -168,6 +179,7 @@ function AppInner() {
             setState((s) => ({ ...s, screen: 'scene', currentLevel: 1 }));
             setOverlay('handbook');
           }}
+          onMultiplayer={() => go('mp-modal')}
         />
       </ScreenLayer>
 
@@ -262,6 +274,68 @@ function AppInner() {
           <AllCasesComplete
             detective={state.detective}
             onComplete={() => go('detective-office')}
+          />
+        )}
+      </ScreenLayer>
+
+      {/* ── Multiplayer screens ── */}
+      <ScreenLayer active={state.screen === 'mp-modal'}>
+        <MultiplayerModal
+          onCreate={() => go('mp-create')}
+          onJoin={() => go('mp-join')}
+          onBack={() => go('title')}
+        />
+      </ScreenLayer>
+
+      <ScreenLayer active={state.screen === 'mp-create'}>
+        <CreateRoom
+          onRoomCreated={(code) => {
+            setMpRoomCode(code);
+            go('mp-lobby');
+          }}
+          onBack={() => go('mp-modal')}
+        />
+      </ScreenLayer>
+
+      <ScreenLayer active={state.screen === 'mp-join'}>
+        <JoinRoom
+          onRoomJoined={(code) => {
+            setMpRoomCode(code);
+            go('mp-lobby');
+          }}
+          onBack={() => go('mp-modal')}
+        />
+      </ScreenLayer>
+
+      <ScreenLayer active={state.screen === 'mp-lobby'}>
+        {mpRoomCode && (
+          <RoomLobby
+            roomCode={mpRoomCode}
+            playerId={mpPlayerId}
+            onGameStarted={() => go('mp-game')}
+            onLeave={() => { setMpRoomCode(null); go('mp-modal'); }}
+          />
+        )}
+      </ScreenLayer>
+
+      <ScreenLayer active={state.screen === 'mp-game'}>
+        {mpRoomCode && (
+          <MultiplayerGame
+            roomCode={mpRoomCode}
+            playerId={mpPlayerId}
+            onResult={() => go('mp-result')}
+            onLeave={() => { setMpRoomCode(null); go('mp-modal'); }}
+          />
+        )}
+      </ScreenLayer>
+
+      <ScreenLayer active={state.screen === 'mp-result'}>
+        {mpRoomCode && (
+          <MultiplayerResult
+            roomCode={mpRoomCode}
+            playerId={mpPlayerId}
+            onPlayAgain={() => go('mp-lobby')}
+            onReturnTitle={() => { setMpRoomCode(null); go('title'); }}
           />
         )}
       </ScreenLayer>
