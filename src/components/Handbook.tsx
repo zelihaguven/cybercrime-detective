@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { HandbookTerm } from '../types/game';
 import { useIsMobile } from '../utils/responsive';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface Props {
   terms: HandbookTerm[];
@@ -9,6 +10,7 @@ interface Props {
 
 export default function Handbook({ terms, onClose }: Props) {
   const isMobile = useIsMobile();
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [selectedTerm, setSelectedTerm] = useState(0);
   const [pageFlipping, setPageFlipping] = useState(false);
@@ -69,18 +71,18 @@ export default function Handbook({ terms, onClose }: Props) {
             <h2 className="font-detective mb-3" style={{ color: '#2A1A04', fontSize: '1.5rem', borderBottom: '2px solid rgba(139,105,20,0.3)', paddingBottom: '8px' }}>{term.term}</h2>
             <p className="font-serif text-base leading-relaxed mb-5" style={{ color: '#3A2510', fontStyle: 'italic' }}>{term.oneLiner}</p>
             <div className="mb-4">
-              <div className="font-detective text-xs tracking-widest uppercase mb-2" style={{ color: '#8B6914', opacity: 0.5, fontSize: '0.6rem' }}>Analogy</div>
+              <div className="font-detective text-xs tracking-widest uppercase mb-2" style={{ color: '#8B6914', opacity: 0.5, fontSize: '0.6rem' }}>{t('handbookAnalogy')}</div>
               <div className="font-sans text-sm leading-relaxed pl-3" style={{ color: '#4A3418', borderLeft: '2px solid rgba(139,105,20,0.3)', lineHeight: 1.7 }}>{term.analogy}</div>
             </div>
             <div>
-              <div className="font-detective text-xs tracking-widest uppercase mb-2" style={{ color: '#8B6914', opacity: 0.5, fontSize: '0.6rem' }}>In This Case</div>
+              <div className="font-detective text-xs tracking-widest uppercase mb-2" style={{ color: '#8B6914', opacity: 0.5, fontSize: '0.6rem' }}>{t('handbookInThisCase')}</div>
               <div className="font-sans text-sm leading-relaxed" style={{ color: '#3A2510', lineHeight: 1.7 }}>{term.inThisCase}</div>
             </div>
           </div>
           {/* Close */}
           <div className="flex-shrink-0 py-3 px-4 flex justify-center" style={{ background: '#EDE4CC', borderTop: '1px solid #C8B89A' }}>
             <button onClick={handleClose} className="font-detective text-xs tracking-widest uppercase px-6 py-2" style={{ border: '1px solid rgba(245,166,35,0.4)', color: 'var(--accent)', background: 'transparent', letterSpacing: '0.2em' }}>
-              Close Handbook
+              {t('handbookClose')}
             </button>
           </div>
         </div>
@@ -164,7 +166,7 @@ export default function Handbook({ terms, onClose }: Props) {
                 className="font-detective text-xs tracking-widest uppercase mb-1"
                 style={{ color: '#8B6914', opacity: 0.7 }}
               >
-                Detective's Handbook
+                {t('handbookTitle')}
               </div>
               <div
                 className="font-serif italic text-xs"
@@ -277,7 +279,7 @@ export default function Handbook({ terms, onClose }: Props) {
                   className="font-detective text-xs tracking-widest uppercase mb-2"
                   style={{ color: '#8B6914', opacity: 0.5, fontSize: '0.6rem' }}
                 >
-                  Analogy
+                  {t('handbookAnalogy')}
                 </div>
                 <div
                   className="font-sans text-sm leading-relaxed pl-3"
@@ -297,7 +299,7 @@ export default function Handbook({ terms, onClose }: Props) {
                   className="font-detective text-xs tracking-widest uppercase mb-2"
                   style={{ color: '#8B6914', opacity: 0.5, fontSize: '0.6rem' }}
                 >
-                  In This Case
+                  {t('handbookInThisCase')}
                 </div>
                 <div
                   className="font-sans text-sm leading-relaxed"
@@ -357,7 +359,7 @@ export default function Handbook({ terms, onClose }: Props) {
               letterSpacing: '0.2em',
             }}
           >
-            Close Handbook
+            {t('handbookClose')}
           </button>
         </div>
       </div>

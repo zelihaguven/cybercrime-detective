@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import type { GameScreen, GameState, Clue, Detective } from './types/game';
 import { LEVELS, getLevelById } from './data/levels';
 import { getRank } from './utils/detective';
+import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 
 import TitleScreen from './components/TitleScreen';
 import DetectiveCreation from './components/DetectiveCreation';
@@ -51,6 +52,15 @@ const init = (): GameState => {
 };
 
 export default function App() {
+  return (
+    <LanguageProvider>
+      <AppInner />
+    </LanguageProvider>
+  );
+}
+
+function AppInner() {
+  const { lang } = useLanguage();
   const [state, setState] = useState<GameState>(init);
   const [overlay, setOverlay] = useState<'board' | 'handbook' | null>(null);
 
@@ -102,7 +112,7 @@ export default function App() {
 
   // Accusation → calculate XP → conclusion
   const handleAccusation = useCallback((answerId: string) => {
-    const level = getLevelById(state.currentLevel);
+    const level = getLevelById(state.currentLevel, lang);
     if (!level) return;
     const correct = answerId === level.correctAnswer;
 
@@ -143,10 +153,10 @@ export default function App() {
     setOverlay(null);
   }, []);
 
-  const level = getLevelById(state.currentLevel) ?? LEVELS[0];
+  const level = getLevelById(state.currentLevel, lang) ?? LEVELS[0];
 
   return (
-    <div className="relative overflow-hidden font-sans" style={{ width: '100vw', height: '100vh' }}>
+    <div className="relative overflow-hidden font-sans" style={{ width: '100vw', height: '100dvh' }}>
 
       <ScreenLayer active={state.screen === 'title'}>
         <TitleScreen

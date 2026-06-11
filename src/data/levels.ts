@@ -1,4 +1,5 @@
-import type { Level } from '../types/game';
+import type { Level, LevelTranslation, Lang } from '../types/game';
+import { DE } from './levels.de';
 
 export const LEVELS: Level[] = [
   {
@@ -1231,5 +1232,37 @@ export const LEVELS: Level[] = [
   },
 ];
 
-export const getLevelById = (id: number): Level | undefined =>
-  LEVELS.find((l) => l.id === id);
+function applyTranslation(level: Level, de: LevelTranslation): Level {
+  return {
+    ...level,
+    title: de.title,
+    subtitle: de.subtitle,
+    caseType: de.caseType,
+    victim: { ...level.victim, description: de.victim.description, background: de.victim.background },
+    location: de.location,
+    investigationLabel: de.investigationLabel,
+    briefing: de.briefing,
+    detectiveMemo: de.detectiveMemo,
+    openingDialogue: de.openingDialogue,
+    conclusionDialogue: de.conclusionDialogue,
+    accusationOptions: de.accusationOptions,
+    handbookTerms: de.handbookTerms,
+    successOutcome: de.successOutcome,
+    failureOutcome: de.failureOutcome,
+    clues: level.clues.map((c) => {
+      const t = de.clueTexts[c.id];
+      return t ? { ...c, label: t.label, shortDesc: t.shortDesc, detail: t.detail, detectiveComment: t.detectiveComment } : c;
+    }),
+    bonusClues: level.bonusClues.map((c) => {
+      const t = de.clueTexts[c.id];
+      return t ? { ...c, label: t.label, shortDesc: t.shortDesc, detail: t.detail, detectiveComment: t.detectiveComment } : c;
+    }),
+  };
+}
+
+export const getLevelById = (id: number, lang?: Lang): Level | undefined => {
+  const level = LEVELS.find((l) => l.id === id);
+  if (!level) return undefined;
+  if (lang === 'de' && DE[id]) return applyTranslation(level, DE[id]);
+  return level;
+};

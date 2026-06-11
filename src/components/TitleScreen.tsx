@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
+import type { Lang } from '../types/game';
 
 interface Props {
   onNewGame: () => void;
@@ -7,6 +9,7 @@ interface Props {
 }
 
 export default function TitleScreen({ onNewGame, onCaseSelect, onHandbook }: Props) {
+  const { lang, setLang, t } = useLanguage();
   const [phase, setPhase] = useState(0);
 
   useEffect(() => {
@@ -44,7 +47,7 @@ export default function TitleScreen({ onNewGame, onCaseSelect, onHandbook }: Pro
           style={{ opacity: phase >= 1 ? 1 : 0, transform: phase >= 1 ? 'translateY(0)' : 'translateY(-20px)' }}
         >
           <span className="font-detective text-xs tracking-[0.3em] uppercase" style={{ color: 'var(--accent)', opacity: 0.8 }}>
-            Cybercrime Detective Division
+            {t('tagline')}
           </span>
         </div>
 
@@ -78,7 +81,7 @@ export default function TitleScreen({ onNewGame, onCaseSelect, onHandbook }: Pro
           <div className="flex items-center gap-4">
             <div style={{ height: 1, width: 60, background: 'rgba(245,166,35,0.4)' }} />
             <span className="font-serif italic text-lg" style={{ color: 'var(--text-muted)' }}>
-              Cybercrime Detective
+              {t('titleSubtitle')}
             </span>
             <div style={{ height: 1, width: 60, background: 'rgba(245,166,35,0.4)' }} />
           </div>
@@ -89,9 +92,29 @@ export default function TitleScreen({ onNewGame, onCaseSelect, onHandbook }: Pro
           className="flex flex-col gap-3 items-center w-full max-w-xs transition-all duration-700"
           style={{ opacity: phase >= 3 ? 1 : 0, transform: phase >= 3 ? 'translateY(0)' : 'translateY(20px)' }}
         >
-          <TitleButton onClick={onNewGame} primary label="New Investigation" icon="◈" />
-          <TitleButton onClick={onCaseSelect} label="Case Selection" icon="⊡" />
-          <TitleButton onClick={onHandbook} label="Detective Handbook" icon="⊞" />
+          {/* Language selector */}
+          <div className="flex gap-2 mb-1">
+            {(['en', 'de'] as Lang[]).map((l) => (
+              <button
+                key={l}
+                onClick={() => setLang(l)}
+                className="font-detective text-xs tracking-widest uppercase px-4 py-2 transition-all duration-200"
+                style={{
+                  border: `1px solid ${lang === l ? 'rgba(245,166,35,0.7)' : 'rgba(245,166,35,0.18)'}`,
+                  background: lang === l ? 'rgba(245,166,35,0.12)' : 'transparent',
+                  color: lang === l ? 'var(--accent)' : 'rgba(245,166,35,0.4)',
+                  letterSpacing: '0.2em',
+                  fontSize: '0.65rem',
+                }}
+              >
+                {l.toUpperCase()}
+              </button>
+            ))}
+          </div>
+
+          <TitleButton onClick={onNewGame} primary label={t('newInvestigation')} icon="◈" />
+          <TitleButton onClick={onCaseSelect} label={t('caseSelection')} icon="⊡" />
+          <TitleButton onClick={onHandbook} label={t('detectiveHandbook')} icon="⊞" />
         </div>
 
         {/* Bottom credit */}
@@ -99,7 +122,7 @@ export default function TitleScreen({ onNewGame, onCaseSelect, onHandbook }: Pro
           className="absolute bottom-6 font-sans text-xs transition-opacity duration-700"
           style={{ color: 'var(--text-muted)', opacity: phase >= 3 ? 0.4 : 0, letterSpacing: '0.15em' }}
         >
-          CYBERCRIME DIVISION — UNIT 7 — CLASSIFIED
+          {t('creditLine')}
         </div>
       </div>
     </div>

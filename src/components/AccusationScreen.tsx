@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import type { Level } from '../types/game';
 import { useIsMobile } from '../utils/responsive';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface Props {
   level: Level;
@@ -10,6 +11,7 @@ interface Props {
 
 export default function AccusationScreen({ level, onSubmit, onCancel }: Props) {
   const isMobile = useIsMobile();
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
 
@@ -47,13 +49,13 @@ export default function AccusationScreen({ level, onSubmit, onCancel }: Props) {
         {/* Header */}
         <div className={`text-center ${isMobile ? 'mb-5' : 'mb-8'}`}>
           <div className="font-detective text-xs tracking-[0.4em] uppercase mb-3" style={{ color: 'var(--accent)', opacity: 0.7 }}>
-            — Final Deduction —
+            {t('finalDeduction')}
           </div>
           <h2 className={`font-detective mb-3 ${isMobile ? 'text-2xl' : 'text-4xl'}`} style={{ color: 'var(--text-primary)' }}>
-            Make Your Accusation
+            {t('makeYourAccusation')}
           </h2>
           <p className="font-serif italic text-sm" style={{ color: 'var(--text-muted)', fontSize: isMobile ? '0.78rem' : undefined }}>
-            Review the evidence. Choose the attack vector that best explains what happened to {level.victim.name}.
+            {t('accusationInstruction')} {level.victim.name}.
           </p>
         </div>
 
@@ -145,7 +147,7 @@ export default function AccusationScreen({ level, onSubmit, onCancel }: Props) {
               letterSpacing: '0.15em',
             }}
           >
-            ← Return to Scene
+            {t('returnToScene')}
           </button>
 
           <button
@@ -162,7 +164,7 @@ export default function AccusationScreen({ level, onSubmit, onCancel }: Props) {
               opacity: 1,
             }}
           >
-            Submit Accusation ⚖
+            {t('submitAccusation')}
           </button>
         </div>
       </div>

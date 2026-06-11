@@ -4,6 +4,7 @@ import { getRankProgress, getRankColor } from '../utils/detective';
 import { OUTFIT_ACCENT_COLORS } from './CharacterSVG';
 import CharacterSVG from './CharacterSVG';
 import { useIsMobile } from '../utils/responsive';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const DIFFICULTY_COLORS = { easy: '#7ABF6A', medium: '#F5A623', hard: '#E05A47' };
 const DIFFICULTY_LABELS = { easy: 'ENTRY LEVEL', medium: 'INTERMEDIATE', hard: 'ADVANCED' };
@@ -17,6 +18,7 @@ interface Props {
 
 export default function DetectiveOffice({ detective, levels, onSelectCase, onNewDetective }: Props) {
   const isMobile = useIsMobile();
+  const { t } = useLanguage();
   const [selected, setSelected] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -86,7 +88,7 @@ export default function DetectiveOffice({ detective, levels, onSelectCase, onNew
               className="w-full font-detective text-sm py-3 tracking-widest uppercase"
               style={{ background: 'rgba(245,166,35,0.1)', border: '1px solid rgba(245,166,35,0.5)', color: 'var(--accent)', letterSpacing: '0.22em' }}
             >
-              Open Case File →
+              {t('openCaseFile')}
             </button>
           </div>
         )}
@@ -201,7 +203,7 @@ export default function DetectiveOffice({ detective, levels, onSelectCase, onNew
               onMouseEnter={(e) => { e.currentTarget.style.color = 'rgba(224,90,71,0.7)'; e.currentTarget.style.borderColor = 'rgba(224,90,71,0.3)'; }}
               onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.2)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)'; }}
             >
-              ↺ New Detective
+              {t('newDetective')}
             </button>
           </div>
         </aside>
@@ -233,7 +235,7 @@ export default function DetectiveOffice({ detective, levels, onSelectCase, onNew
                   boxShadow: '0 0 28px rgba(245,166,35,0.12)',
                 }}
               >
-                Open Case File →
+                {t('openCaseFile')}
               </button>
             )}
           </div>

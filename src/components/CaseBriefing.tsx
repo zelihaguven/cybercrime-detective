@@ -4,8 +4,7 @@ import DialogueBox from './DialogueBox';
 import { getDetectiveAvatarEmoji } from '../utils/detective';
 import CharacterSVG from './CharacterSVG';
 import { useIsMobile } from '../utils/responsive';
-
-const DIFFICULTY_LABEL = { easy: 'ENTRY LEVEL', medium: 'INTERMEDIATE', hard: 'ADVANCED' };
+import { useLanguage } from '../contexts/LanguageContext';
 const DIFFICULTY_COLOR = { easy: '#7ABF6A', medium: '#F5A623', hard: '#E05A47' };
 
 interface Props {
@@ -17,8 +16,11 @@ interface Props {
 
 type Phase = 'dossier' | 'dialogue';
 
+const DIFFICULTY_LABEL_KEYS = { easy: 'difficultyEasy' as const, medium: 'difficultyMedium' as const, hard: 'difficultyHard' as const };
+
 export default function CaseBriefing({ level, detective, onBegin, onBack }: Props) {
   const isMobile = useIsMobile();
+  const { t } = useLanguage();
   const [phase, setPhase] = useState<Phase>('dossier');
   const [mounted, setMounted] = useState(false);
 
@@ -38,7 +40,7 @@ export default function CaseBriefing({ level, detective, onBegin, onBack }: Prop
 
         {/* Scene label */}
         <div className="absolute top-6 left-8 font-detective text-xs" style={{ color: 'rgba(245,166,35,0.4)', letterSpacing: '0.3em', fontSize: '0.6rem' }}>
-          CASE {String(level.id).padStart(2, '0')} · BRIEFING ROOM
+          {t('caseLabel')} {String(level.id).padStart(2, '0')} · {t('briefingRoom')}
         </div>
 
         <DialogueBox
@@ -72,7 +74,7 @@ export default function CaseBriefing({ level, detective, onBegin, onBack }: Prop
         onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent)')}
         onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')}
       >
-        ← Return to Board
+        {t('returnToBoard')}
       </button>
 
       <div className={`relative z-10 w-full max-w-4xl mx-auto ${isMobile ? 'px-4 py-16' : 'px-6'}`}>
@@ -86,7 +88,7 @@ export default function CaseBriefing({ level, detective, onBegin, onBack }: Prop
                   className="font-detective text-xs px-3 py-1"
                   style={{ background: `${diffColor}14`, border: `1px solid ${diffColor}35`, color: diffColor, letterSpacing: '0.18em', fontSize: '0.58rem' }}
                 >
-                  {DIFFICULTY_LABEL[level.difficulty]}
+                  {t(DIFFICULTY_LABEL_KEYS[level.difficulty])}
                 </div>
                 <div className="font-detective text-xs" style={{ color: 'rgba(245,166,35,0.45)', letterSpacing: '0.25em', fontSize: '0.58rem' }}>
                   CASE {String(level.id).padStart(2, '0')}
@@ -153,10 +155,10 @@ export default function CaseBriefing({ level, detective, onBegin, onBack }: Prop
             <div style={{ border: '1px solid rgba(255,255,255,0.08)', padding: '16px', marginBottom: 16, background: 'rgba(255,255,255,0.02)' }}>
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { label: 'INVESTIGATION', value: level.investigationLabel },
-                  { label: 'LOCATION', value: level.location },
+                  { label: t('investigationDetails'), value: level.investigationLabel },
+                  { label: t('location'), value: level.location },
                   { label: 'EVIDENCE', value: `${level.clues.length} items` },
-                  { label: 'DIFFICULTY', value: DIFFICULTY_LABEL[level.difficulty], color: diffColor },
+                  { label: t('difficulty'), value: t(DIFFICULTY_LABEL_KEYS[level.difficulty]), color: diffColor },
                 ].map(({ label, value, color }) => (
                   <div key={label}>
                     <div className="font-detective mb-1" style={{ color: 'rgba(255,255,255,0.28)', fontSize: '0.52rem', letterSpacing: '0.2em' }}>{label}</div>

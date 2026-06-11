@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import type { Clue, Level, Detective } from '../types/game';
 import { getDetectiveAvatarEmoji } from '../utils/detective';
 import { AVATAR_COLORS } from '../data/characters';
-import { useIsMobile } from '../utils/responsive';
+import { useIsMobile, useIsLandscape } from '../utils/responsive';
+import { useLanguage } from '../contexts/LanguageContext';
 import KitchenScene from './KitchenScene';
 import GamingRoomScene from './GamingRoomScene';
 import PriyaHomeOfficeScene from './PriyaHomeOfficeScene';
@@ -23,6 +24,8 @@ interface Props {
 
 export default function Scene({ level, discoveredClues, detective, onClueDiscovered, onOpenBoard, onOpenHandbook, onAccuse, onExit }: Props) {
   const isMobile = useIsMobile();
+  const isLandscape = useIsLandscape();
+  const { t } = useLanguage();
   const [activeClue, setActiveClue] = useState<Clue | null>(null);
   const [zoomed, setZoomed] = useState(false);
   const [showHint, setShowHint] = useState(true);
@@ -115,6 +118,8 @@ export default function Scene({ level, discoveredClues, detective, onClueDiscove
         showHint={showHint}
         newPin={newPin}
         isMobile={isMobile}
+        isLandscape={isLandscape}
+        t={t}
       />
 
       {/* Exit confirmation */}
@@ -122,10 +127,10 @@ export default function Scene({ level, discoveredClues, detective, onClueDiscove
         <div className="absolute inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(4,3,2,0.88)' }}>
           <div style={{ background: '#14100A', border: '1px solid rgba(245,166,35,0.3)', padding: '28px 28px 24px', maxWidth: 360, width: '90%', boxShadow: '0 20px 60px rgba(0,0,0,0.8)' }}>
             <div className="font-detective text-xs tracking-widest uppercase mb-3" style={{ color: 'rgba(245,166,35,0.5)', fontSize: '0.58rem' }}>
-              LEAVE INVESTIGATION?
+              {t('leaveInvestigation')}
             </div>
             <p className="font-serif italic text-sm mb-6" style={{ color: 'rgba(255,255,255,0.55)', lineHeight: 1.8 }}>
-              Clues found this session are not saved. You can reopen this case from the office at any time.
+              {t('leaveWarning')}
             </p>
             <div className="flex gap-3">
               <button
@@ -133,14 +138,14 @@ export default function Scene({ level, discoveredClues, detective, onClueDiscove
                 className="flex-1 font-detective text-xs tracking-widest uppercase py-2.5 transition-all duration-200"
                 style={{ border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.4)', background: 'transparent', letterSpacing: '0.15em' }}
               >
-                Keep Going
+                {t('keepGoing')}
               </button>
               <button
                 onClick={onExit}
                 className="flex-1 font-detective text-xs tracking-widest uppercase py-2.5 transition-all duration-200"
                 style={{ border: '1px solid rgba(224,90,71,0.5)', color: 'var(--danger)', background: 'rgba(224,90,71,0.06)', letterSpacing: '0.15em' }}
               >
-                Return to Office
+                {t('returnToOfficeBtn')}
               </button>
             </div>
           </div>
@@ -250,12 +255,13 @@ function Hotspot({ clue, discovered, onClick, isMobile }: { clue: Clue; discover
 }
 
 function HUD({
-  level, found, required, detective, onOpenBoard, onOpenHandbook, onAccuse, onExitRequest, showHint, newPin, isMobile,
+  level, found, required, detective, onOpenBoard, onOpenHandbook, onAccuse, onExitRequest, showHint, newPin, isMobile, isLandscape, t,
 }: {
   level: Level; found: number; required: number; detective?: Detective | null;
   onOpenBoard: () => void; onOpenHandbook: () => void; onAccuse: () => void;
   onExitRequest?: () => void;
-  showHint: boolean; newPin: string | null; isMobile: boolean;
+  showHint: boolean; newPin: string | null; isMobile: boolean; isLandscape: boolean;
+  t: (key: string) => string;
 }) {
   const canAccuse = found >= required;
 
@@ -266,7 +272,7 @@ function HUD({
         className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between"
         style={{
           background: 'linear-gradient(to bottom, rgba(10,8,6,0.9) 0%, transparent 100%)',
-          padding: isMobile ? '8px 12px' : '16px 24px',
+          padding: isLandscape ? '4px 10px' : isMobile ? '8px 12px' : '16px 24px',
         }}
       >
         <div className="flex items-start gap-3">
@@ -326,7 +332,7 @@ function HUD({
         className="absolute bottom-0 left-0 right-0 z-30 flex items-center justify-between"
         style={{
           background: 'linear-gradient(to top, rgba(10,8,6,0.95) 0%, transparent 100%)',
-          padding: isMobile ? '8px 12px' : '16px 24px',
+          padding: isLandscape ? '4px 10px' : isMobile ? '8px 12px' : '16px 24px',
         }}
       >
         {!isMobile && (
@@ -335,9 +341,9 @@ function HUD({
           </div>
         )}
         <div className={`flex items-center gap-2 ${isMobile ? 'w-full justify-end' : ''}`}>
-          <HudButton onClick={onOpenHandbook} label="Handbook" icon="📓" isMobile={isMobile} />
-          <HudButton onClick={onOpenBoard} label="Evidence Board" icon="📌" highlight={!!newPin} isMobile={isMobile} />
-          {canAccuse && <HudButton onClick={onAccuse} label="Make Accusation" icon="⚖" danger isMobile={isMobile} />}
+          <HudButton onClick={onOpenHandbook} label={t('handbook')} icon="📓" isMobile={isMobile || isLandscape} />
+          <HudButton onClick={onOpenBoard} label={t('evidenceBoard')} icon="📌" highlight={!!newPin} isMobile={isMobile || isLandscape} />
+          {canAccuse && <HudButton onClick={onAccuse} label={t('makeAccusation')} icon="⚖" danger isMobile={isMobile || isLandscape} />}
         </div>
       </div>
 

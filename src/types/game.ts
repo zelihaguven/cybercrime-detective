@@ -1,3 +1,5 @@
+export type Lang = 'en' | 'de';
+
 export type GameScreen =
   | 'title'
   | 'detective-creation'
@@ -91,6 +93,25 @@ export interface Level {
   conclusionDialogue: DialogueLine[];
   detectiveMemo: string;
   xpReward: number;
+  de?: LevelTranslation;
+}
+
+export interface LevelTranslation {
+  title: string;
+  subtitle: string;
+  caseType: string;
+  victim: { description: string; background: string };
+  location: string;
+  investigationLabel: string;
+  briefing: string;
+  detectiveMemo: string;
+  openingDialogue: DialogueLine[];
+  conclusionDialogue: DialogueLine[];
+  clueTexts: Record<string, { label: string; shortDesc: string; detail: string; detectiveComment: string }>;
+  accusationOptions: { id: string; label: string; description: string }[];
+  handbookTerms: HandbookTerm[];
+  successOutcome: string;
+  failureOutcome: string;
 }
 
 export interface GameState {

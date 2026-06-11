@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { Detective } from '../types/game';
 import { LEVELS } from '../data/levels';
+import { useLanguage } from '../contexts/LanguageContext';
 import { getRankColor, getRankProgress } from '../utils/detective';
 import { OUTFIT_ACCENT_COLORS } from './CharacterSVG';
 import CharacterSVG from './CharacterSVG';
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export default function AllCasesComplete({ detective, onComplete }: Props) {
+  const { t } = useLanguage();
   const [mounted, setMounted] = useState(false);
   const [stampVisible, setStampVisible] = useState(false);
   const [casesVisible, setCasesVisible] = useState(false);
@@ -59,13 +61,13 @@ export default function AllCasesComplete({ detective, onComplete }: Props) {
               transform: stampVisible ? 'scale(1) rotate(-2.5deg)' : 'scale(1.15) rotate(-2.5deg)',
             }}
           >
-            ALL CASES CLOSED
+            {t('allCasesClosed')}
           </div>
           <div
             className="font-detective transition-opacity duration-500"
             style={{ color: 'rgba(255,255,255,0.22)', letterSpacing: '0.25em', fontSize: '0.58rem', opacity: stampVisible ? 1 : 0 }}
           >
-            6 OF 6 · CYBERCRIME CASES RESOLVED
+            {t('allCasesSubline')}
           </div>
         </div>
 
@@ -146,12 +148,11 @@ export default function AllCasesComplete({ detective, onComplete }: Props) {
           className="text-center transition-opacity duration-500"
           style={{ opacity: ctaVisible ? 1 : 0 }}
         >
-          <p className="font-serif italic text-sm mb-2" style={{ color: 'rgba(255,255,255,0.42)', lineHeight: 1.9 }}>
-            "Six victims. Six attack vectors. All identified. All documented.<br />
-            Prevention starts in this room — and you proved it."
+          <p className="font-serif italic text-sm mb-2 whitespace-pre-line" style={{ color: 'rgba(255,255,255,0.42)', lineHeight: 1.9 }}>
+            {t('weberQuote')}
           </p>
           <p className="font-detective text-xs mb-6" style={{ color: 'rgba(255,255,255,0.2)', letterSpacing: '0.2em', fontSize: '0.58rem' }}>
-            — Chief Inspector Weber, CIU Berlin
+            {t('weberCredit')}
           </p>
           <button
             onClick={onComplete}
@@ -166,7 +167,7 @@ export default function AllCasesComplete({ detective, onComplete }: Props) {
             onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(122,191,106,0.18)')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(122,191,106,0.1)')}
           >
-            Return to Office →
+            {t('returnToOfficeFinal')}
           </button>
         </div>
       </div>
