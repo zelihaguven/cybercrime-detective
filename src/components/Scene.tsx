@@ -95,15 +95,22 @@ export default function Scene({ level, discoveredClues, detective, onClueDiscove
           style={{ background: 'radial-gradient(ellipse at 22% 45%, rgba(255,230,160,0.06) 0%, transparent 55%)' }}
         />
 
-        {allClues.map((clue) => (
-          <Hotspot
-            key={clue.id}
-            clue={clue}
-            discovered={discoveredClues.includes(clue.id)}
-            onClick={handleClueClick}
-            isMobile={isMobile}
-          />
-        ))}
+        <svg
+          className="absolute inset-0 w-full h-full"
+          viewBox="0 0 1440 900"
+          preserveAspectRatio="xMidYMid slice"
+          style={{ pointerEvents: 'none' }}
+        >
+          {allClues.map((clue) => (
+            <SVGHotspot
+              key={clue.id}
+              clue={clue}
+              discovered={discoveredClues.includes(clue.id)}
+              onClick={handleClueClick}
+              isMobile={isMobile}
+            />
+          ))}
+        </svg>
       </div>
 
       {/* HUD */}
@@ -219,39 +226,92 @@ export default function Scene({ level, discoveredClues, detective, onClueDiscove
   );
 }
 
-function Hotspot({ clue, discovered, onClick, isMobile }: { clue: Clue; discovered: boolean; onClick: (c: Clue) => void; isMobile: boolean }) {
+const SVG_W = 1440;
+const SVG_H = 900;
+
+function SVGHotspot({ clue, discovered, onClick, isMobile }: { clue: Clue; discovered: boolean; onClick: (c: Clue) => void; isMobile: boolean }) {
   const [hovered, setHovered] = useState(false);
-  const w = isMobile ? Math.max((clue.hitW ?? 6) * 1.8, 14) : (clue.hitW ?? 6);
-  const h = isMobile ? Math.max((clue.hitH ?? 8) * 1.8, 14) : (clue.hitH ?? 8);
+
+  // Convert percentage clue coordinates to SVG viewBox units so the browser
+  // handles xMidYMid slice transforms automatically (fixes mobile position drift)
+  const cx = (clue.x / 100) * SVG_W;
+  const cy = (clue.y / 100) * SVG_H;
+  const hwBase = ((clue.hitW ?? 6) / 100) * SVG_W;
+  const hhBase = ((clue.hitH ?? 8) / 100) * SVG_H;
+  const hw = isMobile ? hwBase * 1.8 : hwBase;
+  const hh = isMobile ? hhBase * 1.8 : hhBase;
+
+  const r = hovered ? (isMobile ? 24 : 14) : (isMobile ? 18 : 8);
+  // Bug 2: 40% opacity at idle for all devices (was 0 on desktop)
+  const opacity = hovered ? 1 : 0.4;
+  const fill = discovered ? 'rgba(122,191,106,0.9)' : 'rgba(245,166,35,1)';
+  const glowFull = discovered ? 'rgba(122,191,106,0.8)' : 'rgba(245,166,35,0.8)';
+  const glowIdle = discovered ? 'rgba(122,191,106,0.3)' : 'rgba(245,166,35,0.3)';
 
   return (
-    <button
-      className="absolute hotspot group"
-      style={{ left: `${clue.x - w / 2}%`, top: `${clue.y - h / 2}%`, width: `${w}%`, height: `${h}%`, background: 'transparent', border: 'none', cursor: 'pointer' }}
+    <g
+      style={{ cursor: 'pointer', pointerEvents: 'all' }}
       onClick={() => onClick(clue)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-300 pointer-events-none"
+      {/* Invisible hit area */}
+      <rect
+        x={cx - hw / 2}
+        y={cy - hh / 2}
+        width={hw}
+        height={hh}
+        fill="transparent"
+      />
+      {/* Visual indicator dot */}
+      <circle
+        cx={cx}
+        cy={cy}
+        r={r}
+        fill={fill}
+        opacity={opacity}
         style={{
-          width: hovered ? 14 : (isMobile ? 10 : 6),
-          height: hovered ? 14 : (isMobile ? 10 : 6),
-          opacity: hovered ? 1 : (discovered ? 0.6 : (isMobile ? 0.4 : 0)),
-          background: discovered ? `rgba(122,191,106,0.9)` : `rgba(245,166,35,1)`,
-          boxShadow: hovered ? discovered ? '0 0 16px rgba(122,191,106,0.8)' : '0 0 16px rgba(245,166,35,0.8)' : (isMobile ? (discovered ? '0 0 8px rgba(122,191,106,0.5)' : '0 0 8px rgba(245,166,35,0.5)') : 'none'),
+          transition: 'opacity 0.3s',
+          filter: hovered
+            ? `drop-shadow(0 0 ${isMobile ? 12 : 8}px ${glowFull})`
+            : isMobile
+              ? `drop-shadow(0 0 5px ${glowIdle})`
+              : 'none',
         }}
       />
+      {/* Desktop hover label */}
       {hovered && !isMobile && (
-        <div
-          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 font-detective text-xs whitespace-nowrap px-3 py-1 rounded pointer-events-none z-30 fade-in"
-          style={{ background: 'rgba(10,8,6,0.92)', border: '1px solid rgba(245,166,35,0.4)', color: 'var(--accent)', letterSpacing: '0.1em', boxShadow: '0 4px 20px rgba(0,0,0,0.6)' }}
+        <foreignObject
+          x={cx - 250}
+          y={cy - hhBase / 2 - 52}
+          width={500}
+          height={40}
+          overflow="visible"
+          style={{ pointerEvents: 'none' }}
         >
-          {discovered && <span style={{ color: 'var(--success)' }}>✓ </span>}
-          {clue.label}
-        </div>
+          <div
+            style={{
+              background: 'rgba(10,8,6,0.92)',
+              border: '1px solid rgba(245,166,35,0.4)',
+              color: '#F5A623',
+              fontSize: '0.72rem',
+              letterSpacing: '0.1em',
+              padding: '4px 12px',
+              whiteSpace: 'nowrap',
+              display: 'inline-block',
+              position: 'absolute',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.6)',
+              fontFamily: '"Special Elite", serif',
+            }}
+          >
+            {discovered && <span style={{ color: '#7ABF6A' }}>✓ </span>}
+            {clue.label}
+          </div>
+        </foreignObject>
       )}
-    </button>
+    </g>
   );
 }
 
