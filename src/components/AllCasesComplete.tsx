@@ -115,7 +115,7 @@ export default function AllCasesComplete({ detective, onComplete }: Props) {
 
         {/* Case grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-7">
-          {LEVELS.map((level, i) => {
+          {LEVELS.filter((l) => !l.multiplayerOnly).map((level, i) => {
             const l = getLevelById(level.id, lang) ?? level;
             return (
               <div

@@ -156,7 +156,7 @@ function AppInner() {
   // Conclusion → office (XP already saved in handleAccusation)
   const handleConclusionComplete = useCallback(() => {
     if (!state.detective) { go('detective-office'); return; }
-    const allComplete = state.accusationCorrect && LEVELS.every(l => state.detective!.completedCases.includes(l.id));
+    const allComplete = state.accusationCorrect && LEVELS.filter(l => !l.multiplayerOnly).every(l => state.detective!.completedCases.includes(l.id));
     go(allComplete ? 'all-cases-complete' : 'detective-office');
   }, [state.detective, state.accusationCorrect, go]);
 
