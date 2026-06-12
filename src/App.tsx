@@ -166,6 +166,7 @@ function AppInner() {
   }, []);
 
   const level = getLevelById(state.currentLevel, lang) ?? LEVELS[0];
+  const translatedLevels = LEVELS.map((l) => getLevelById(l.id, lang) ?? l);
 
   return (
     <div className="app-root relative overflow-hidden font-sans" style={{ width: '100vw' }}>
@@ -197,7 +198,7 @@ function AppInner() {
         {state.detective && (
           <DetectiveOffice
             detective={state.detective}
-            levels={LEVELS}
+            levels={translatedLevels}
             onSelectCase={handleSelectCase}
             onNewDetective={handleNewDetective}
           />

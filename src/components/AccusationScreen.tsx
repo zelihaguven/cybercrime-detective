@@ -11,7 +11,7 @@ interface Props {
 
 export default function AccusationScreen({ level, onSubmit, onCancel }: Props) {
   const isMobile = useIsMobile();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
 
@@ -19,7 +19,7 @@ export default function AccusationScreen({ level, onSubmit, onCancel }: Props) {
   const shuffledOptions = useMemo(
     () => [...level.accusationOptions].sort(() => Math.random() - 0.5),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [level.id]
+    [level.id, lang]
   );
 
   useEffect(() => { setTimeout(() => setOpen(true), 60); }, []);
