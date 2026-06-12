@@ -7,5 +7,3 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      - key: BASE_PATH
-        value: /
