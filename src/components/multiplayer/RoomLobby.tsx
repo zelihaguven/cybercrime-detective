@@ -35,9 +35,16 @@ export default function RoomLobby({ roomCode, playerId, onGameStarted, onLeave }
     }
   }, [room?.phase, room?.status]);
 
-  const handleCaseChange = (caseId: 7 | 8) => {
+  const handleCaseChange = (caseId: 7 | 8 | 9 | 10) => {
     if (!isHost) return;
     setSelectedCase(roomCode, caseId);
+  };
+
+  const caseLabel = (id: number) => {
+    if (id === 7) return t('mpCase7Label');
+    if (id === 8) return t('mpCase8Label');
+    if (id === 9) return t('mpCase9Label');
+    return t('mpCase10Label');
   };
 
   const handleStart = () => {
@@ -95,12 +102,12 @@ export default function RoomLobby({ roomCode, playerId, onGameStarted, onLeave }
         {isHost && (
           <div className="mb-5">
             <div className="font-detective text-xs mb-2" style={{ color: 'rgba(255,255,255,0.3)', letterSpacing: '0.2em', fontSize: '0.62rem' }}>{t('mpCaseSelect')}</div>
-            <div className="flex gap-2">
-              {([7, 8] as const).map((id) => (
+            <div className="grid grid-cols-2 gap-2">
+              {([7, 8, 9, 10] as const).map((id) => (
                 <button
                   key={id}
                   onClick={() => handleCaseChange(id)}
-                  className="flex-1 py-2.5 font-detective text-xs transition-all duration-200"
+                  className="py-2.5 font-detective text-xs transition-all duration-200"
                   style={{
                     background: room.selectedCase === id ? 'rgba(245,166,35,0.12)' : 'rgba(255,255,255,0.03)',
                     border: `1px solid rgba(245,166,35,${room.selectedCase === id ? '0.5' : '0.15'})`,
@@ -110,7 +117,7 @@ export default function RoomLobby({ roomCode, playerId, onGameStarted, onLeave }
                     cursor: 'pointer',
                   }}
                 >
-                  {id === 7 ? t('mpCase7Label') : t('mpCase8Label')}
+                  {caseLabel(id)}
                 </button>
               ))}
             </div>
@@ -122,7 +129,7 @@ export default function RoomLobby({ roomCode, playerId, onGameStarted, onLeave }
           <div className="mb-5 px-4 py-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
             <div className="font-detective text-xs mb-1" style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.58rem', letterSpacing: '0.18em' }}>{t('mpCaseSelect')}</div>
             <div className="font-detective text-sm" style={{ color: 'rgba(245,166,35,0.7)', letterSpacing: '0.08em', fontSize: '0.7rem' }}>
-              {room.selectedCase === 7 ? t('mpCase7Label') : t('mpCase8Label')}
+              {caseLabel(room.selectedCase ?? 7)}
             </div>
           </div>
         )}

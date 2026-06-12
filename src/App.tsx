@@ -166,7 +166,7 @@ function AppInner() {
   }, []);
 
   const level = getLevelById(state.currentLevel, lang) ?? LEVELS[0];
-  const translatedLevels = LEVELS.map((l) => getLevelById(l.id, lang) ?? l);
+  const translatedLevels = LEVELS.filter((l) => !l.multiplayerOnly).map((l) => getLevelById(l.id, lang) ?? l);
 
   return (
     <div className="app-root relative overflow-hidden font-sans" style={{ width: '100vw' }}>

@@ -46,7 +46,7 @@ export function joinRoom(
   });
 }
 
-export function setSelectedCase(code: string, caseId: 7 | 8): void {
+export function setSelectedCase(code: string, caseId: 7 | 8 | 9 | 10): void {
   socket.emit('selectCase', { code, caseId });
 }
 

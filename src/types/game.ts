@@ -99,6 +99,7 @@ export interface Level {
   conclusionDialogue: DialogueLine[];
   detectiveMemo: string;
   xpReward: number;
+  multiplayerOnly?: boolean;
   de?: LevelTranslation;
 }
 

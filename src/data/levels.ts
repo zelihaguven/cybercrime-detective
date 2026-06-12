@@ -1234,6 +1234,7 @@ export const LEVELS: Level[] = [
   // ── Case 7 — The Leaked Exam (multiplayer) ──────────────────────
   {
     id: 7,
+    multiplayerOnly: true,
     title: 'The Leaked Exam',
     subtitle: 'A late-night login. A private message. A maths exam seen by 47 students who should never have seen it.',
     caseType: 'Unauthorised Data Access',
@@ -1451,6 +1452,7 @@ export const LEVELS: Level[] = [
   // ── Case 8 — The Fake Webshop (multiplayer) ─────────────────────
   {
     id: 8,
+    multiplayerOnly: true,
     title: 'The Fake Webshop',
     subtitle: 'A sold-out concert. A twenty-one-day-old domain. Eighty-five euros gone.',
     caseType: 'E-Commerce Fraud',
@@ -1673,6 +1675,7 @@ export const LEVELS: Level[] = [
   // ── Case 9 — The Voice That Wasn't Hers (multiplayer) ───────────
   {
     id: 9,
+    multiplayerOnly: true,
     title: 'The Voice That Wasn\'t Hers',
     subtitle: 'A phone call in the afternoon. A crying voice. A mother who almost sent €500 to people who never knew her daughter.',
     caseType: 'AI Voice Fraud',
@@ -1895,6 +1898,7 @@ export const LEVELS: Level[] = [
   // ── Case 10 — The Free Poster (multiplayer) ──────────────────────
   {
     id: 10,
+    multiplayerOnly: true,
     title: 'The Free Poster',
     subtitle: 'A QR code in the corridor. A promise of free Spotify. Twelve school accounts accessed from a server in another country by lunchtime.',
     caseType: 'QR Code Phishing',
