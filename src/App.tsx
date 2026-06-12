@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import type { GameScreen, GameState, Clue, Detective } from './types/game';
 import { LEVELS, getLevelById } from './data/levels';
 import { getRank } from './utils/detective';
+import { checkNewBadges } from './data/badges';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import LangToggle from './components/LangToggle';
 
@@ -34,6 +35,7 @@ function loadDetective(): Detective | null {
     const d = JSON.parse(s);
     if (!d.appearance) d.appearance = { skinTone: 2, hairStyle: 1, hairColor: 1, outfitColor: d.avatar ?? 0 };
     if (d.specialty === undefined) d.specialty = 0;
+    if (!d.earnedBadges) d.earnedBadges = [];
     return d;
   } catch { return null; }
 }
@@ -56,6 +58,7 @@ const init = (): GameState => {
     discoveredClues: [],
     accusationCorrect: null,
     pendingXP: 0,
+    pendingBadges: [],
   };
 };
 
@@ -132,11 +135,14 @@ function AppInner() {
     const bonusIds = level.bonusClues.map((c) => c.id);
     const foundAll = requiredIds.every((id) => state.discoveredClues.includes(id));
     const foundBonus = bonusIds.filter((id) => state.discoveredClues.includes(id)).length;
+    const foundAllBonus = bonusIds.length > 0 && foundBonus === bonusIds.length;
 
     let xp = 20;
     if (correct) xp += level.xpReward ?? 50;
     if (foundAll) xp += 30;
     xp += foundBonus * 10;
+
+    const soloCases = LEVELS.filter((l) => !l.multiplayerOnly);
 
     // Save progress immediately on correct accusation — don't wait for conclusion dismiss
     if (correct && state.detective) {
@@ -144,11 +150,38 @@ function AppInner() {
       const completedCases = state.detective.completedCases.includes(state.currentLevel)
         ? state.detective.completedCases
         : [...state.detective.completedCases, state.currentLevel];
-      const updated = { ...state.detective, xp: newXP, rank: getRank(newXP), completedCases };
+      const newBadges = checkNewBadges({
+        correct,
+        foundAll,
+        foundAllBonus,
+        newXP,
+        newCompletedSoloCases: completedCases.filter((id) => soloCases.some((l) => l.id === id)),
+        totalSoloCases: soloCases.length,
+        alreadyEarned: state.detective.earnedBadges ?? [],
+      });
+      const earnedBadges = [...(state.detective.earnedBadges ?? []), ...newBadges];
+      const updated = { ...state.detective, xp: newXP, rank: getRank(newXP), completedCases, earnedBadges };
       saveDetective(updated);
-      setState((s) => ({ ...s, detective: updated, screen: 'case-conclusion', accusationCorrect: correct, pendingXP: xp }));
+      setState((s) => ({ ...s, detective: updated, screen: 'case-conclusion', accusationCorrect: correct, pendingXP: xp, pendingBadges: newBadges }));
     } else {
-      setState((s) => ({ ...s, screen: 'case-conclusion', accusationCorrect: correct, pendingXP: xp }));
+      // Wrong accusation — still check clue-finding badges
+      const newBadges = state.detective ? checkNewBadges({
+        correct: false,
+        foundAll,
+        foundAllBonus,
+        newXP: state.detective.xp,
+        newCompletedSoloCases: state.detective.completedCases.filter((id) => soloCases.some((l) => l.id === id)),
+        totalSoloCases: soloCases.length,
+        alreadyEarned: state.detective.earnedBadges ?? [],
+      }) : [];
+      if (newBadges.length > 0 && state.detective) {
+        const earnedBadges = [...(state.detective.earnedBadges ?? []), ...newBadges];
+        const updated = { ...state.detective, earnedBadges };
+        saveDetective(updated);
+        setState((s) => ({ ...s, detective: updated, screen: 'case-conclusion', accusationCorrect: correct, pendingXP: xp, pendingBadges: newBadges }));
+      } else {
+        setState((s) => ({ ...s, screen: 'case-conclusion', accusationCorrect: correct, pendingXP: xp, pendingBadges: [] }));
+      }
     }
     setOverlay(null);
   }, [state.currentLevel, state.discoveredClues, state.detective]);
@@ -161,7 +194,7 @@ function AppInner() {
   }, [state.detective, state.accusationCorrect, go]);
 
   const handleRetry = useCallback(() => {
-    setState((s) => ({ ...s, screen: 'scene', discoveredClues: [], accusationCorrect: null, pendingXP: 0 }));
+    setState((s) => ({ ...s, screen: 'scene', discoveredClues: [], accusationCorrect: null, pendingXP: 0, pendingBadges: [] }));
     setOverlay(null);
   }, []);
 
@@ -263,6 +296,7 @@ function AppInner() {
             detective={state.detective}
             correct={state.accusationCorrect ?? false}
             xpEarned={state.pendingXP}
+            newBadges={state.pendingBadges}
             discoveredCount={state.discoveredClues.length}
             onComplete={handleConclusionComplete}
             onRetry={handleRetry}

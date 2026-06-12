@@ -89,6 +89,7 @@ export default function DetectiveCreation({ onComplete }: Props) {
       xp: 0,
       rank: 'Junior Investigator',
       completedCases: [],
+      earnedBadges: [],
     });
   };
 

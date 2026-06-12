@@ -5,6 +5,7 @@ import { OUTFIT_ACCENT_COLORS } from './CharacterSVG';
 import CharacterSVG from './CharacterSVG';
 import { useIsMobile } from '../utils/responsive';
 import { useLanguage } from '../contexts/LanguageContext';
+import { BADGES } from '../data/badges';
 
 const DIFFICULTY_COLORS = { easy: '#7ABF6A', medium: '#F5A623', hard: '#E05A47' };
 const DIFFICULTY_LABEL_KEYS = { easy: 'difficultyEasy' as const, medium: 'difficultyMedium' as const, hard: 'difficultyHard' as const };
@@ -18,7 +19,7 @@ interface Props {
 
 export default function DetectiveOffice({ detective, levels, onSelectCase, onNewDetective }: Props) {
   const isMobile = useIsMobile();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [selected, setSelected] = useState<number | null>(null);
 
   const { progress } = getRankProgress(detective.xp);
@@ -169,6 +170,38 @@ export default function DetectiveOffice({ detective, levels, onSelectCase, onNew
                 <span className="font-detective text-sm" style={{ color }}>{value}</span>
               </div>
             ))}
+          </div>
+
+          {/* Badges */}
+          <div className="mb-6">
+            <div className="font-detective mb-2" style={{ color: 'rgba(255,255,255,0.18)', fontSize: '0.52rem', letterSpacing: '0.2em' }}>
+              {lang === 'de' ? 'ABZEICHEN' : 'BADGES'}
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {BADGES.map((badge) => {
+                const earned = (detective.earnedBadges ?? []).includes(badge.id);
+                return (
+                  <div
+                    key={badge.id}
+                    title={badge.desc[lang as 'en' | 'de'] ?? badge.desc.en}
+                    style={{
+                      width: 32,
+                      height: 32,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '1rem',
+                      background: earned ? 'rgba(245,166,35,0.1)' : 'rgba(255,255,255,0.03)',
+                      border: `1px solid ${earned ? 'rgba(245,166,35,0.35)' : 'rgba(255,255,255,0.07)'}`,
+                      opacity: earned ? 1 : 0.3,
+                      cursor: 'default',
+                    }}
+                  >
+                    {badge.icon}
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {/* Unit members */}

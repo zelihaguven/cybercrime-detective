@@ -41,6 +41,7 @@ export interface Detective {
   xp: number;
   rank: DetectiveRank;
   completedCases: number[];
+  earnedBadges: string[];
 }
 
 export interface DialogueLine {
@@ -129,4 +130,5 @@ export interface GameState {
   discoveredClues: string[];
   accusationCorrect: boolean | null;
   pendingXP: number;
+  pendingBadges: string[];
 }

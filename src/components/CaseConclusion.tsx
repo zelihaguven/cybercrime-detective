@@ -5,12 +5,14 @@ import { getDetectiveAvatarEmoji, getRank, getRankProgress, getRankColor } from 
 import { OUTFIT_ACCENT_COLORS } from './CharacterSVG';
 import CharacterSVG from './CharacterSVG';
 import { useLanguage } from '../contexts/LanguageContext';
+import { getBadge } from '../data/badges';
 
 interface Props {
   level: Level;
   detective: Detective;
   correct: boolean;
   xpEarned: number;
+  newBadges: string[];
   discoveredCount: number;
   onComplete: () => void;
   onRetry: () => void;
@@ -18,8 +20,8 @@ interface Props {
 
 type Phase = 'results' | 'dialogue' | 'done';
 
-export default function CaseConclusion({ level, detective, correct, xpEarned, discoveredCount, onComplete, onRetry }: Props) {
-  const { t } = useLanguage();
+export default function CaseConclusion({ level, detective, correct, xpEarned, newBadges, discoveredCount, onComplete, onRetry }: Props) {
+  const { t, lang } = useLanguage();
   const [phase, setPhase] = useState<Phase>('results');
   const [stampVisible, setStampVisible] = useState(false);
   const [displayXP, setDisplayXP] = useState(0);
@@ -209,6 +211,33 @@ export default function CaseConclusion({ level, detective, correct, xpEarned, di
                 />
               </div>
             </div>
+
+            {/* New badges */}
+            {newBadges.length > 0 && (
+              <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                <div className="font-detective mb-2" style={{ color: 'rgba(245,166,35,0.45)', fontSize: '0.52rem', letterSpacing: '0.25em' }}>
+                  {lang === 'de' ? 'ABZEICHEN VERDIENT' : 'BADGES EARNED'}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {newBadges.map((id) => {
+                    const badge = getBadge(id);
+                    if (!badge) return null;
+                    return (
+                      <div
+                        key={id}
+                        className="flex items-center gap-1.5 px-2.5 py-1.5"
+                        style={{ background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.35)' }}
+                      >
+                        <span style={{ fontSize: '0.9rem' }}>{badge.icon}</span>
+                        <span className="font-detective" style={{ color: 'var(--accent)', fontSize: '0.6rem', letterSpacing: '0.08em' }}>
+                          {badge.name[lang as 'en' | 'de'] ?? badge.name.en}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           /* Wrong answer card */
