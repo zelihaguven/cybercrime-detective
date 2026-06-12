@@ -130,5 +130,6 @@ export interface GameState {
   discoveredClues: string[];
   accusationCorrect: boolean | null;
   pendingXP: number;
+  pendingSpecialtyBonus: number;
   pendingBadges: string[];
 }

@@ -6,6 +6,7 @@ import CharacterSVG from './CharacterSVG';
 import { useIsMobile } from '../utils/responsive';
 import { useLanguage } from '../contexts/LanguageContext';
 import { BADGES } from '../data/badges';
+import { SPECIALTIES } from '../data/characters';
 
 const DIFFICULTY_COLORS = { easy: '#7ABF6A', medium: '#F5A623', hard: '#E05A47' };
 const DIFFICULTY_LABEL_KEYS = { easy: 'difficultyEasy' as const, medium: 'difficultyMedium' as const, hard: 'difficultyHard' as const };
@@ -171,6 +172,37 @@ export default function DetectiveOffice({ detective, levels, onSelectCase, onNew
               </div>
             ))}
           </div>
+
+          {/* Specialty perk */}
+          {(() => {
+            const spec = SPECIALTIES[detective.specialty ?? 0];
+            const SPECIALTY_CLUE_TYPES = ['screenshot', 'witness', 'note', 'photo'];
+            const clueType = SPECIALTY_CLUE_TYPES[detective.specialty ?? 0];
+            const CLUE_ICONS: Record<string, string> = { screenshot: '🖥️', witness: '🗣️', note: '📄', photo: '📷' };
+            const clueTypeLabels: Record<string, { en: string; de: string }> = {
+              screenshot: { en: 'digital clues', de: 'digitale Hinweise' },
+              witness: { en: 'witness statements', de: 'Zeugenaussagen' },
+              note: { en: 'field notes', de: 'Feldnotizen' },
+              photo: { en: 'photographs', de: 'Fotos' },
+            };
+            const label = clueTypeLabels[clueType]?.[lang as 'en' | 'de'] ?? clueType;
+            return (
+              <div className="mb-6 px-3 py-2.5" style={{ background: 'rgba(185,143,212,0.05)', border: '1px solid rgba(185,143,212,0.15)' }}>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span style={{ fontSize: '0.85rem' }}>{spec.icon}</span>
+                  <span className="font-detective" style={{ color: 'rgba(185,143,212,0.8)', fontSize: '0.55rem', letterSpacing: '0.15em' }}>
+                    {lang === 'de' ? 'FACHGEBIET' : 'SPECIALTY'}
+                  </span>
+                </div>
+                <div className="font-detective" style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.6rem', letterSpacing: '0.06em' }}>
+                  {spec.label}
+                </div>
+                <div className="font-detective mt-1" style={{ color: 'rgba(185,143,212,0.55)', fontSize: '0.52rem', letterSpacing: '0.06em' }}>
+                  {CLUE_ICONS[clueType]} +5 XP {lang === 'de' ? 'pro' : 'per'} {label}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Badges */}
           <div className="mb-6">

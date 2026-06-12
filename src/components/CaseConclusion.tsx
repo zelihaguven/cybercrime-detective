@@ -12,6 +12,7 @@ interface Props {
   detective: Detective;
   correct: boolean;
   xpEarned: number;
+  specialtyBonus: number;
   newBadges: string[];
   discoveredCount: number;
   onComplete: () => void;
@@ -20,7 +21,7 @@ interface Props {
 
 type Phase = 'results' | 'dialogue' | 'done';
 
-export default function CaseConclusion({ level, detective, correct, xpEarned, newBadges, discoveredCount, onComplete, onRetry }: Props) {
+export default function CaseConclusion({ level, detective, correct, xpEarned, specialtyBonus, newBadges, discoveredCount, onComplete, onRetry }: Props) {
   const { t, lang } = useLanguage();
   const [phase, setPhase] = useState<Phase>('results');
   const [stampVisible, setStampVisible] = useState(false);
@@ -172,11 +173,12 @@ export default function CaseConclusion({ level, detective, correct, xpEarned, ne
             </div>
 
             {/* Stats row */}
-            <div className="grid grid-cols-3 gap-3 mb-5">
+            <div className={`grid gap-3 mb-5 ${specialtyBonus > 0 ? 'grid-cols-4' : 'grid-cols-3'}`}>
               {[
                 { label: t('verdictLabel'), value: t('verdictCorrect'), color: '#7ABF6A' },
                 { label: t('cluesFound'), value: `${discoveredCount} / ${level.clues.length + level.bonusClues.length}`, color: '#F5A623' },
                 { label: t('attackTypeLabel'), value: level.caseType, color: 'rgba(255,255,255,0.55)' },
+                ...(specialtyBonus > 0 ? [{ label: lang === 'de' ? 'FACHBONUS' : 'SPECIALTY', value: `+${specialtyBonus} XP`, color: '#B98FD4' }] : []),
               ].map(({ label, value, color }) => (
                 <div key={label} style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', padding: '10px 12px', textAlign: 'center' }}>
                   <div className="font-detective" style={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.5rem', letterSpacing: '0.18em', marginBottom: 4 }}>{label}</div>

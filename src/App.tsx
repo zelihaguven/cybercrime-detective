@@ -58,6 +58,7 @@ const init = (): GameState => {
     discoveredClues: [],
     accusationCorrect: null,
     pendingXP: 0,
+    pendingSpecialtyBonus: 0,
     pendingBadges: [],
   };
 };
@@ -137,10 +138,19 @@ function AppInner() {
     const foundBonus = bonusIds.filter((id) => state.discoveredClues.includes(id)).length;
     const foundAllBonus = bonusIds.length > 0 && foundBonus === bonusIds.length;
 
+    // Specialty bonus: +5 XP per discovered clue matching the detective's specialty type
+    const SPECIALTY_CLUE_TYPES = ['screenshot', 'witness', 'note', 'photo'] as const;
+    const specialtyClueType = state.detective ? SPECIALTY_CLUE_TYPES[state.detective.specialty ?? 0] : null;
+    const allLevelClues = [...level.clues, ...level.bonusClues];
+    const specialtyBonus = specialtyClueType
+      ? allLevelClues.filter((c) => c.type === specialtyClueType && state.discoveredClues.includes(c.id)).length * 5
+      : 0;
+
     let xp = 20;
     if (correct) xp += level.xpReward ?? 50;
     if (foundAll) xp += 30;
     xp += foundBonus * 10;
+    xp += specialtyBonus;
 
     const soloCases = LEVELS.filter((l) => !l.multiplayerOnly);
 
@@ -162,7 +172,7 @@ function AppInner() {
       const earnedBadges = [...(state.detective.earnedBadges ?? []), ...newBadges];
       const updated = { ...state.detective, xp: newXP, rank: getRank(newXP), completedCases, earnedBadges };
       saveDetective(updated);
-      setState((s) => ({ ...s, detective: updated, screen: 'case-conclusion', accusationCorrect: correct, pendingXP: xp, pendingBadges: newBadges }));
+      setState((s) => ({ ...s, detective: updated, screen: 'case-conclusion', accusationCorrect: correct, pendingXP: xp, pendingSpecialtyBonus: specialtyBonus, pendingBadges: newBadges }));
     } else {
       // Wrong accusation — still check clue-finding badges
       const newBadges = state.detective ? checkNewBadges({
@@ -178,9 +188,9 @@ function AppInner() {
         const earnedBadges = [...(state.detective.earnedBadges ?? []), ...newBadges];
         const updated = { ...state.detective, earnedBadges };
         saveDetective(updated);
-        setState((s) => ({ ...s, detective: updated, screen: 'case-conclusion', accusationCorrect: correct, pendingXP: xp, pendingBadges: newBadges }));
+        setState((s) => ({ ...s, detective: updated, screen: 'case-conclusion', accusationCorrect: correct, pendingXP: xp, pendingSpecialtyBonus: specialtyBonus, pendingBadges: newBadges }));
       } else {
-        setState((s) => ({ ...s, screen: 'case-conclusion', accusationCorrect: correct, pendingXP: xp, pendingBadges: [] }));
+        setState((s) => ({ ...s, screen: 'case-conclusion', accusationCorrect: correct, pendingXP: xp, pendingSpecialtyBonus: specialtyBonus, pendingBadges: [] }));
       }
     }
     setOverlay(null);
@@ -194,7 +204,7 @@ function AppInner() {
   }, [state.detective, state.accusationCorrect, go]);
 
   const handleRetry = useCallback(() => {
-    setState((s) => ({ ...s, screen: 'scene', discoveredClues: [], accusationCorrect: null, pendingXP: 0, pendingBadges: [] }));
+    setState((s) => ({ ...s, screen: 'scene', discoveredClues: [], accusationCorrect: null, pendingXP: 0, pendingSpecialtyBonus: 0, pendingBadges: [] }));
     setOverlay(null);
   }, []);
 
@@ -296,6 +306,7 @@ function AppInner() {
             detective={state.detective}
             correct={state.accusationCorrect ?? false}
             xpEarned={state.pendingXP}
+            specialtyBonus={state.pendingSpecialtyBonus}
             newBadges={state.pendingBadges}
             discoveredCount={state.discoveredClues.length}
             onComplete={handleConclusionComplete}
