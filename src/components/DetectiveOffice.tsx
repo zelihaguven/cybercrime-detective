@@ -115,6 +115,7 @@ export default function DetectiveOffice({ detective, levels, onSelectCase, onNew
             display: 'flex',
             flexDirection: 'column',
             flexShrink: 0,
+            overflowY: 'auto',
           }}
         >
           {/* Unit badge */}

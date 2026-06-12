@@ -3,6 +3,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useRoom } from '../../hooks/useRoom';
 import { setPlayerReady, advanceToAccusation, submitAccusation } from '../../utils/roomActions';
 import { getLevelById } from '../../data/levels';
+import { useIsMobile } from '../../utils/responsive';
 import type { Clue } from '../../types/game';
 
 interface Props {
@@ -19,6 +20,8 @@ export default function MultiplayerGame({ roomCode, playerId, onResult, onLeave 
   const [markingReady, setMarkingReady] = useState(false);
   const [selectedAccusation, setSelectedAccusation] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  const isMobile = useIsMobile();
 
   const myPlayer = room?.players?.[playerId];
   const isHost = myPlayer?.isHost ?? false;
@@ -65,8 +68,212 @@ export default function MultiplayerGame({ roomCode, playerId, onResult, onLeave 
 
   const phase = room.phase;
 
+  // ── Shared sub-components ──────────────────────────────────────────
+
+  const clueList = (
+    <div className="space-y-3 mb-6">
+      {myClues.map((clue) => (
+        <div
+          key={clue.id}
+          onClick={() => setExpandedClue(expandedClue === clue.id ? null : clue.id)}
+          className="cursor-pointer transition-all duration-200"
+          style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)' }}
+        >
+          <div className="flex items-start gap-3 px-4 py-3">
+            <span style={{ fontSize: '1.1rem', flexShrink: 0, marginTop: 2 }}>{clue.icon}</span>
+            <div className="flex-1 min-w-0">
+              <div className="font-detective text-sm mb-0.5" style={{ color: 'var(--accent)', letterSpacing: '0.06em', fontSize: '0.72rem', wordBreak: 'break-word' }}>
+                {clue.label}
+              </div>
+              <div className="font-sans text-xs" style={{ color: 'rgba(255,255,255,0.45)', lineHeight: 1.5, wordBreak: 'break-word' }}>
+                {clue.shortDesc}
+              </div>
+            </div>
+            <span className="font-detective text-xs flex-shrink-0" style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.6rem' }}>
+              {expandedClue === clue.id ? '▲' : '▼'}
+            </span>
+          </div>
+
+          {expandedClue === clue.id && (
+            <div className="px-4 pb-4" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+              <p className="font-sans text-sm mt-3 mb-3" style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.7, wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                {clue.detail}
+              </p>
+              {clue.detectiveComment && (
+                <div className="px-3 py-2" style={{ background: 'rgba(245,166,35,0.05)', borderLeft: '2px solid rgba(245,166,35,0.3)' }}>
+                  <p className="font-serif italic text-xs" style={{ color: 'rgba(245,166,35,0.7)', lineHeight: 1.6, wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                    "{clue.detectiveComment}"
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+
+  const readyButton = !myPlayer?.ready ? (
+    <button
+      onClick={handleReady}
+      disabled={markingReady}
+      className="w-full font-detective text-sm tracking-widest uppercase py-3.5 transition-all duration-200"
+      style={{
+        background: 'rgba(122,191,106,0.08)',
+        border: '1px solid rgba(122,191,106,0.4)',
+        color: '#7ABF6A',
+        letterSpacing: '0.22em',
+        cursor: markingReady ? 'wait' : 'pointer',
+      }}
+    >
+      {t('mpMarkReady')} ✓
+    </button>
+  ) : (
+    <div className="text-center py-3 font-detective text-sm" style={{ color: '#7ABF6A', letterSpacing: '0.18em' }}>
+      ✓ {t('mpReady')}
+    </div>
+  );
+
+  const accusationContent = (
+    <>
+      <div className="font-detective text-xs mb-4" style={{ color: 'rgba(255,255,255,0.3)', letterSpacing: '0.22em', fontSize: '0.62rem' }}>
+        — {t('finalDeduction')} —
+      </div>
+      {isHost ? (
+        <>
+          <p className="font-sans text-sm mb-5" style={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.7 }}>
+            {t('accusationInstruction')} {level.victim.name}
+          </p>
+          <div className="space-y-3 mb-6">
+            {level.accusationOptions.map((opt) => (
+              <button
+                key={opt.id}
+                onClick={() => setSelectedAccusation(opt.id)}
+                className="w-full text-left px-4 py-4 transition-all duration-200"
+                style={{
+                  background: selectedAccusation === opt.id ? 'rgba(245,166,35,0.1)' : 'rgba(255,255,255,0.025)',
+                  border: `1px solid rgba(245,166,35,${selectedAccusation === opt.id ? '0.5' : '0.12'})`,
+                }}
+              >
+                <div className="font-detective text-sm mb-1" style={{ color: selectedAccusation === opt.id ? 'var(--accent)' : 'var(--text-primary)', fontSize: '0.72rem', letterSpacing: '0.05em', wordBreak: 'break-word' }}>
+                  {opt.label}
+                </div>
+                <div className="font-sans text-xs" style={{ color: 'rgba(255,255,255,0.4)', lineHeight: 1.5, wordBreak: 'break-word' }}>
+                  {opt.description}
+                </div>
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={handleSubmitAccusation}
+            disabled={!selectedAccusation || submitting}
+            className="w-full font-detective text-sm tracking-widest uppercase py-3.5 transition-all duration-200"
+            style={{
+              background: selectedAccusation && !submitting ? 'rgba(245,166,35,0.1)' : 'rgba(245,166,35,0.03)',
+              border: `1px solid rgba(245,166,35,${selectedAccusation && !submitting ? '0.5' : '0.15'})`,
+              color: selectedAccusation && !submitting ? 'var(--accent)' : 'rgba(245,166,35,0.25)',
+              letterSpacing: '0.22em',
+              cursor: selectedAccusation && !submitting ? 'pointer' : 'not-allowed',
+            }}
+          >
+            {t('mpSubmitAccusation')} ⚖
+          </button>
+        </>
+      ) : (
+        <div className="text-center py-8">
+          <div className="font-detective text-sm mb-3" style={{ color: 'rgba(255,255,255,0.35)', letterSpacing: '0.18em' }}>
+            {t('mpLeadOnly')}
+          </div>
+          <div className="font-detective text-xs" style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.62rem' }}>
+            {t('mpWaiting')}
+          </div>
+        </div>
+      )}
+    </>
+  );
+
+  const bgStyle = { background: 'radial-gradient(ellipse at 50% 10%, rgba(14,10,30,0.98) 0%, #07050C 65%)' };
+
+  // ── Mobile layout ───────────────────────────────────────────────────
+  if (isMobile) {
+    return (
+      <div className="absolute inset-0 flex flex-col" style={bgStyle}>
+        <div className="scanlines absolute inset-0 pointer-events-none opacity-30" />
+        <div className="noise-overlay absolute inset-0 pointer-events-none" />
+
+        {/* Top bar */}
+        <div className="relative z-10 flex-shrink-0 flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="min-w-0 flex-1">
+            <div className="font-detective" style={{ color: 'rgba(245,166,35,0.4)', letterSpacing: '0.2em', fontSize: '0.55rem' }}>
+              {level.caseType.toUpperCase()} · {roomCode}
+            </div>
+            <div className="font-detective text-sm truncate" style={{ color: 'var(--text-primary)', letterSpacing: '0.04em' }}>
+              {level.title}
+            </div>
+          </div>
+          <button
+            onClick={onLeave}
+            className="font-detective text-xs ml-3 flex-shrink-0"
+            style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.6rem', letterSpacing: '0.2em', background: 'none', border: 'none', cursor: 'pointer' }}
+          >
+            {t('mpLeave')}
+          </button>
+        </div>
+
+        {/* Main scrollable content */}
+        <div className="relative z-10 flex-1 overflow-y-auto px-4 py-4">
+          {phase === 'clue-review' && (
+            <>
+              <div className="font-detective text-xs mb-4" style={{ color: 'rgba(255,255,255,0.3)', letterSpacing: '0.22em', fontSize: '0.62rem' }}>
+                {t('mpYourClues')} · {myClues.length} {t('mpClueCount')}
+              </div>
+              {clueList}
+              {readyButton}
+            </>
+          )}
+          {(phase === 'accusation' || phase === 'result') && accusationContent}
+        </div>
+
+        {/* Bottom team bar */}
+        <div className="relative z-10 flex-shrink-0 px-4 py-3" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(0,0,0,0.4)' }}>
+          <div className="flex items-center gap-1 flex-wrap mb-2">
+            <span className="font-detective" style={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.52rem', letterSpacing: '0.15em', marginRight: 4 }}>
+              {t('mpTeamStatus')} {readyCount}/{players.length}
+            </span>
+            {players.map(([id, player]) => (
+              <div key={id} className="flex items-center gap-1 px-2 py-1" style={{ background: id === playerId ? 'rgba(245,166,35,0.06)' : 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div className="w-1 h-1 rounded-full" style={{ background: player.connected ? '#7ABF6A' : 'rgba(255,255,255,0.2)' }} />
+                <span className="font-detective" style={{ color: id === playerId ? 'var(--accent)' : 'var(--text-primary)', fontSize: '0.58rem' }}>
+                  {player.name}
+                </span>
+                <span className="font-detective" style={{ color: player.ready ? '#7ABF6A' : 'rgba(255,255,255,0.2)', fontSize: '0.52rem' }}>
+                  {player.ready ? '✓' : '○'}
+                </span>
+              </div>
+            ))}
+          </div>
+          {phase === 'clue-review' && isHost && allReady && (
+            <button
+              onClick={handleAdvanceToAccusation}
+              className="w-full font-detective text-xs tracking-widest uppercase py-2.5 transition-all duration-200"
+              style={{ background: 'rgba(245,166,35,0.1)', border: '1px solid rgba(245,166,35,0.4)', color: 'var(--accent)', letterSpacing: '0.15em', fontSize: '0.6rem', cursor: 'pointer' }}
+            >
+              {t('makeAccusation')} →
+            </button>
+          )}
+          {phase === 'clue-review' && !allReady && (
+            <div className="text-center font-detective text-xs" style={{ color: 'rgba(255,255,255,0.18)', fontSize: '0.55rem' }}>
+              {t('mpWaitingForTeam')}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ── Desktop layout ──────────────────────────────────────────────────
   return (
-    <div className="absolute inset-0 flex" style={{ background: 'radial-gradient(ellipse at 50% 10%, rgba(14,10,30,0.98) 0%, #07050C 65%)' }}>
+    <div className="absolute inset-0 flex" style={bgStyle}>
       <div className="scanlines absolute inset-0 pointer-events-none opacity-30" />
       <div className="noise-overlay absolute inset-0 pointer-events-none" />
 
@@ -97,129 +304,15 @@ export default function MultiplayerGame({ roomCode, playerId, onResult, onLeave 
             <div className="font-detective text-xs mb-4" style={{ color: 'rgba(255,255,255,0.3)', letterSpacing: '0.22em', fontSize: '0.62rem' }}>
               {t('mpYourClues')} · {myClues.length} {t('mpClueCount')}
             </div>
-
-            <div className="space-y-3 mb-6">
-              {myClues.map((clue) => (
-                <div
-                  key={clue.id}
-                  onClick={() => setExpandedClue(expandedClue === clue.id ? null : clue.id)}
-                  className="cursor-pointer transition-all duration-200"
-                  style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)' }}
-                >
-                  <div className="flex items-start gap-3 px-4 py-3">
-                    <span style={{ fontSize: '1.1rem', flexShrink: 0, marginTop: 2 }}>{clue.icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-detective text-sm mb-0.5" style={{ color: 'var(--accent)', letterSpacing: '0.06em', fontSize: '0.72rem' }}>
-                        {clue.label}
-                      </div>
-                      <div className="font-sans text-xs" style={{ color: 'rgba(255,255,255,0.45)', lineHeight: 1.5 }}>
-                        {clue.shortDesc}
-                      </div>
-                    </div>
-                    <span className="font-detective text-xs flex-shrink-0" style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.6rem' }}>
-                      {expandedClue === clue.id ? '▲' : '▼'}
-                    </span>
-                  </div>
-
-                  {expandedClue === clue.id && (
-                    <div className="px-4 pb-4" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                      <p className="font-sans text-sm mt-3 mb-3" style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.7 }}>
-                        {clue.detail}
-                      </p>
-                      {clue.detectiveComment && (
-                        <div className="px-3 py-2" style={{ background: 'rgba(245,166,35,0.05)', borderLeft: '2px solid rgba(245,166,35,0.3)' }}>
-                          <p className="font-serif italic text-xs" style={{ color: 'rgba(245,166,35,0.7)', lineHeight: 1.6 }}>
-                            "{clue.detectiveComment}"
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {/* Ready button */}
-            {!myPlayer?.ready ? (
-              <button
-                onClick={handleReady}
-                disabled={markingReady}
-                className="w-full font-detective text-sm tracking-widest uppercase py-3.5 transition-all duration-200"
-                style={{
-                  background: 'rgba(122,191,106,0.08)',
-                  border: '1px solid rgba(122,191,106,0.4)',
-                  color: '#7ABF6A',
-                  letterSpacing: '0.22em',
-                  cursor: markingReady ? 'wait' : 'pointer',
-                }}
-              >
-                {t('mpMarkReady')} ✓
-              </button>
-            ) : (
-              <div className="text-center py-3 font-detective text-sm" style={{ color: '#7ABF6A', letterSpacing: '0.18em' }}>
-                ✓ {t('mpReady')}
-              </div>
-            )}
+            {clueList}
+            {readyButton}
           </div>
         )}
 
         {/* Accusation phase */}
         {(phase === 'accusation' || phase === 'result') && (
           <div className="flex-1 overflow-y-auto px-5 py-5">
-            <div className="font-detective text-xs mb-4" style={{ color: 'rgba(255,255,255,0.3)', letterSpacing: '0.22em', fontSize: '0.62rem' }}>
-              — {t('finalDeduction')} —
-            </div>
-
-            {isHost ? (
-              <>
-                <p className="font-sans text-sm mb-5" style={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.7 }}>
-                  {t('accusationInstruction')} {level.victim.name}
-                </p>
-                <div className="space-y-3 mb-6">
-                  {level.accusationOptions.map((opt) => (
-                    <button
-                      key={opt.id}
-                      onClick={() => setSelectedAccusation(opt.id)}
-                      className="w-full text-left px-4 py-4 transition-all duration-200"
-                      style={{
-                        background: selectedAccusation === opt.id ? 'rgba(245,166,35,0.1)' : 'rgba(255,255,255,0.025)',
-                        border: `1px solid rgba(245,166,35,${selectedAccusation === opt.id ? '0.5' : '0.12'})`,
-                      }}
-                    >
-                      <div className="font-detective text-sm mb-1" style={{ color: selectedAccusation === opt.id ? 'var(--accent)' : 'var(--text-primary)', fontSize: '0.72rem', letterSpacing: '0.05em' }}>
-                        {opt.label}
-                      </div>
-                      <div className="font-sans text-xs" style={{ color: 'rgba(255,255,255,0.4)', lineHeight: 1.5 }}>
-                        {opt.description}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-                <button
-                  onClick={handleSubmitAccusation}
-                  disabled={!selectedAccusation || submitting}
-                  className="w-full font-detective text-sm tracking-widest uppercase py-3.5 transition-all duration-200"
-                  style={{
-                    background: selectedAccusation && !submitting ? 'rgba(245,166,35,0.1)' : 'rgba(245,166,35,0.03)',
-                    border: `1px solid rgba(245,166,35,${selectedAccusation && !submitting ? '0.5' : '0.15'})`,
-                    color: selectedAccusation && !submitting ? 'var(--accent)' : 'rgba(245,166,35,0.25)',
-                    letterSpacing: '0.22em',
-                    cursor: selectedAccusation && !submitting ? 'pointer' : 'not-allowed',
-                  }}
-                >
-                  {t('mpSubmitAccusation')} ⚖
-                </button>
-              </>
-            ) : (
-              <div className="text-center py-8">
-                <div className="font-detective text-sm mb-3" style={{ color: 'rgba(255,255,255,0.35)', letterSpacing: '0.18em' }}>
-                  {t('mpLeadOnly')}
-                </div>
-                <div className="font-detective text-xs" style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.62rem' }}>
-                  {t('mpWaiting')}
-                </div>
-              </div>
-            )}
+            {accusationContent}
           </div>
         )}
       </div>
