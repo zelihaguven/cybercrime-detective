@@ -2,10 +2,20 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { existsSync } from 'fs';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const DIST_DIR = path.join(__dirname, '..', 'dist');
 
 const app = express();
 app.use(cors());
 app.get('/health', (_, res) => res.json({ ok: true }));
+
+if (existsSync(DIST_DIR)) {
+  app.use(express.static(DIST_DIR));
+}
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -169,6 +179,11 @@ setInterval(() => {
     if (now > room.expiresAt) rooms.delete(code);
   }
 }, CLEANUP_INTERVAL);
+
+// SPA fallback — send index.html for any unmatched route
+if (existsSync(DIST_DIR)) {
+  app.get('*', (_, res) => res.sendFile(path.join(DIST_DIR, 'index.html')));
+}
 
 const PORT = process.env.PORT ?? 3001;
 httpServer.listen(PORT, () => console.log(`[detective-server] listening on :${PORT}`));
