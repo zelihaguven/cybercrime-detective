@@ -182,7 +182,7 @@ setInterval(() => {
 
 // SPA fallback — send index.html for any unmatched route
 if (existsSync(DIST_DIR)) {
-  app.get('*', (_, res) => res.sendFile(path.join(DIST_DIR, 'index.html')));
+  app.get('/{*splat}', (_, res) => res.sendFile(path.join(DIST_DIR, 'index.html')));
 }
 
 const PORT = process.env.PORT ?? 3001;
