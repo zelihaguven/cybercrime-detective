@@ -219,10 +219,7 @@ function AppInner() {
         <TitleScreen
           onNewGame={handleNewGame}
           onCaseSelect={handleContinue}
-          onHandbook={() => {
-            setState((s) => ({ ...s, screen: 'scene', currentLevel: 1 }));
-            setOverlay('handbook');
-          }}
+          onHandbook={() => setOverlay('handbook')}
           onMultiplayer={() => go('mp-modal')}
         />
       </ScreenLayer>
@@ -276,9 +273,6 @@ function AppInner() {
             discoveredIds={state.discoveredClues}
             onClose={() => setOverlay(null)}
           />
-        )}
-        {overlay === 'handbook' && (
-          <Handbook terms={level.handbookTerms} onClose={() => setOverlay(null)} />
         )}
       </ScreenLayer>
 
@@ -385,6 +379,13 @@ function AppInner() {
           />
         )}
       </ScreenLayer>
+
+      {/* Global handbook overlay — works from any screen */}
+      {overlay === 'handbook' && (
+        <div className="absolute inset-0" style={{ zIndex: 100 }}>
+          <Handbook terms={level.handbookTerms} onClose={() => setOverlay(null)} />
+        </div>
+      )}
 
     </div>
   );
