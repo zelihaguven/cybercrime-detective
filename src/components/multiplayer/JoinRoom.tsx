@@ -7,6 +7,7 @@ import type { UIKey } from '../../i18n/ui';
 interface Props {
   onRoomJoined: (code: string) => void;
   onBack: () => void;
+  defaultName?: string;
 }
 
 const ERROR_KEYS: Record<string, UIKey> = {
@@ -17,9 +18,9 @@ const ERROR_KEYS: Record<string, UIKey> = {
   name_taken:     'mpErrorNameTaken',
 };
 
-export default function JoinRoom({ onRoomJoined, onBack }: Props) {
+export default function JoinRoom({ onRoomJoined, onBack, defaultName = '' }: Props) {
   const { t } = useLanguage();
-  const [name, setName] = useState('');
+  const [name, setName] = useState(defaultName);
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

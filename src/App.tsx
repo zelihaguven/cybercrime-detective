@@ -334,6 +334,7 @@ function AppInner() {
             go('mp-lobby');
           }}
           onBack={() => go('mp-modal')}
+          defaultName={state.detective?.name ?? ''}
         />
       </ScreenLayer>
 
@@ -344,6 +345,7 @@ function AppInner() {
             go('mp-lobby');
           }}
           onBack={() => go('mp-modal')}
+          defaultName={state.detective?.name ?? ''}
         />
       </ScreenLayer>
 

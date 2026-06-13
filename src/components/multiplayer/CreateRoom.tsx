@@ -6,11 +6,12 @@ import { createRoom } from '../../utils/roomActions';
 interface Props {
   onRoomCreated: (code: string) => void;
   onBack: () => void;
+  defaultName?: string;
 }
 
-export default function CreateRoom({ onRoomCreated, onBack }: Props) {
+export default function CreateRoom({ onRoomCreated, onBack, defaultName = '' }: Props) {
   const { t } = useLanguage();
-  const [name, setName] = useState('');
+  const [name, setName] = useState(defaultName);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
