@@ -14,6 +14,7 @@ const ERROR_KEYS: Record<string, UIKey> = {
   room_expired:   'mpErrorExpired',
   room_started:   'mpErrorStarted',
   room_full:      'mpErrorFull',
+  name_taken:     'mpErrorNameTaken',
 };
 
 export default function JoinRoom({ onRoomJoined, onBack }: Props) {

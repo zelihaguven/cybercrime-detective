@@ -213,7 +213,7 @@ function AppInner() {
 
   return (
     <div className="app-root relative overflow-hidden font-sans" style={{ width: '100vw' }}>
-      <LangToggle />
+      {state.screen === 'title' && <LangToggle />}
 
       <ScreenLayer active={state.screen === 'title'}>
         <TitleScreen
@@ -225,7 +225,7 @@ function AppInner() {
       </ScreenLayer>
 
       <ScreenLayer active={state.screen === 'detective-creation'}>
-        <DetectiveCreation onComplete={handleDetectiveCreated} />
+        <DetectiveCreation onComplete={handleDetectiveCreated} onBack={() => go('title')} />
       </ScreenLayer>
 
       <ScreenLayer active={state.screen === 'intro-sequence'}>

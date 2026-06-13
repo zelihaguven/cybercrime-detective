@@ -51,6 +51,7 @@ const BADGE_NAMES = ['Shield', 'Star', 'Hex'];
 
 interface Props {
   onComplete: (detective: Detective) => void;
+  onBack?: () => void;
 }
 
 const DEFAULT_APPEARANCE: CharacterAppearance = {
@@ -60,7 +61,7 @@ const DEFAULT_APPEARANCE: CharacterAppearance = {
   outfitColor: 0,
 };
 
-export default function DetectiveCreation({ onComplete }: Props) {
+export default function DetectiveCreation({ onComplete, onBack }: Props) {
   const isMobile = useIsMobile();
   const { t } = useLanguage();
   const [name, setName] = useState('');
@@ -105,7 +106,18 @@ export default function DetectiveCreation({ onComplete }: Props) {
         style={{ opacity: mounted ? 1 : 0, transform: mounted ? 'none' : 'translateY(20px)' }}
       >
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 relative">
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="absolute left-0 top-0 font-detective text-xs tracking-widest"
+              style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.62rem', letterSpacing: '0.2em', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0' }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.7)')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')}
+            >
+              ← {t('back')}
+            </button>
+          )}
           <div className="font-detective text-xs tracking-[0.45em] mb-2" style={{ color: 'rgba(245,166,35,0.45)' }}>
             {t('ciuBerlin')}
           </div>

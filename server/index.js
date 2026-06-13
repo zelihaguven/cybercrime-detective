@@ -52,6 +52,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('createRoom', ({ playerId, playerName }, cb) => {
+    const name = typeof playerName === 'string' ? playerName.trim() : '';
+    if (name.length < 2 || name.length > 24) return cb({ error: 'invalid_name' });
     const now = Date.now();
     const code = uniqueCode();
     const room = {
@@ -65,7 +67,7 @@ io.on('connection', (socket) => {
       accusationResult: null,
       players: {
         [playerId]: {
-          name: playerName,
+          name,
           isHost: true,
           clueIndices: [],
           ready: false,
@@ -82,14 +84,20 @@ io.on('connection', (socket) => {
   });
 
   socket.on('joinRoom', ({ code, playerId, playerName }, cb) => {
+    const name = typeof playerName === 'string' ? playerName.trim() : '';
+    if (name.length < 2 || name.length > 24) return cb({ error: 'invalid_name' });
     const room = rooms.get(code);
     if (!room)                              return cb({ error: 'room_not_found' });
     if (Date.now() > room.expiresAt)        return cb({ error: 'room_expired' });
     if (room.status !== 'waiting')          return cb({ error: 'room_started' });
     if (Object.keys(room.players).length >= 4) return cb({ error: 'room_full' });
+    const nameTaken = Object.values(room.players).some(
+      (p) => p.name.toLowerCase() === name.toLowerCase()
+    );
+    if (nameTaken)                          return cb({ error: 'name_taken' });
 
     room.players[playerId] = {
-      name: playerName,
+      name,
       isHost: false,
       clueIndices: [],
       ready: false,

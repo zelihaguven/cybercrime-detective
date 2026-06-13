@@ -238,8 +238,8 @@ function SVGHotspot({ clue, discovered, onClick, isMobile }: { clue: Clue; disco
   const cy = (clue.y / 100) * SVG_H;
   const hwBase = ((clue.hitW ?? 6) / 100) * SVG_W;
   const hhBase = ((clue.hitH ?? 8) / 100) * SVG_H;
-  const hw = isMobile ? hwBase * 1.8 : hwBase;
-  const hh = isMobile ? hhBase * 1.8 : hhBase;
+  const hw = isMobile ? hwBase * 1.35 : hwBase;
+  const hh = isMobile ? hhBase * 1.35 : hhBase;
 
   const r = hovered ? (isMobile ? 24 : 14) : (isMobile ? 18 : 8);
   // Bug 2: 40% opacity at idle for all devices (was 0 on desktop)
@@ -328,12 +328,17 @@ function HUD({
 
   return (
     <>
-      {/* Top bar */}
+      {/* Top gradient — visual only, passes through taps */}
+      <div
+        className="absolute top-0 left-0 right-0 z-29 pointer-events-none"
+        style={{ height: isMobile ? 70 : 100, background: 'linear-gradient(to bottom, rgba(10,8,6,0.9) 0%, transparent 100%)' }}
+      />
+      {/* Top bar content */}
       <div
         className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between"
         style={{
-          background: 'linear-gradient(to bottom, rgba(10,8,6,0.9) 0%, transparent 100%)',
           padding: isLandscape ? '4px 10px' : isMobile ? '8px 12px' : '16px 24px',
+          pointerEvents: 'none',
         }}
       >
         <div className="flex items-start gap-3">
@@ -347,6 +352,7 @@ function HUD({
                 fontSize: isMobile ? '0.55rem' : '0.6rem',
                 marginTop: isMobile ? 1 : 3,
                 padding: '2px 0',
+                pointerEvents: 'auto',
               }}
               onMouseEnter={(e) => (e.currentTarget.style.color = 'rgba(224,90,71,0.8)')}
               onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')}
@@ -354,7 +360,7 @@ function HUD({
               ← {isMobile ? '' : 'OFFICE'}
             </button>
           )}
-          <div>
+          <div style={{ pointerEvents: 'none' }}>
             {!isMobile && detective && (
               <div className="font-detective text-xs mb-0.5" style={{ color: 'rgba(245,166,35,0.45)', letterSpacing: '0.2em', fontSize: '0.58rem' }}>
                 Det. {detective.name} · {level.investigationLabel}
@@ -373,11 +379,11 @@ function HUD({
 
         {/* Clue indicator */}
         {isMobile ? (
-          <span className="font-detective text-xs" style={{ color: 'var(--accent)', opacity: 0.8, fontSize: '0.7rem' }}>
+          <span className="font-detective text-xs" style={{ color: 'var(--accent)', opacity: 0.8, fontSize: '0.7rem', pointerEvents: 'none' }}>
             {found}/{required}
           </span>
         ) : (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" style={{ pointerEvents: 'none' }}>
             {Array.from({ length: required }).map((_, i) => (
               <div key={i} className="transition-all duration-500" style={{ width: 10, height: 10, borderRadius: '50%', background: i < found ? 'var(--accent)' : 'rgba(245,166,35,0.2)', boxShadow: i < found ? '0 0 8px rgba(245,166,35,0.6)' : 'none' }} />
             ))}
@@ -388,20 +394,25 @@ function HUD({
         )}
       </div>
 
-      {/* Bottom bar */}
+      {/* Bottom gradient — visual only, passes through taps */}
+      <div
+        className="absolute bottom-0 left-0 right-0 z-29 pointer-events-none"
+        style={{ height: isMobile ? 70 : 100, background: 'linear-gradient(to top, rgba(10,8,6,0.95) 0%, transparent 100%)' }}
+      />
+      {/* Bottom bar content */}
       <div
         className="absolute bottom-0 left-0 right-0 z-30 flex items-center justify-between"
         style={{
-          background: 'linear-gradient(to top, rgba(10,8,6,0.95) 0%, transparent 100%)',
           padding: isLandscape ? '4px 10px' : isMobile ? '8px 12px' : '16px 24px',
+          pointerEvents: 'none',
         }}
       >
         {!isMobile && (
-          <div className="font-detective text-xs tracking-widest uppercase" style={{ color: 'var(--text-muted)', opacity: 0.5 }}>
+          <div className="font-detective text-xs tracking-widest uppercase" style={{ color: 'var(--text-muted)', opacity: 0.5, pointerEvents: 'none' }}>
             {level.location}
           </div>
         )}
-        <div className={`flex items-center gap-2 ${isMobile ? 'w-full justify-end' : ''}`}>
+        <div className={`flex items-center gap-2 ${isMobile ? 'w-full justify-end' : ''}`} style={{ pointerEvents: 'none' }}>
           <HudButton onClick={onOpenHandbook} label={t('handbook')} icon="📓" isMobile={isMobile || isLandscape} />
           <HudButton onClick={onOpenBoard} label={t('evidenceBoard')} icon="📌" highlight={!!newPin} isMobile={isMobile || isLandscape} />
           {canAccuse && <HudButton onClick={onAccuse} label={t('makeAccusation')} icon="⚖" danger isMobile={isMobile || isLandscape} />}
@@ -444,6 +455,7 @@ function HudButton({ onClick, label, icon, highlight = false, danger = false, is
         letterSpacing: '0.15em',
         fontSize: '0.65rem',
         padding: isMobile ? '8px 10px' : '8px 16px',
+        pointerEvents: 'auto',
       }}
     >
       <span style={{ fontSize: isMobile ? '1rem' : undefined }}>{icon}</span>
