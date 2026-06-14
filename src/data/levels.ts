@@ -1,5 +1,6 @@
 import type { Level, LevelTranslation, Lang } from '../types/game';
 import { DE } from './levels.de';
+import { TR } from './levels.tr';
 
 export const LEVELS: Level[] = [
   {
@@ -2151,5 +2152,6 @@ export const getLevelById = (id: number, lang?: Lang): Level | undefined => {
   const level = LEVELS.find((l) => l.id === id);
   if (!level) return undefined;
   if (lang === 'de' && DE[id]) return applyTranslation(level, DE[id]);
+  if (lang === 'tr' && TR[id]) return applyTranslation(level, TR[id]);
   return level;
 };

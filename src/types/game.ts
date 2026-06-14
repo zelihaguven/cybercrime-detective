@@ -1,4 +1,4 @@
-export type Lang = 'en' | 'de';
+export type Lang = 'en' | 'de' | 'tr';
 
 export type GameScreen =
   | 'title'
