@@ -87,51 +87,13 @@ export default function AccusationScreen({ level, onSubmit, onCancel }: Props) {
         {/* Options */}
         <div className="space-y-3 mb-6">
           {shuffledOptions.map((option) => (
-            <button
+            <OptionCard
               key={option.id}
-              onClick={() => setSelected(option.id)}
-              className="w-full text-left px-5 py-4 transition-all duration-300"
-              style={{
-                background: selected === option.id ? 'rgba(245,166,35,0.1)' : 'rgba(255,255,255,0.02)',
-                border: selected === option.id
-                  ? '1px solid rgba(245,166,35,0.7)'
-                  : '1px solid rgba(255,255,255,0.08)',
-                boxShadow: selected === option.id ? '0 0 20px rgba(245,166,35,0.15)' : 'none',
-              }}
-            >
-              <div className="flex items-start gap-3">
-                {/* Radio indicator */}
-                <div
-                  className="mt-0.5 flex-shrink-0 transition-all duration-300"
-                  style={{
-                    width: 16,
-                    height: 16,
-                    borderRadius: '50%',
-                    border: `2px solid ${selected === option.id ? 'rgba(245,166,35,0.8)' : 'rgba(255,255,255,0.2)'}`,
-                    background: selected === option.id ? 'rgba(245,166,35,0.6)' : 'transparent',
-                    boxShadow: selected === option.id ? '0 0 8px rgba(245,166,35,0.4)' : 'none',
-                  }}
-                />
-                <div>
-                  <div
-                    className="font-detective text-sm mb-1"
-                    style={{
-                      color: selected === option.id ? 'var(--accent)' : 'var(--text-primary)',
-                      fontSize: '0.8rem',
-                      letterSpacing: '0.05em',
-                    }}
-                  >
-                    {option.label}
-                  </div>
-                  <p
-                    className="font-sans text-xs"
-                    style={{ color: 'var(--text-muted)', lineHeight: 1.6, opacity: 0.7 }}
-                  >
-                    {option.description}
-                  </p>
-                </div>
-              </div>
-            </button>
+              option={option}
+              selected={selected === option.id}
+              onSelect={() => setSelected(option.id)}
+              isMobile={isMobile}
+            />
           ))}
         </div>
 
@@ -168,6 +130,107 @@ export default function AccusationScreen({ level, onSubmit, onCancel }: Props) {
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ── OptionCard with expandable description ──
+function OptionCard({
+  option,
+  selected,
+  onSelect,
+  isMobile,
+}: {
+  option: { id: string; label: string; description: string };
+  selected: boolean;
+  onSelect: () => void;
+  isMobile: boolean;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const [hovered, setHovered] = useState(false);
+
+  // On mobile: tap info button to expand. On desktop: show on hover.
+  const showDesc = isMobile ? expanded : (hovered || selected);
+
+  return (
+    <div
+      className="relative w-full text-left transition-all duration-300"
+      style={{
+        background: selected ? 'rgba(245,166,35,0.1)' : 'rgba(255,255,255,0.02)',
+        border: selected
+          ? '1px solid rgba(245,166,35,0.7)'
+          : '1px solid rgba(255,255,255,0.08)',
+        boxShadow: selected ? '0 0 20px rgba(245,166,35,0.12)' : 'none',
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <button
+        onClick={onSelect}
+        className="w-full text-left px-5 py-4 flex items-start gap-3"
+      >
+        {/* Radio */}
+        <div
+          className="mt-0.5 flex-shrink-0 transition-all duration-300"
+          style={{
+            width: 16,
+            height: 16,
+            borderRadius: '50%',
+            border: `2px solid ${selected ? 'rgba(245,166,35,0.8)' : 'rgba(255,255,255,0.2)'}`,
+            background: selected ? 'rgba(245,166,35,0.6)' : 'transparent',
+            boxShadow: selected ? '0 0 8px rgba(245,166,35,0.4)' : 'none',
+          }}
+        />
+        <div className="flex-1 min-w-0">
+          {/* Label */}
+          <div
+            className="font-detective"
+            style={{
+              color: selected ? 'var(--accent)' : 'var(--text-primary)',
+              fontSize: isMobile ? '0.82rem' : '0.85rem',
+              letterSpacing: '0.05em',
+              marginBottom: showDesc ? 6 : 0,
+            }}
+          >
+            {option.label}
+          </div>
+          {/* Description — always visible but subtle when not focused */}
+          <p
+            className="font-sans transition-all duration-200"
+            style={{
+              color: selected ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.45)',
+              lineHeight: 1.6,
+              fontSize: isMobile ? '0.75rem' : '0.78rem',
+              maxHeight: showDesc ? '8rem' : (isMobile ? 0 : '8rem'),
+              overflow: 'hidden',
+              opacity: showDesc ? 1 : (isMobile ? 0 : 0.5),
+              marginTop: isMobile && !showDesc ? 0 : 4,
+            }}
+          >
+            {option.description}
+          </p>
+        </div>
+      </button>
+
+      {/* Mobile: ℹ button to expand */}
+      {isMobile && (
+        <button
+          onClick={(e) => { e.stopPropagation(); setExpanded((v) => !v); }}
+          className="absolute top-3 right-3 font-detective flex items-center justify-center transition-all duration-200"
+          style={{
+            width: 22,
+            height: 22,
+            borderRadius: '50%',
+            border: `1px solid ${expanded ? 'rgba(245,166,35,0.6)' : 'rgba(255,255,255,0.15)'}`,
+            color: expanded ? 'rgba(245,166,35,0.9)' : 'rgba(255,255,255,0.3)',
+            fontSize: '0.6rem',
+            background: expanded ? 'rgba(245,166,35,0.08)' : 'transparent',
+          }}
+          title="What does this mean?"
+        >
+          ℹ
+        </button>
+      )}
     </div>
   );
 }

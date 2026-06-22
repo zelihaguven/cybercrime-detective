@@ -3,97 +3,167 @@ import { useLanguage } from '../contexts/LanguageContext';
 
 interface Props {
   onNewGame: () => void;
-  onCaseSelect: () => void;
+  onContinue?: () => void;
   onHandbook: () => void;
   onMultiplayer?: () => void;
+  hasDetective?: boolean;
 }
 
-export default function TitleScreen({ onNewGame, onCaseSelect, onHandbook, onMultiplayer }: Props) {
+export default function TitleScreen({ onNewGame, onContinue, onHandbook, onMultiplayer, hasDetective = false }: Props) {
   const { t } = useLanguage();
+  // phase: 0=hidden, 1=tagline, 2=title+slogan, 3=click-hint
   const [phase, setPhase] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
 
   useEffect(() => {
     const t1 = setTimeout(() => setPhase(1), 400);
-    const t2 = setTimeout(() => setPhase(2), 1200);
+    const t2 = setTimeout(() => setPhase(2), 1000);
     const t3 = setTimeout(() => setPhase(3), 2000);
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, []);
 
+  const handleSplashClick = () => {
+    if (menuOpen || phase < 2) return;
+    setMenuOpen(true);
+    setTimeout(() => setMenuVisible(true), 80);
+  };
+
   return (
-    <div className="relative w-full h-full overflow-hidden" style={{ background: '#0A0C12' }}>
-      {/* Detective office background */}
+    <div
+      className="relative w-full h-full overflow-hidden"
+      style={{ background: '#0A0C12', cursor: !menuOpen && phase >= 2 ? 'pointer' : 'default' }}
+      onClick={handleSplashClick}
+    >
       <OfficeBackground />
-
-      {/* Rain on window */}
       <RainEffect />
-
-      {/* Volumetric light from desk lamp */}
       <LampLight />
-
-      {/* Atmospheric fog */}
       <FogLayer />
-
-      {/* Vignette */}
       <div className="vignette" />
       <div className="scanlines" />
       <div className="noise-overlay" />
 
-      {/* Content */}
-      <div className="relative z-20 flex flex-col items-center justify-center h-full">
+      {/* Splash content — always visible */}
+      <div className="relative z-20 flex flex-col items-center justify-center h-full pointer-events-none">
 
-        {/* Case badge */}
+        {/* Unit badge — fades in first */}
         <div
-          className="mb-3 transition-all duration-700"
-          style={{ opacity: phase >= 1 ? 1 : 0, transform: phase >= 1 ? 'translateY(0)' : 'translateY(-20px)' }}
+          className="mb-4 transition-all duration-700"
+          style={{ opacity: phase >= 1 ? 1 : 0, transform: phase >= 1 ? 'translateY(0)' : 'translateY(-16px)' }}
         >
-          <span className="font-detective text-xs tracking-[0.3em] uppercase" style={{ color: 'var(--accent)', opacity: 0.8 }}>
-            {t('tagline')}
-          </span>
-        </div>
-
-        {/* Title */}
-        <div
-          className="transition-all duration-1000"
-          style={{ opacity: phase >= 1 ? 1 : 0, transform: phase >= 1 ? 'translateY(0)' : 'translateY(20px)' }}
-        >
-          <h1
-            className="font-detective text-center leading-none"
-            style={{
-              fontSize: 'clamp(4rem, 12vw, 9rem)',
-              color: 'var(--text-primary)',
-              textShadow: '0 0 60px rgba(245,166,35,0.2), 0 4px 20px rgba(0,0,0,0.8)',
-              letterSpacing: '-0.01em',
-            }}
-          >
-            CASE FILES
-          </h1>
-        </div>
-
-        {/* Subtitle */}
-        <div
-          className="mt-3 mb-12 transition-all duration-700"
-          style={{
-            opacity: phase >= 2 ? 1 : 0,
-            transform: phase >= 2 ? 'translateY(0)' : 'translateY(10px)',
-            transitionDelay: '0.2s',
-          }}
-        >
-          <div className="flex items-center gap-4">
-            <div style={{ height: 1, width: 60, background: 'rgba(245,166,35,0.4)' }} />
-            <span className="font-serif italic text-lg" style={{ color: 'var(--text-muted)' }}>
-              {t('titleSubtitle')}
+          <div className="flex items-center gap-3">
+            <div style={{ width: 32, height: 1, background: 'rgba(245,166,35,0.4)' }} />
+            <span className="font-detective text-xs tracking-[0.35em] uppercase" style={{ color: 'var(--accent)', opacity: 0.7, fontSize: '0.6rem' }}>
+              {t('tagline')}
             </span>
-            <div style={{ height: 1, width: 60, background: 'rgba(245,166,35,0.4)' }} />
+            <div style={{ width: 32, height: 1, background: 'rgba(245,166,35,0.4)' }} />
           </div>
         </div>
 
-        {/* Navigation buttons */}
+        {/* Two-line title: CYBERCRIME / DETECTIVE */}
         <div
-          className="flex flex-col gap-3 items-center w-full max-w-xs transition-all duration-700"
-          style={{ opacity: phase >= 3 ? 1 : 0, transform: phase >= 3 ? 'translateY(0)' : 'translateY(20px)' }}
+          className="text-center transition-all duration-1000"
+          style={{ opacity: phase >= 2 ? 1 : 0, transform: phase >= 2 ? 'translateY(0)' : 'translateY(24px)' }}
         >
-          <TitleButton onClick={onNewGame} primary label={t('newInvestigation')} icon="◈" />
-          <TitleButton onClick={onCaseSelect} label={t('caseSelection')} icon="⊡" />
+          <div
+            className="font-detective leading-none"
+            style={{
+              fontSize: 'clamp(3rem, 10vw, 7.5rem)',
+              color: 'var(--accent)',
+              textShadow: '0 0 80px rgba(245,166,35,0.35), 0 4px 24px rgba(0,0,0,0.9)',
+              letterSpacing: '0.06em',
+            }}
+          >
+            CYBERCRIME
+          </div>
+          <div
+            className="font-detective leading-none"
+            style={{
+              fontSize: 'clamp(2rem, 6.5vw, 5rem)',
+              color: 'var(--text-primary)',
+              textShadow: '0 0 40px rgba(245,166,35,0.1), 0 4px 20px rgba(0,0,0,0.8)',
+              letterSpacing: '0.38em',
+              opacity: 0.9,
+            }}
+          >
+            DETECTIVE
+          </div>
+        </div>
+
+        {/* Slogan */}
+        <div
+          className="mt-4 transition-all duration-700"
+          style={{
+            opacity: phase >= 2 ? 1 : 0,
+            transform: phase >= 2 ? 'translateY(0)' : 'translateY(10px)',
+            transitionDelay: '0.3s',
+          }}
+        >
+          <div className="flex items-center gap-4">
+            <div style={{ height: 1, width: 50, background: 'rgba(245,166,35,0.35)' }} />
+            <span className="font-serif italic" style={{ color: 'var(--text-muted)', fontSize: 'clamp(0.85rem, 2vw, 1.1rem)' }}>
+              {t('titleSlogan')}
+            </span>
+            <div style={{ height: 1, width: 50, background: 'rgba(245,166,35,0.35)' }} />
+          </div>
+        </div>
+
+        {/* Click-to-begin hint — pulses, hidden when menu is open */}
+        <div
+          className="mt-14 transition-all duration-700"
+          style={{
+            opacity: phase >= 3 && !menuOpen ? 1 : 0,
+            transform: phase >= 3 && !menuOpen ? 'translateY(0)' : 'translateY(8px)',
+          }}
+        >
+          <span
+            className="font-detective tracking-[0.3em] uppercase click-hint-pulse"
+            style={{ color: 'rgba(245,166,35,0.55)', fontSize: '0.68rem' }}
+          >
+            {t('clickToBegin')}
+          </span>
+        </div>
+      </div>
+
+      {/* Menu overlay — slides up on click */}
+      <div
+        className="absolute inset-0 z-30 flex flex-col items-center justify-center pointer-events-none transition-all duration-500"
+        style={{
+          opacity: menuVisible ? 1 : 0,
+          transform: menuVisible ? 'translateY(0)' : 'translateY(30px)',
+          background: 'radial-gradient(ellipse at 50% 60%, rgba(7,5,12,0.92) 0%, rgba(7,5,12,0.7) 100%)',
+        }}
+      >
+        {/* Menu title — compact two-line */}
+        <div className="text-center mb-8" style={{ pointerEvents: 'none' }}>
+          <div
+            className="font-detective leading-tight"
+            style={{ color: 'var(--accent)', fontSize: 'clamp(1.4rem, 3.5vw, 2.4rem)', letterSpacing: '0.06em', opacity: 0.9 }}
+          >
+            CYBERCRIME
+          </div>
+          <div
+            className="font-detective leading-tight"
+            style={{ color: 'var(--text-primary)', fontSize: 'clamp(0.9rem, 2.2vw, 1.5rem)', letterSpacing: '0.35em', opacity: 0.75 }}
+          >
+            DETECTIVE
+          </div>
+        </div>
+
+        {/* Nav buttons */}
+        <div
+          className="flex flex-col gap-3 items-center w-full max-w-xs"
+          style={{ pointerEvents: menuVisible ? 'auto' : 'none' }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {hasDetective ? (
+            <>
+              <TitleButton onClick={onContinue ?? onNewGame} primary label={t('continueInvestigation')} icon="◈" />
+              <TitleButton onClick={onNewGame} label={t('newInvestigation')} icon="⊡" />
+            </>
+          ) : (
+            <TitleButton onClick={onNewGame} primary label={t('beginInvestigation')} icon="◈" />
+          )}
           <TitleButton onClick={onHandbook} label={t('detectiveHandbook')} icon="⊞" />
           {onMultiplayer && (
             <TitleButton onClick={onMultiplayer} label={t('multiplayerMode')} icon="⊗" />
@@ -102,8 +172,8 @@ export default function TitleScreen({ onNewGame, onCaseSelect, onHandbook, onMul
 
         {/* Bottom credit */}
         <div
-          className="absolute bottom-6 font-sans text-xs transition-opacity duration-700"
-          style={{ color: 'var(--text-muted)', opacity: phase >= 3 ? 0.4 : 0, letterSpacing: '0.15em' }}
+          className="absolute bottom-6 font-sans text-xs"
+          style={{ color: 'var(--text-muted)', opacity: 0.35, letterSpacing: '0.15em', pointerEvents: 'none' }}
         >
           {t('creditLine')}
         </div>

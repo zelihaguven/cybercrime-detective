@@ -20,7 +20,17 @@ export function useRoom(roomCode: string | null, playerId: string): UseRoomRetur
       return;
     }
 
-    if (!socket.connected) socket.connect();
+    function fetchRoom() {
+      socket.emit('getRoom', { code: roomCode, playerId }, (err: string | null, data: { room?: Room }) => {
+        if (err) {
+          setError(err);
+          setLoading(false);
+        } else if (data?.room) {
+          setRoom(data.room);
+          setLoading(false);
+        }
+      });
+    }
 
     const handleUpdate = (updated: Room) => {
       if (updated.code === roomCode) {
@@ -30,28 +40,16 @@ export function useRoom(roomCode: string | null, playerId: string): UseRoomRetur
       }
     };
 
-    const handleConnectError = () => {
-      setError('connection_error');
-      setLoading(false);
-    };
+    const handleReconnect = () => fetchRoom();
 
     socket.on('roomUpdate', handleUpdate);
-    socket.on('connect_error', handleConnectError);
+    socket.on('connect', handleReconnect);
 
-    // Fetch current state (covers the case where we navigate into an existing room)
-    socket.emit('getRoom', { code: roomCode }, (res: { room?: Room; error?: string }) => {
-      if (res.error) {
-        setError(res.error);
-        setLoading(false);
-      } else if (res.room) {
-        setRoom(res.room);
-        setLoading(false);
-      }
-    });
+    fetchRoom();
 
     return () => {
       socket.off('roomUpdate', handleUpdate);
-      socket.off('connect_error', handleConnectError);
+      socket.off('connect', handleReconnect);
     };
   }, [roomCode, playerId]);
 

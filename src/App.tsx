@@ -218,9 +218,10 @@ function AppInner() {
       <ScreenLayer active={state.screen === 'title'}>
         <TitleScreen
           onNewGame={handleNewGame}
-          onCaseSelect={handleContinue}
+          onContinue={handleContinue}
           onHandbook={() => setOverlay('handbook')}
           onMultiplayer={() => go('mp-modal')}
+          hasDetective={!!(state.detective && state.hasSeenIntro)}
         />
       </ScreenLayer>
 

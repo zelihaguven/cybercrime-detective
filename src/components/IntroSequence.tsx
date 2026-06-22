@@ -7,7 +7,7 @@ import { useIsMobile } from '../utils/responsive';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const INTRO_CHARACTER_IDS: DialogueLine['characterId'][] = [
-  'narrator', 'narrator', 'weber', 'weber', 'mia', 'weber', 'jonas', 'weber', 'detective', 'weber',
+  'narrator', 'weber', 'mia', 'weber',
 ];
 
 interface Props {
@@ -62,52 +62,55 @@ export default function IntroSequence({ detective, onComplete }: Props) {
       {/* Lamp light pool */}
       <div className="absolute pointer-events-none" style={{ top: '55%', left: '50%', transform: 'translate(-50%, -50%)', width: 500, height: 200, background: 'radial-gradient(ellipse, rgba(255,200,80,0.04) 0%, transparent 70%)', borderRadius: '50%' }} />
 
-      {/* Character silhouettes */}
-      {!isMobile && (
-        <div
-          className="absolute pointer-events-none flex items-end gap-24 transition-opacity duration-1000"
-          style={{ bottom: '22%', left: '50%', transform: 'translateX(-50%)', opacity: mounted ? 0.55 : 0 }}
-        >
-          <div className="flex flex-col items-center">
-            <span className="text-6xl" style={{ filter: 'grayscale(20%) brightness(0.7)' }}>🧔</span>
-            <span className="font-detective mt-1" style={{ color: '#5B8DD9', fontSize: '0.55rem', letterSpacing: '0.28em' }}>WEBER</span>
-          </div>
-          <div className="flex flex-col items-center">
-            {detective.appearance
-              ? <CharacterSVG appearance={detective.appearance} size={96} />
-              : <span className="text-7xl" style={{ filter: 'brightness(0.85)' }}>{getDetectiveAvatarEmoji(detective.avatar)}</span>}
-            <span className="font-detective mt-1" style={{ color: OUTFIT_ACCENT_COLORS[detective.appearance?.outfitColor ?? detective.avatar] ?? '#F5A623', fontSize: '0.55rem', letterSpacing: '0.28em' }}>{detective.name.toUpperCase()}</span>
-          </div>
-          <div className="flex flex-col items-center">
-            <span className="text-6xl" style={{ filter: 'grayscale(20%) brightness(0.7)' }}>👩‍💻</span>
-            <span className="font-detective mt-1" style={{ color: '#7ABF6A', fontSize: '0.55rem', letterSpacing: '0.28em' }}>MIA</span>
-          </div>
+      {/* Character silhouettes — bigger, more prominent */}
+      <div
+        className="absolute pointer-events-none flex items-end transition-opacity duration-1000"
+        style={{
+          bottom: isMobile ? '30%' : '24%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          opacity: mounted ? 0.7 : 0,
+          gap: isMobile ? 32 : 80,
+        }}
+      >
+        <div className="flex flex-col items-center">
+          <span style={{ fontSize: isMobile ? '4rem' : '7rem', filter: 'grayscale(15%) brightness(0.75)' }}>🧔</span>
+          <span className="font-detective mt-1" style={{ color: '#5B8DD9', fontSize: isMobile ? '0.45rem' : '0.6rem', letterSpacing: '0.28em' }}>WEBER</span>
         </div>
-      )}
-      {isMobile && (
-        <div
-          className="absolute pointer-events-none flex items-end gap-8 transition-opacity duration-1000"
-          style={{ bottom: '22%', left: '50%', transform: 'translateX(-50%)', opacity: mounted ? 0.55 : 0 }}
-        >
-          <div className="flex flex-col items-center">
-            <span className="text-4xl" style={{ filter: 'grayscale(20%) brightness(0.7)' }}>🧔</span>
-            <span className="font-detective mt-1" style={{ color: '#5B8DD9', fontSize: '0.45rem', letterSpacing: '0.2em' }}>WEBER</span>
-          </div>
-          <div className="flex flex-col items-center">
-            {detective.appearance
-              ? <CharacterSVG appearance={detective.appearance} size={64} />
-              : <span className="text-5xl" style={{ filter: 'brightness(0.85)' }}>{getDetectiveAvatarEmoji(detective.avatar)}</span>}
-            <span className="font-detective mt-1" style={{ color: OUTFIT_ACCENT_COLORS[detective.appearance?.outfitColor ?? detective.avatar] ?? '#F5A623', fontSize: '0.45rem', letterSpacing: '0.2em' }}>{detective.name.toUpperCase()}</span>
-          </div>
-          <div className="flex flex-col items-center">
-            <span className="text-4xl" style={{ filter: 'grayscale(20%) brightness(0.7)' }}>👩‍💻</span>
-            <span className="font-detective mt-1" style={{ color: '#7ABF6A', fontSize: '0.45rem', letterSpacing: '0.2em' }}>MIA</span>
-          </div>
+        <div className="flex flex-col items-center">
+          {detective.appearance
+            ? <CharacterSVG appearance={detective.appearance} size={isMobile ? 80 : 140} />
+            : <span style={{ fontSize: isMobile ? '5rem' : '8.5rem', filter: 'brightness(0.9)' }}>{getDetectiveAvatarEmoji(detective.avatar)}</span>}
+          <span className="font-detective mt-1" style={{ color: OUTFIT_ACCENT_COLORS[detective.appearance?.outfitColor ?? detective.avatar] ?? '#F5A623', fontSize: isMobile ? '0.45rem' : '0.6rem', letterSpacing: '0.28em' }}>{detective.name.toUpperCase()}</span>
         </div>
-      )}
+        <div className="flex flex-col items-center">
+          <span style={{ fontSize: isMobile ? '4rem' : '7rem', filter: 'grayscale(15%) brightness(0.75)' }}>👩‍💻</span>
+          <span className="font-detective mt-1" style={{ color: '#7ABF6A', fontSize: isMobile ? '0.45rem' : '0.6rem', letterSpacing: '0.28em' }}>MIA</span>
+        </div>
+      </div>
 
       <div className="scanlines absolute inset-0 pointer-events-none" />
       <div className="noise-overlay absolute inset-0 pointer-events-none" />
+
+      {/* Skip button — always visible, top-right */}
+      <button
+        onClick={onComplete}
+        className="absolute z-50 font-detective text-xs tracking-widest uppercase transition-all duration-200"
+        style={{
+          top: 20,
+          right: 24,
+          color: 'rgba(255,255,255,0.28)',
+          letterSpacing: '0.22em',
+          fontSize: '0.6rem',
+          background: 'rgba(255,255,255,0.04)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          padding: '6px 14px',
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'; }}
+        onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.28)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
+      >
+        SKIP INTRO ›
+      </button>
 
       <DialogueBox
         lines={introLines}

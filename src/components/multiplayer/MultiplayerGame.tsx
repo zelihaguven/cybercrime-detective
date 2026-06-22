@@ -5,6 +5,7 @@ import { setPlayerReady, advanceToAccusation, submitAccusation } from '../../uti
 import { getLevelById } from '../../data/levels';
 import { useIsMobile } from '../../utils/responsive';
 import type { Clue } from '../../types/game';
+import Handbook from '../Handbook';
 
 interface Props {
   roomCode: string;
@@ -20,6 +21,7 @@ export default function MultiplayerGame({ roomCode, playerId, onResult, onLeave 
   const [markingReady, setMarkingReady] = useState(false);
   const [selectedAccusation, setSelectedAccusation] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [showHandbook, setShowHandbook] = useState(false);
 
   const isMobile = useIsMobile();
 
@@ -200,6 +202,11 @@ export default function MultiplayerGame({ roomCode, playerId, onResult, onLeave 
       <div className="absolute inset-0 flex flex-col" style={bgStyle}>
         <div className="scanlines absolute inset-0 pointer-events-none opacity-30" />
         <div className="noise-overlay absolute inset-0 pointer-events-none" />
+        {showHandbook && level.handbookTerms && (
+          <div className="absolute inset-0" style={{ zIndex: 100 }}>
+            <Handbook terms={level.handbookTerms} onClose={() => setShowHandbook(false)} />
+          </div>
+        )}
 
         {/* Top bar */}
         <div className="relative z-10 flex-shrink-0 flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
@@ -211,13 +218,22 @@ export default function MultiplayerGame({ roomCode, playerId, onResult, onLeave 
               {level.title}
             </div>
           </div>
-          <button
-            onClick={onLeave}
-            className="font-detective text-xs ml-3 flex-shrink-0"
-            style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.6rem', letterSpacing: '0.2em', background: 'none', border: 'none', cursor: 'pointer' }}
-          >
-            {t('mpLeave')}
-          </button>
+          <div className="flex items-center gap-2 flex-shrink-0 ml-3">
+            <button
+              onClick={() => setShowHandbook(true)}
+              className="font-detective text-xs"
+              style={{ color: 'rgba(245,166,35,0.5)', fontSize: '0.6rem', letterSpacing: '0.15em', background: 'rgba(245,166,35,0.05)', border: '1px solid rgba(245,166,35,0.2)', padding: '4px 8px', cursor: 'pointer' }}
+            >
+              📓
+            </button>
+            <button
+              onClick={onLeave}
+              className="font-detective text-xs"
+              style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.6rem', letterSpacing: '0.2em', background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              {t('mpLeave')}
+            </button>
+          </div>
         </div>
 
         {/* Main scrollable content */}
@@ -276,6 +292,11 @@ export default function MultiplayerGame({ roomCode, playerId, onResult, onLeave 
     <div className="absolute inset-0 flex" style={bgStyle}>
       <div className="scanlines absolute inset-0 pointer-events-none opacity-30" />
       <div className="noise-overlay absolute inset-0 pointer-events-none" />
+      {showHandbook && level.handbookTerms && (
+        <div className="absolute inset-0" style={{ zIndex: 100 }}>
+          <Handbook terms={level.handbookTerms} onClose={() => setShowHandbook(false)} />
+        </div>
+      )}
 
       {/* Main area */}
       <div className="relative z-10 flex-1 flex flex-col overflow-hidden">
@@ -289,13 +310,22 @@ export default function MultiplayerGame({ roomCode, playerId, onResult, onLeave 
               {level.title}
             </div>
           </div>
-          <button
-            onClick={onLeave}
-            className="font-detective text-xs"
-            style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.6rem', letterSpacing: '0.2em', background: 'none', border: 'none', cursor: 'pointer' }}
-          >
-            {t('mpLeave')}
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowHandbook(true)}
+              className="font-detective text-xs tracking-widest uppercase transition-all duration-200"
+              style={{ color: 'rgba(245,166,35,0.6)', fontSize: '0.6rem', letterSpacing: '0.18em', background: 'rgba(245,166,35,0.05)', border: '1px solid rgba(245,166,35,0.25)', padding: '5px 12px', cursor: 'pointer' }}
+            >
+              📓 {t('mpHandbook')}
+            </button>
+            <button
+              onClick={onLeave}
+              className="font-detective text-xs"
+              style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.6rem', letterSpacing: '0.2em', background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              {t('mpLeave')}
+            </button>
+          </div>
         </div>
 
         {/* Clue review phase */}

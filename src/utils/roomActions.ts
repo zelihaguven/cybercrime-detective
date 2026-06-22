@@ -23,9 +23,9 @@ export function createRoom(
     socket.emit(
       'createRoom',
       { playerId, playerName },
-      (res: { code?: string; error?: string }) => {
-        if (res.error || !res.code) reject(new Error(res.error ?? 'unknown'));
-        else resolve({ code: res.code });
+      (err: string | null, data: { code: string }) => {
+        if (err || !data?.code) reject(new Error(err ?? 'unknown'));
+        else resolve({ code: data.code });
       },
     );
   });
@@ -41,7 +41,7 @@ export function joinRoom(
     socket.emit(
       'joinRoom',
       { code, playerId, playerName },
-      (res: { error?: string }) => resolve(res),
+      (err: string | null) => resolve(err ? { error: err } : {}),
     );
   });
 }
