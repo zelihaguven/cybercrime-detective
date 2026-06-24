@@ -129,21 +129,10 @@ function AppInner() {
     setState((s) => ({ ...s, screen: 'title', detective: null, hasSeenIntro: false, currentLevel: 1, discoveredClues: [], accusationCorrect: null, pendingXP: 0 }));
   }, []);
 
-  // Office → incident screen (first time) or case briefing
+  // Office → case briefing
   const handleSelectCase = useCallback((levelId: number) => {
-    const lvl = getLevelById(levelId, lang);
-    const alreadySeen = state.seenIncidentScreens?.includes(levelId) ?? false;
-    if (lvl?.incidentScreen && !alreadySeen) {
-      setState((s) => ({
-        ...s,
-        currentLevel: levelId,
-        seenIncidentScreens: [...(s.seenIncidentScreens ?? []), levelId],
-        screen: 'incident-screen',
-      }));
-    } else {
-      setState((s) => ({ ...s, currentLevel: levelId, screen: 'case-briefing' }));
-    }
-  }, [lang, state.seenIncidentScreens]);
+    setState((s) => ({ ...s, currentLevel: levelId, screen: 'case-briefing' }));
+  }, []);
 
   // Briefing → scene
   const handleBeginInvestigation = useCallback(() => {
@@ -236,7 +225,7 @@ function AppInner() {
   }, [state.detective, state.accusationCorrect, go]);
 
   const handleRetry = useCallback(() => {
-    setState((s) => ({ ...s, screen: 'scene', discoveredClues: [], accusationCorrect: null, pendingXP: 0, pendingSpecialtyBonus: 0, pendingBadges: [] }));
+    setState((s) => ({ ...s, screen: 'scene', accusationCorrect: null, pendingXP: 0, pendingSpecialtyBonus: 0, pendingBadges: [] }));
     setOverlay(null);
   }, []);
 
@@ -283,6 +272,7 @@ function AppInner() {
           <IncidentScreen
             incident={level.incidentScreen}
             levelId={state.currentLevel}
+            victimName={level.victim.name}
             onComplete={() => go('case-briefing')}
           />
         )}

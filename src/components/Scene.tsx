@@ -5,7 +5,7 @@ import { getDetectiveAvatarEmoji } from '../utils/detective';
 import { AVATAR_COLORS } from '../data/characters';
 import { useIsMobile, useIsLandscape } from '../utils/responsive';
 import { useLanguage } from '../contexts/LanguageContext';
-import TutorialOverlay, { hasTutorialBeenSeen } from './TutorialOverlay';
+import TutorialOverlay from './TutorialOverlay';
 import TermText from './TermText';
 import KitchenScene from './KitchenScene';
 import GamingRoomScene from './GamingRoomScene';
@@ -39,7 +39,7 @@ export default function Scene({ level, discoveredClues, detective, onClueDiscove
   const [detectiveComment, setDetectiveComment] = useState<string | null>(null);
   const [showMemo, setShowMemo] = useState(true);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
-  const [showTutorial, setShowTutorial] = useState(() => level.id === 1 && !hasTutorialBeenSeen());
+  const [showTutorial, setShowTutorial] = useState(() => level.id === 1);
 
   const allClues = [...level.clues, ...level.bonusClues];
   const found = discoveredClues.length;

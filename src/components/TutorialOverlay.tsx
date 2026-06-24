@@ -2,17 +2,6 @@ import { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useIsMobile } from '../utils/responsive';
 
-const TUTORIAL_KEY = 'ciu-tutorial-v1';
-
-export function hasTutorialBeenSeen(): boolean {
-  try { return localStorage.getItem(TUTORIAL_KEY) === 'true'; }
-  catch { return false; }
-}
-
-function markTutorialSeen(): void {
-  try { localStorage.setItem(TUTORIAL_KEY, 'true'); } catch {}
-}
-
 interface Props {
   onDone: () => void;
 }
@@ -34,7 +23,6 @@ export default function TutorialOverlay({ onDone }: Props) {
 
   const handleNext = () => {
     if (isLast) {
-      markTutorialSeen();
       onDone();
     } else {
       setStep((s) => s + 1);
@@ -42,7 +30,6 @@ export default function TutorialOverlay({ onDone }: Props) {
   };
 
   const handleSkip = () => {
-    markTutorialSeen();
     onDone();
   };
 
