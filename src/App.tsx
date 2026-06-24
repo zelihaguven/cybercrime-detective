@@ -262,7 +262,7 @@ function AppInner() {
       </ScreenLayer>
 
       <ScreenLayer active={state.screen === 'intro-sequence'}>
-        {state.detective && (
+        {state.screen === 'intro-sequence' && state.detective && (
           <IntroSequence detective={state.detective} onComplete={handleIntroComplete} />
         )}
       </ScreenLayer>
@@ -279,7 +279,7 @@ function AppInner() {
       </ScreenLayer>
 
       <ScreenLayer active={state.screen === 'incident-screen'}>
-        {level.incidentScreen && (
+        {state.screen === 'incident-screen' && level.incidentScreen && (
           <IncidentScreen
             incident={level.incidentScreen}
             levelId={state.currentLevel}
