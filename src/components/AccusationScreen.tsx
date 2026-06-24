@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import type { Level } from '../types/game';
 import { useIsMobile } from '../utils/responsive';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -134,23 +134,36 @@ export default function AccusationScreen({ level, onSubmit, onCancel }: Props) {
   );
 }
 
-// ── OptionCard with expandable description ──
+// ── OptionCard with expandable description + term tooltip ──
 function OptionCard({
   option,
   selected,
   onSelect,
   isMobile,
 }: {
-  option: { id: string; label: string; description: string };
+  option: { id: string; label: string; description: string; tooltip?: string };
   selected: boolean;
   onSelect: () => void;
   isMobile: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+  const tooltipRef = useRef<HTMLDivElement>(null);
 
-  // On mobile: tap info button to expand. On desktop: show on hover.
   const showDesc = isMobile ? expanded : (hovered || selected);
+
+  // Close tooltip when clicking outside (mobile)
+  useEffect(() => {
+    if (!tooltipOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (tooltipRef.current && !tooltipRef.current.contains(e.target as Node)) {
+        setTooltipOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [tooltipOpen]);
 
   return (
     <div
@@ -163,7 +176,7 @@ function OptionCard({
         boxShadow: selected ? '0 0 20px rgba(245,166,35,0.12)' : 'none',
       }}
       onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseLeave={() => { setHovered(false); if (!isMobile) setTooltipOpen(false); }}
     >
       <button
         onClick={onSelect}
@@ -182,19 +195,83 @@ function OptionCard({
           }}
         />
         <div className="flex-1 min-w-0">
-          {/* Label */}
-          <div
-            className="font-detective"
-            style={{
-              color: selected ? 'var(--accent)' : 'var(--text-primary)',
-              fontSize: isMobile ? '0.82rem' : '0.85rem',
-              letterSpacing: '0.05em',
-              marginBottom: showDesc ? 6 : 0,
-            }}
-          >
-            {option.label}
+          {/* Label row */}
+          <div className="flex items-center gap-2 flex-wrap" style={{ marginBottom: showDesc ? 6 : 0 }}>
+            <span
+              className="font-detective"
+              style={{
+                color: selected ? 'var(--accent)' : 'var(--text-primary)',
+                fontSize: isMobile ? '0.82rem' : '0.85rem',
+                letterSpacing: '0.05em',
+              }}
+            >
+              {option.label}
+            </span>
+
+            {/* ? tooltip badge */}
+            {option.tooltip && (
+              <div ref={tooltipRef} className="relative flex-shrink-0" style={{ display: 'inline-flex' }}>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setTooltipOpen((v) => !v); }}
+                  onMouseEnter={() => { if (!isMobile) setTooltipOpen(true); }}
+                  onMouseLeave={() => { if (!isMobile) setTooltipOpen(false); }}
+                  className="flex items-center justify-center font-detective transition-all duration-150"
+                  style={{
+                    width: 17,
+                    height: 17,
+                    borderRadius: '50%',
+                    border: `1px solid ${tooltipOpen ? 'rgba(245,166,35,0.7)' : 'rgba(255,255,255,0.22)'}`,
+                    color: tooltipOpen ? 'rgba(245,166,35,1)' : 'rgba(255,255,255,0.4)',
+                    fontSize: '0.6rem',
+                    background: tooltipOpen ? 'rgba(245,166,35,0.1)' : 'transparent',
+                    lineHeight: 1,
+                  }}
+                >
+                  ?
+                </button>
+
+                {/* Tooltip bubble */}
+                {tooltipOpen && (
+                  <div
+                    className="absolute z-50 font-sans"
+                    style={{
+                      bottom: 'calc(100% + 8px)',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      minWidth: 220,
+                      maxWidth: 300,
+                      background: '#1a1208',
+                      border: '1px solid rgba(245,166,35,0.35)',
+                      padding: '10px 12px',
+                      color: 'rgba(255,255,255,0.82)',
+                      fontSize: '0.72rem',
+                      lineHeight: 1.6,
+                      boxShadow: '0 4px 24px rgba(0,0,0,0.7)',
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {/* Arrow */}
+                    <div style={{
+                      position: 'absolute',
+                      bottom: -5,
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      width: 8,
+                      height: 8,
+                      background: '#1a1208',
+                      border: '1px solid rgba(245,166,35,0.35)',
+                      borderTop: 'none',
+                      borderLeft: 'none',
+                      rotate: '45deg',
+                    }} />
+                    {option.tooltip}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-          {/* Description — always visible but subtle when not focused */}
+
+          {/* Description */}
           <p
             className="font-sans transition-all duration-200"
             style={{
@@ -212,7 +289,7 @@ function OptionCard({
         </div>
       </button>
 
-      {/* Mobile: ℹ button to expand */}
+      {/* Mobile: ℹ button to expand description */}
       {isMobile && (
         <button
           onClick={(e) => { e.stopPropagation(); setExpanded((v) => !v); }}
@@ -226,7 +303,6 @@ function OptionCard({
             fontSize: '0.6rem',
             background: expanded ? 'rgba(245,166,35,0.08)' : 'transparent',
           }}
-          title="What does this mean?"
         >
           ℹ
         </button>

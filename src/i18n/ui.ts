@@ -241,10 +241,10 @@ export const UI = {
     // Multiplayer handbook
     mpHandbook: 'Handbook',
     // Intro Sequence (4 lines)
-    introLine0: 'Berlin · Cybercrime Investigation Unit · 08:42 AM. Rain on the windows. Six open cases.',
-    introLine1: "Welcome, {detective}. I'm Chief Inspector Weber. Your job: investigate the scene, collect evidence, pin it to your board — then name the attack.",
-    introLine2: "Mia here — digital forensics. Find clues in the field and I'll help decode them.",
-    introLine3: "The board is yours, {detective}. First case is already waiting.",
+    introLine0: 'Berlin. 08:42 AM. Rain.',
+    introLine1: "{detective}. I'm Weber. Six open cases.",
+    introLine2: "Mia. Digital forensics.",
+    introLine3: "The first one's already running.",
   },
   de: {
     tagline: 'Cybercrime-Ermittlungseinheit',
@@ -471,10 +471,10 @@ export const UI = {
     tutorialStep4Title: 'Die Anklage erheben',
     tutorialStep4Desc: 'Finde alle erforderlichen Hinweise und der Anklage-Button (⚖) erscheint. Identifiziere den Angriffstyp, der am besten erklärt, was passiert ist.',
     mpHandbook: 'Handbuch',
-    introLine0: 'Berlin · Cybercrime-Ermittlungseinheit · 08:42 Uhr. Regen an den Scheiben. Sechs offene Fälle.',
-    introLine1: "Willkommen, {detective}. Ich bin Chefinspektor Weber. Dein Job: Tatort untersuchen, Beweise sammeln, ans Board pinnen — dann den Angriff benennen.",
-    introLine2: "Mia hier — Digitale Forensik. Finde Hinweise im Feld und ich helfe dir, sie zu entschlüsseln.",
-    introLine3: "Das Board gehört dir, {detective}. Der erste Fall wartet bereits.",
+    introLine0: 'Berlin. 08:42 Uhr. Regen.',
+    introLine1: "{detective}. Ich bin Weber. Sechs offene Fälle.",
+    introLine2: "Mia. Digitale Forensik.",
+    introLine3: "Der erste läuft bereits.",
   },
   tr: {
     tagline: 'Siber Suç Dedektif Birimi',
@@ -700,10 +700,10 @@ export const UI = {
     tutorialStep4Title: 'Suçlama Yapmak',
     tutorialStep4Desc: 'Tüm gerekli ipuçlarını bulduğunda Suçlama butonu (⚖) belirir. Kurbanın başına geleni en iyi açıklayan saldırı türünü seç.',
     mpHandbook: 'El Kitabı',
-    introLine0: 'Berlin · Siber Suç Soruşturma Birimi · 08:42. Yağmur cama çarpıyor. Altı açık dava.',
-    introLine1: "Hoş geldin, {detective}. Ben Baş Müfettiş Weber. Görevin: sahneyi soruştur, kanıt topla, panona yapıştır — sonra saldırıyı adlandır.",
-    introLine2: "Ben Mia — dijital adli analiz. Sahada ipucu bul, ben çözümlememe yardım ederim.",
-    introLine3: "Pano senin, {detective}. İlk dava zaten bekliyor.",
+    introLine0: 'Berlin. 08:42. Yağmur.',
+    introLine1: "{detective}. Ben Weber. Altı açık dava.",
+    introLine2: "Mia. Dijital adli bilişim.",
+    introLine3: "İlk dava zaten başladı.",
   },
 } as const;
 

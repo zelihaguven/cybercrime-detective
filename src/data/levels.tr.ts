@@ -14,12 +14,9 @@ export const TR: Record<number, LevelTranslation> = {
     briefing: 'Salı sabahı erken saatler. Hilde kahvaltı yaparken telefonu titredi. Rutin bir bildirime benzeyen şey, onu banka bilgilerini bir yabancıya vermeye yöneltti. Mutfağı araştır. Nasıl olduğunu bul.',
     detectiveMemo: 'Hilde\'nin mutfağı. Her şey yerli yerinde — soğumuş kahve ve açık tablet dışında. Bu sessiz bir suç mahalli. Buradaki şiddet dijitaldir.',
     openingDialogue: [
-      { characterId: 'weber', text: 'Bu dava dün geldi. Hilde Bauer. 72 yaşında. Freiburg\'da emekli öğretmen. Sekiz yüz euro kaybetti.' },
-      { characterId: 'mia', text: 'Miktar küçük ama yöntem hassas. Bu kampanyayı kuran kişi aynı hafta en az kırk farklı kurbana karşı kullandı.' },
-      { characterId: 'weber', text: 'Mutfak senin suç mahallen, {detective}. Hilde erişim izni verdi. Kendisine ne olduğunu anlamak istiyor.' },
-      { characterId: 'detective', text: 'İlk izlenim ne?' },
-      { characterId: 'mia', text: 'SMS tabanlı. Bir mesaj aldı, bir linke tıkladı ve kart bilgilerini sahte sitede girdi. Klasik yöntem — ama uygulama temizdi. İlk bakışta göze çarpan bir şey yok.' },
-      { characterId: 'weber', text: 'Bu yüzden seni gönderiyoruz. Henüz açık olan bir şey yok. İzi kendin bulmalısın.' },
+      { characterId: 'weber', text: 'Hilde Bauer. Yetmiş iki yaşında. Kahvesi soğumadan sekiz yüz euro gitti.' },
+      { characterId: 'mia', text: 'Aynı sabah kırk kurban. Bu rastlantı değildi — biri kampanya başlattı.' },
+      { characterId: 'weber', text: 'Mutfağına erişim izni verdi. Ne olduğunu anlamak istiyor.' },
     ],
     conclusionDialogue: [
       { characterId: 'detective', text: 'Saldırı vektörü açık. SMS kimlik avı. DHL\'in kimliğini taklit ettiler, klonlanmış bir site kurdular ve birinin tuzağa düşmesini beklediler.' },
@@ -73,10 +70,10 @@ export const TR: Record<number, LevelTranslation> = {
       },
     },
     accusationOptions: [
-      { id: 'vishing', label: 'Telefon Dolandırıcılığı (Vishing)', description: 'Biri Hilde\'yi arayıp DHL destek ekibi gibi davranarak telefonda kart bilgilerini aldı.' },
-      { id: 'smishing', label: 'SMS Kimlik Avı (Smishing)', description: 'Saldırgan DHL adına sahte SMS gönderdi ve Hilde\'nin kart bilgilerini ele geçirdi.' },
-      { id: 'malware', label: 'Bankacılık Kötü Amaçlı Yazılımı', description: 'Tabletine yüklenen yazılım bankacılık uygulamasını ele geçirerek ödemeyi saldırganlara yöneltti.' },
-      { id: 'data-breach', label: 'Karanlık Ağ Veri İhlali', description: 'Hilde\'nin kart bilgileri önceki bir ihlalden elde edildi ve onun katılımı olmadan kullanıldı.' },
+      { id: 'vishing', label: 'Telefon Dolandırıcılığı (Vishing)', description: 'Biri Hilde\'yi arayıp DHL destek ekibi gibi davranarak telefonda kart bilgilerini aldı.', tooltip: 'Dolandırıcılar banka veya kargo şirketi gibi davranarak telefonda kişisel bilgileri çalmaya çalışır.' },
+      { id: 'smishing', label: 'SMS Kimlik Avı (Smishing)', description: 'Saldırgan DHL adına sahte SMS gönderdi ve Hilde\'nin kart bilgilerini ele geçirdi.', tooltip: 'Sahte SMS içindeki bağlantı, ödeme bilgilerini veya şifreni çalan düzmece bir siteye götürür.' },
+      { id: 'malware', label: 'Bankacılık Kötü Amaçlı Yazılımı', description: 'Tabletine yüklenen yazılım bankacılık uygulamasını ele geçirerek ödemeyi saldırganlara yöneltti.', tooltip: 'Cihazına gizlice yüklenen zararlı yazılım verilerini çalar, faaliyetlerini izler veya ödemelerini saldırganlara yönlendirir.' },
+      { id: 'data-breach', label: 'Karanlık Ağ Veri İhlali', description: 'Hilde\'nin kart bilgileri önceki bir ihlalden elde edildi ve onun katılımı olmadan kullanıldı.', tooltip: 'Bilgisayar korsanlarının bir şirketin sunucularına sızarak şifre veya kart numarası gibi kullanıcı verilerini çaldığı ve ardından sattığı olay.' },
     ],
     handbookTerms: [
       { term: 'Smishing', oneLiner: 'SMS yoluyla gerçekleştirilen kimlik avı saldırıları.', analogy: 'Kapının altından sürülen sahte mektup — bankandan geliyormuş gibi görünüyor ama bir hırsız gönderdi.', inThisCase: 'Hilde DHL\'den geliyormuş gibi görünen bir SMS aldı. Link, kart bilgilerini girdiği sahte ödeme sayfasına yöneltti.' },
@@ -104,12 +101,9 @@ export const TR: Record<number, LevelTranslation> = {
     briefing: 'Çarşamba akşamı. Luca güvendiği bir arkadaşından Minecraft Premium teklifi içeren bir Discord mesajı aldı. Linke tıkladı. Saniyeler içinde hesabı gitti. Oyun odasını araştır. Ne olduğunu bul.',
     detectiveMemo: 'Luca\'nın oyun odası. Çift monitör, enerji içecekleri, son oyun. Her şey normal görünüyor — sadece Discord sekmesi değil. Burası suç mahalli. Silah bir linkti.',
     openingDialogue: [
-      { characterId: 'weber', text: 'Luca Bianchi. On beş yaşında. Berlin. Discord hesabı ele geçirildi ve aynı kimlik avı linkini arkadaşlarına yaymak için kullanıldı.' },
-      { characterId: 'mia', text: 'Yönlendirici günlüğü her şeyi gösteriyor. Hızlı bağlantı, anında erişim. Bu uzaktan değildi — Luca linke tıkladı ve bilgilerini bizzat girdi.' },
-      { characterId: 'detective', text: 'Nereden geldi?' },
-      { characterId: 'mia', text: 'Zaten ele geçirilmiş bir arkadaşının hesabından. Mesaj meşru görünüyordu — çünkü gönderen gerçek bir kişiydi. Hesabı değil.' },
-      { characterId: 'weber', text: 'Oyun odası senin sahnen, {detective}. Luca işbirliği yapıyor ama utanıyor. Giriş noktasını bul.' },
-      { characterId: 'jonas', text: 'Hesabını kurtarmak istediğini söyledi. Önce ne olduğunu anlamamız lazım.' },
+      { characterId: 'weber', text: 'On beş yaşında. İndirme bitmeden hesabı gitmişti.' },
+      { characterId: 'mia', text: 'Avrupa genelinde üç yüz kırk hesap. Kit hâlâ çalışıyor.' },
+      { characterId: 'weber', text: 'Luca\'nın odası bıraktığı gibi duruyor.' },
     ],
     conclusionDialogue: [
       { characterId: 'detective', text: 'Saldırı zinciri açık. Ele geçirilmiş arkadaş hesabı sahte "ücretsiz yükseltme" linki gönderdi. Luca kimlik avı sayfasında Discord bilgilerini girdi. Saniyeler içinde hesabı gitti.' },
@@ -151,10 +145,10 @@ export const TR: Record<number, LevelTranslation> = {
       },
     },
     accusationOptions: [
-      { id: 'malware-mod', label: 'Oyun Moduna Gizlenmiş Kötü Amaçlı Yazılım', description: 'Luca gayri resmi siteden indirdiği Minecraft modu aracılığıyla giriş bilgilerini çaldırdı.' },
-      { id: 'account-brute-force', label: 'Şifre Kaba Kuvvet Saldırısı', description: 'Otomatik betik doğru şifreyi bulana kadar binlerce kombinasyon denedi.' },
-      { id: 'phishing', label: 'Discord Kimlik Avı Linki (Kimlik Bilgisi Hırsızlığı)', description: 'Ele geçirilmiş arkadaş hesabı sahte "ücretsiz yükseltme" linki gönderdi. Luca kimlik avı sayfasında Discord bilgilerini girdi.' },
-      { id: 'sim-swap', label: 'SIM Kart Değiştirme', description: 'Saldırganlar mobil operatörü Luca\'nın numarasını kendi SIM\'lerine aktarmaya ikna etti ve Discord şifresini sıfırlamak için SMS kodlarını kullandı.' },
+      { id: 'malware-mod', label: 'Oyun Moduna Gizlenmiş Kötü Amaçlı Yazılım', description: 'Luca gayri resmi siteden indirdiği Minecraft modu aracılığıyla giriş bilgilerini çaldırdı.', tooltip: 'İndirdiğin bir dosyaya (oyun modu gibi) gizlenmiş zararlı kod. Yüklendikten sonra arka planda sessizce çalışarak şifreleri çalar.' },
+      { id: 'account-brute-force', label: 'Şifre Kaba Kuvvet Saldırısı', description: 'Otomatik betik doğru şifreyi bulana kadar binlerce kombinasyon denedi.', tooltip: 'Doğru şifreyi bulana kadar saniyede binlerce olası kombinasyonu deneyen otomatik saldırı.' },
+      { id: 'phishing', label: 'Discord Kimlik Avı Linki (Kimlik Bilgisi Hırsızlığı)', description: 'Ele geçirilmiş arkadaş hesabı sahte "ücretsiz yükseltme" linki gönderdi. Luca kimlik avı sayfasında Discord bilgilerini girdi.', tooltip: 'Gerçek bir site gibi görünen sahte bağlantı; giriş bilgilerini girdiğinde bunları saldırgana iletir.' },
+      { id: 'sim-swap', label: 'SIM Kart Değiştirme', description: 'Saldırganlar mobil operatörü Luca\'nın numarasını kendi SIM\'lerine aktarmaya ikna etti ve Discord şifresini sıfırlamak için SMS kodlarını kullandı.', tooltip: 'Dolandırıcıların mobil operatörü ikna ederek numaranı kendi SIM kartlarına aktardığı ve SMS doğrulama kodlarına eriştiği saldırı.' },
     ],
     handbookTerms: [
       { term: 'Phishing', oneLiner: 'Güvenilen kaynağı taklit ederek birini kimlik bilgilerini vermeye kandırmak.', analogy: 'Sahte ön kapı — gerçeğiyle birebir aynı görünüyor ama kapıcıya verdiğin her şey hırsıza gidiyor.', inThisCase: 'Sahte "minecraft-premium-claim.xyz" sayfası Discord girişi gibi görünüyordu. Luca\'nın bilgileri Discord\'a değil saldırgana gitti.' },
@@ -182,12 +176,9 @@ export const TR: Record<number, LevelTranslation> = {
     briefing: 'Çarşamba sabahı. Priya beş ihlal bildirimi ve iki yetkisiz fatura indirmesiyle uyandı. E-posta, Dropbox ve Figma hesapları sabahın erken saatlerinde Doğu Avrupa\'dan giriş gösteriyor. Ev stüdyosunu araştır. Giriş noktasını bul.',
     detectiveMemo: 'Yaratıcı stüdyo, sabah ışığı. Her şey normal görünüyor — eskizler, renkler, kahve, bitkiler. Ama biri sahip olduğu her dijital kapıdan içeri girdi. Nasıl öğren.',
     openingDialogue: [
-      { characterId: 'weber', text: 'Priya Sharma. 31 yaşında. Prenzlauer Berg\'de serbest grafik tasarımcı. Beş ihlal bildirimi ve iki yetkisiz fatura indirmesiyle uyandı.' },
-      { characterId: 'mia', text: 'On altı hesapta aynı şifreyi kullanmış. Saldırganlar 2019 Canva ihlalinden elde edilen kimlik listesini kullandı. Klasik doldurma saldırısı.' },
-      { characterId: 'detective', text: 'Neler ele geçirdiler?' },
-      { characterId: 'mia', text: 'Henüz emin değiliz. Dropbox, Figma, Adobe Cloud\'da müşteri dosyaları var. Bunlara dokundularsa ciddi sorumluluk sorunu olabilir.' },
-      { characterId: 'weber', text: 'Stüdyo senin sahnen, {detective}. İşbirliği yapıyor ama korkmuş. Giriş noktasını bul.' },
-      { characterId: 'jonas', text: 'Kahvenin hâlâ sıcak olduğunu söylememi istedi.' },
+      { characterId: 'weber', text: 'Priya Sharma. Otuz bir. Beş güvenlik bildirimiyle uyandı.' },
+      { characterId: 'mia', text: '2019 Canva sızıntısı. Şifreler tekrar kullanılmış. Saldırganlar altı saattir listede.' },
+      { characterId: 'weber', text: 'Ne götürdüklerini henüz bilmiyor. Biz de bilmiyoruz.' },
     ],
     conclusionDialogue: [
       { characterId: 'detective', text: 'Saldırı zinciri açık. 2019 Canva ihlali kimlik bilgilerini açığa çıkardı. Saldırganlar doldurma araçları çalıştırdı. Aynı şifre e-posta, Dropbox ve Figma\'yı açtı.' },
@@ -235,9 +226,9 @@ export const TR: Record<number, LevelTranslation> = {
       },
     },
     accusationOptions: [
-      { id: 'phishing-link', label: 'E-posta Yoluyla Kimlik Avı Linki', description: 'Priya sahte e-postanın kandırmasıyla şifresini dolandırıcı bir sitede girdi.' },
-      { id: 'credential-stuffing', label: 'Kimlik Bilgisi Doldurma Saldırısı', description: 'Saldırganlar 2019 Canva ihlalindeki kimlik bilgilerini kullanarak Priya\'nın tekrar kullanılan şifresini birden fazla hesapta test etti; e-posta, Dropbox ve Figma\'ya erişti.' },
-      { id: 'insider-threat', label: 'Müşteriden İçeriden Tehdit', description: 'Paylaşılan klasör erişimine sahip bir müşteri, kendisine verilen kimlik bilgilerini kullanarak kasıtlı olarak veri sızdırdı.' },
+      { id: 'phishing-link', label: 'E-posta Yoluyla Kimlik Avı Linki', description: 'Priya sahte e-postanın kandırmasıyla şifresini dolandırıcı bir sitede girdi.', tooltip: 'E-postadaki sahte bağlantı düzmece giriş sayfasına götürür; bilgilerini girdiğinde saldırgan bunları kaydeder.' },
+      { id: 'credential-stuffing', label: 'Kimlik Bilgisi Doldurma Saldırısı', description: 'Saldırganlar 2019 Canva ihlalindeki kimlik bilgilerini kullanarak Priya\'nın tekrar kullanılan şifresini birden fazla hesapta test etti; e-posta, Dropbox ve Figma\'ya erişti.', tooltip: 'Saldırganların bir ihlalden çalınan şifreleri alıp farklı sitelerde otomatik denediği saldırı — aynı şifrenin birden fazla yerde kullanılmasından yararlanır.' },
+      { id: 'insider-threat', label: 'Müşteriden İçeriden Tehdit', description: 'Paylaşılan klasör erişimine sahip bir müşteri, kendisine verilen kimlik bilgilerini kullanarak kasıtlı olarak veri sızdırdı.', tooltip: 'Kuruluş içindeki biri (çalışan, yüklenici) tarafından yasal erişimin kötüye kullanılmasından kaynaklanan güvenlik riski.' },
     ],
     handbookTerms: [
       { term: 'Kimlik Bilgisi Doldurma', oneLiner: 'Çalınan kullanıcı adı/şifre çiftlerini kullanarak başka hesaplara otomatik giriş denemek.', analogy: 'Çalınan anahtarı binadaki her kilitte denemek — çoğu uymaz ama bazıları uyar.', inThisCase: 'Priya\'nın Canva kimlik bilgileri e-posta, bulut depolama ve müşteri platformlarında otomatik olarak test edildi.' },
@@ -263,12 +254,9 @@ export const TR: Record<number, LevelTranslation> = {
     briefing: 'Çarşamba sabahı, 09:47. Marcus panikte bizi aradı. PC ekranı fidye talebi gösteriyor. 3.847 dosya şifreli. POS verileri, tedarikçi sözleşmeleri, müşteri kayıtları — hepsi kilitli. Yedeği 14 haftadır çalışmıyor. Arka ofisi araştır. Kötü amaçlı yazılımın nasıl girdiğini bul.',
     detectiveMemo: 'Küçük arka ofis, sıcak kehribar ışık, kahve çekirdeği kokusu. Ve olmaması gereken kırmızı parlayan PC ekranı. Biri saldırıyı fiziksel olarak buraya taşıdı. Bu suça açılan kapı bir USB portuydu.',
     openingDialogue: [
-      { characterId: 'weber', text: 'Café Marcus. Berlin-Mitte. Saldırı bu sabah keşfedildi. Marcus bizi 09:52\'de aradı. Tüm POS sistemi şifrelenmiş.' },
-      { characterId: 'mia', text: 'Fidye yazılımı LockBit 3.0. Talep 0.25 Bitcoin — yaklaşık on iki bin euro. Sayaç işliyor.' },
-      { characterId: 'detective', text: 'Nasıl girdiklerini biliyor musunuz?' },
-      { characterId: 'mia', text: 'Dışarıdan bariz bir şey yok. Açık port yok, şüpheli e-posta trafiği yok. Belki fiziksel bir şey.' },
-      { characterId: 'weber', text: 'Sahne senin, {detective}. Marcus dışarıda bekliyor — o ekrana artık bakamıyor.' },
-      { characterId: 'jonas', text: 'Sürekli şunu söylüyor: "Sadece tariflerimi geri istiyorum." Onlar da içerde.' },
+      { characterId: 'weber', text: 'Café Marcus. Berlin-Mitte. Sabah dokuzdan beri şifreli.' },
+      { characterId: 'mia', text: 'LockBit 3.0. On iki bin euro talep. Yedek on dört haftalık.' },
+      { characterId: 'weber', text: 'Marcus dışarıda bekliyor. Tarifleri de içeride diyor.' },
     ],
     conclusionDialogue: [
       { characterId: 'detective', text: 'USB düşürme. Birisi oturma alanına bıraktı. Elena buldu, sahibini bulmak için taktı. AutoPlay gerisini yaptı.' },
@@ -316,9 +304,9 @@ export const TR: Record<number, LevelTranslation> = {
       },
     },
     accusationOptions: [
-      { id: 'phishing-email', label: 'Kötü Amaçlı Ekli Kimlik Avı E-postası', description: 'Marcus veya bir çalışan, PC\'ye fidye yazılımı kuran kötü amaçlı e-posta ekini açtı.' },
-      { id: 'remote-exploit', label: 'Uzak Masaüstü Protokolü Açığı', description: 'Saldırganlar açık RDP portundan faydalanarak PC\'ye uzaktan erişti ve fidye yazılımını elle kurdu.' },
-      { id: 'ransomware-usb', label: 'USB Düşürme Saldırısıyla Fidye Yazılımı', description: 'Saldırganlar kafede virüslü USB bıraktı. Çalışan taktı, Windows AutoPlay LockBit fidye yazılımını otomatik çalıştırdı.' },
+      { id: 'phishing-email', label: 'Kötü Amaçlı Ekli Kimlik Avı E-postası', description: 'Marcus veya bir çalışan, PC\'ye fidye yazılımı kuran kötü amaçlı e-posta ekini açtı.', tooltip: 'Resmi görünen, tehlikeli bağlantı veya ek içeren sahte e-posta. Açılırsa cihaza sessizce zararlı yazılım yükler.' },
+      { id: 'remote-exploit', label: 'Uzak Masaüstü Protokolü Açığı', description: 'Saldırganlar açık RDP portundan faydalanarak PC\'ye uzaktan erişti ve fidye yazılımını elle kurdu.', tooltip: 'İnternete açık yazılımlardaki (Uzak Masaüstü gibi) güvenlik açıklarını kullanan ve dünyanın herhangi bir yerinden izinsiz erişim sağlayan saldırı.' },
+      { id: 'ransomware-usb', label: 'USB Düşürme Saldırısıyla Fidye Yazılımı', description: 'Saldırganlar kafede virüslü USB bıraktı. Çalışan taktı, Windows AutoPlay LockBit fidye yazılımını otomatik çalıştırdı.', tooltip: 'Birinin takması için virüslü USB bırakılan fiziksel saldırı. Bağlanınca fidye yazılımı otomatik çalışarak tüm dosyaları şifreler.' },
     ],
     handbookTerms: [
       { term: 'Fidye Yazılımı', oneLiner: 'Dosyaları şifreleyen ve erişimi geri kazanmak için ödeme talep eden kötü amaçlı yazılım.', analogy: 'Biri dosya dolaplarınıza girer, her çekmeceyi kendi asmasıyla kilitler ve anahtar için nakit ister.', inThisCase: 'Marcus\'un tüm POS verileri, tedarikçi sözleşmeleri ve mali kayıtları LockBit 3.0 tarafından şifrelendi. 72 saat içinde 0.25 BTC talep edildi.' },
@@ -344,12 +332,9 @@ export const TR: Record<number, LevelTranslation> = {
     briefing: 'Perşembe sabahı. 82 öğrenci Abitur biyoloji sınavına oturdu. 09:58\'de — sınav başladıktan iki dakika sonra — tüm okul ağı çöktü. Çevrimiçi sınav platformu erişilemez. Trafik analizi 2,4 gigabit sele trafiği gösteriyor. Biri bunun için ödedi. Kimin ve nasıl olduğunu bul.',
     detectiveMemo: 'Acil durum operasyon modu. Her monitör ya kırmızı ya ölü. Sınav sistemi 82 zaman aşımı gösteriyor. Biri bu okulu on beş euroyla krize sürükledi. Kanıt bu günlüklerde.',
     openingDialogue: [
-      { characterId: 'weber', text: 'Bu canlı. Gymnasium Lichtenberg. DDoS saldırısı — devam ediyor. 82 öğrenci odada biyoloji Abitur\'unu yapamıyor. Ağ on bir dakikadır çökmüş.' },
-      { characterId: 'mia', text: 'Trafik analizi 2,4 gigabit UDP seli gösteriyor. Booter hizmeti — bu imzayı daha önce gördük. Mirai varyant botnet.' },
-      { characterId: 'detective', text: 'Biri bu saldırı için ödedi mi?' },
-      { characterId: 'mia', text: 'Yaklaşık on beş euro için, evet. Bu hizmetler açıkça reklam yapıyor. Zor olan kimin satın aldığını izlemek.' },
-      { characterId: 'weber', text: '{detective}, BT odası senin sahnen. Günlükler hâlâ çalışıyor. Saldırgana götüren ipi bul.' },
-      { characterId: 'jonas', text: 'Seksen iki çocuk bekliyor. Öğretmenleri panikte. Hızlanalım.' },
+      { characterId: 'weber', text: 'Seksen iki öğrenci. Biyoloji sınavı. On bir dakikadır çevrimdışı.' },
+      { characterId: 'mia', text: 'UDP seli — 2,4 gigabit. Biri on beş euro ödedi bunun için.' },
+      { characterId: 'weber', text: 'Gelecekleri o odada oturuyor. Hadi.' },
     ],
     conclusionDialogue: [
       { characterId: 'detective', text: 'GX_404. Sosyal medya gönderisi saldırıdan 24 saat önceydi. Gizlemek için çaba bile harcamamış — booter kiralayacağını kamuoyu önünde övünmüş.' },
@@ -397,9 +382,9 @@ export const TR: Record<number, LevelTranslation> = {
       },
     },
     accusationOptions: [
-      { id: 'state-actor', label: 'Devlet Destekli Siber Saldırı', description: 'Sofistike bir devlet aktörü okul kayıtlarını çalmak veya eğitim altyapısını sekteye uğratmak için okulu hedef aldı.' },
-      { id: 'ddos-booter', label: 'DDoS Booter Hizmeti Saldırısı', description: 'Bir öğrenci (GX_404) okul ağını sel altında bırakmak için ticari DDoS kiralama hizmetine 15 euro ödedi; 82 öğrencinin biyoloji Abitur sınavı kesintiye uğradı.' },
-      { id: 'network-failure', label: 'İç Ağ Arızası', description: 'Okulun eskiyen ağ altyapısı 82 eş zamanlı çevrimiçi sınav oturumunun yükü altında çöktü — saldırı değil kapasite planlaması hatası.' },
+      { id: 'state-actor', label: 'Devlet Destekli Siber Saldırı', description: 'Sofistike bir devlet aktörü okul kayıtlarını çalmak veya eğitim altyapısını sekteye uğratmak için okulu hedef aldı.', tooltip: 'Bir ülke hükümetinin başka ülkeleri veya kuruluşları casusluk yapmak, işleri aksatmak veya veri çalmak için planladığı ve finanse ettiği siber saldırı.' },
+      { id: 'ddos-booter', label: 'DDoS Booter Hizmeti Saldırısı', description: 'Bir öğrenci (GX_404) okul ağını sel altında bırakmak için ticari DDoS kiralama hizmetine 15 euro ödedi; 82 öğrencinin biyoloji Abitur sınavı kesintiye uğradı.', tooltip: 'Bir ağı devasa sahte trafikle dolduran, onu çevrimdışı bırakan ücretli çevrimiçi hizmet — isteyen herkesin kiralayabileceği DDoS saldırısı.' },
+      { id: 'network-failure', label: 'İç Ağ Arızası', description: 'Okulun eskiyen ağ altyapısı 82 eş zamanlı çevrimiçi sınav oturumunun yükü altında çöktü — saldırı değil kapasite planlaması hatası.', tooltip: 'Sistemin o kadar fazla trafiği kaldıracak şekilde tasarlanmadığı için çöktüğü teknik arıza — kasıtlı saldırı değil, kapasite planlama hatası.' },
     ],
     handbookTerms: [
       { term: 'DDoS Saldırısı', oneLiner: 'Hedefi o kadar çok sahte trafikle doldurmak ki gerçek kullanıcılar ulaşamaz.', analogy: 'Binlerce kişinin aynı anda bir mağazanın tek telefon hattını tıkaması — hiçbir gerçek müşteri ulaşamıyor.', inThisCase: 'Okulun 100 Mbps bağlantısı 2,4 Gbps UDP paketiyle tıkandı — 24 kat kapasite aşımı — sınav platformu tüm 82 öğrenci için erişilemez hale geldi.' },
@@ -425,12 +410,9 @@ export const TR: Record<number, LevelTranslation> = {
     briefing: 'Gece geç saatler. TechCorp AG\'nin güvenlik ekibi 23:32\'de bir anomali işaretliyor. Yeni bir hesap — alex.meyer — 23:17\'de oluşturuldu ve hemen ödeme modülü kaynak kodu deposunu klonlamaya başladı. 2 dakikadan kısa sürede 2,3 gigabayt temel fikri mülkiyet sızdırıldı. Hesabı oluşturan BT yöneticisi CEO\'dan e-posta aldığını söylüyor. CEO Helsinki\'de.',
     detectiveMemo: 'Gece BT odası. Üç iş istasyonu, arkada şehir silueti. Bu günlüklerin bir yerinde biri sahte anahtarla ön kapıdan içeri girdiği an var. Bir e-posta. Bir tık. Yıllarca süren çalışma, gitti.',
     openingDialogue: [
-      { characterId: 'weber', text: 'TechCorp AG. Kaynak kodu ihlali. Otuz dakika önce güvenlik ekibi tarafından keşfedildi. Ödeme modülü. Bankaların müşterilerinin parasına güvendiği kod türü.' },
-      { characterId: 'mia', text: 'Biri 23:17\'de yeni hesap oluşturdu ve hemen depoları klonlamaya başladı. 2,3 gigabayt kaynak kodu. İki dakikadan kısa sürede gitti.' },
-      { characterId: 'detective', text: 'Hesap nasıl oluşturuldu?' },
-      { characterId: 'mia', text: 'Asıl soru bu. Nöbetteki BT yöneticisi manuel olarak oluşturdu. CEO\'dan e-posta aldığını söylüyor.' },
-      { characterId: 'weber', text: 'CEO Helsinki\'de. Böyle bir e-posta göndermedi. {detective} — BT odası senin sahnen. Nasıl olduğunu bul ve kapıyı kapat.' },
-      { characterId: 'jonas', text: 'Hukuk ekibi zaten telefonda. Hızlı hareket edin.' },
+      { characterId: 'weber', text: 'TechCorp AG. Ödeme modülü kaynak kodu. 2,3 gigabayt. Kırk dakika önce.' },
+      { characterId: 'mia', text: 'Yeni hesap. Gece 23:17. İki dakikada depo klonlandı.' },
+      { characterId: 'weber', text: 'CEO Helsinki\'de. Hiçbir şey göndermedi.' },
     ],
     conclusionDialogue: [
       { characterId: 'detective', text: 'Hedefli kimlik avı. Benzer domain — techcorp-ag.de. CEO Helsinki\'deydi, bu LinkedIn\'de kamuoyu önünde duyurulmuştu. Saldırgan onun mesajını okudu ve ulaşılamaz olduğu anda harekete geçti.' },
@@ -478,9 +460,9 @@ export const TR: Record<number, LevelTranslation> = {
       },
     },
     accusationOptions: [
-      { id: 'insider-threat', label: 'İçeriden Tehdit — Hain Çalışan', description: 'Mevcut veya eski TechCorp çalışanı ödeme modülü kaynak kodunu çalmak ve rakibe satmak için meşru erişimini kullandı.' },
-      { id: 'supply-chain', label: 'Tedarik Zinciri Saldırısı Üzerinden Yüklenici', description: 'Meşru bir yüklenici hesabı kimlik bilgisi hırsızlığıyla ele geçirildi ve iç sistemlere kalıcı erişim sağladı.' },
-      { id: 'spear-phishing', label: 'Hedefli Kimlik Avı — CEO Taklidi', description: 'Saldırganlar benzer domain kaydettirdi ve CEO\'yu taklit ederek BT personelinini ayrıcalıklı arka kapı hesabı oluşturmaları için kandırdı; hesap hemen 2,3 GB ödeme kaynak kodunu sızdırmak için kullanıldı.' },
+      { id: 'insider-threat', label: 'İçeriden Tehdit — Hain Çalışan', description: 'Mevcut veya eski TechCorp çalışanı ödeme modülü kaynak kodunu çalmak ve rakibe satmak için meşru erişimini kullandı.', tooltip: 'Kuruluş içindeki birinin (çalışan veya yüklenici) hassas verileri çalmak veya sızdırmak için yasal erişimini kötüye kullandığı güvenlik riski.' },
+      { id: 'supply-chain', label: 'Tedarik Zinciri Saldırısı Üzerinden Yüklenici', description: 'Meşru bir yüklenici hesabı kimlik bilgisi hırsızlığıyla ele geçirildi ve iç sistemlere kalıcı erişim sağladı.', tooltip: 'Daha zayıf güvenliğe sahip bir tedarikçi veya yükleniciyi hedef alarak ana hedefin sistemlerine dolaylı yoldan sızan saldırı.' },
+      { id: 'spear-phishing', label: 'Hedefli Kimlik Avı — CEO Taklidi', description: 'Saldırganlar benzer domain kaydettirdi ve CEO\'yu taklit ederek BT personelinini ayrıcalıklı arka kapı hesabı oluşturmaları için kandırdı; hesap hemen 2,3 GB ödeme kaynak kodunu sızdırmak için kullanıldı.', tooltip: 'Belirli bir kişiye özel hazırlanan, gerçek kişisel bilgiler kullanılarak sahte mesajı inandırıcı kılan son derece hedefli kimlik avı saldırısı.' },
     ],
     handbookTerms: [
       { term: 'Hedefli Kimlik Avı (Spear Phishing)', oneLiner: 'İnanılır görünmek için kişisel veya şirkete özgü ayrıntılar kullanan hedefli kimlik avı.', analogy: 'Patronunuzdan ofis anahtarlarını teslim etmenizi isteyen sahte mektup — ama imza biraz yanlış.', inThisCase: 'Saldırgan TechCorp\'un CEO\'sunu LinkedIn\'de araştırdı, neredeyse aynı domain kaydettirdi ve doğrulamanın en zor olduğu gece geç saatte ikna edici acil e-posta gönderdi.' },
@@ -613,10 +595,10 @@ export const TR: Record<number, LevelTranslation> = {
       },
     },
     accusationOptions: [
-      { id: 'emma-berger', label: 'Emma Berger — Ekran Görüntüsünü Aldı ve Paylaştı', description: 'Sınıf temsilcisi. Pazar gecesi geç saatte meşru portal erişimini sınav dosyasını görüntülemek için kullandı. Bilinmeyen numaradan özel olarak Leyla\'ya gönderdi. Ekran görüntüsü yayıldıktan dakikalar sonra şifresini değiştirdi.' },
-      { id: 'leyla-ozturk', label: 'Leyla Öztürk — Grupta Paylaştı', description: '23:43\'te bilinmeyen numaradan sınav fotoğrafını özel mesaj olarak aldı. 23:47\'de WhatsApp sınıf grubuna iletti. Kendi yanıtı — "Bunu nereden aldın?" — alıcı olduğunu, kaynak olmadığını gösteriyor.' },
-      { id: 'jonas-mueller', label: 'Jonas Müller — Daha İleriye İletti', description: '23:59\'da sınavı ikinci WhatsApp grubuna iletti. Sınıf grubundan üçüncü el kopya olarak aldı. 21:15\'te sınav portalına erişmeye çalıştı ve reddedildi — dosyaya doğrudan erişimi yoktu.' },
-      { id: 'herr-schneider', label: 'Herr Schneider — Sınavı Yükledi', description: '18:00\'de sınavı güvenli personel portalına yükledi. Yüklemeden sonra dosyaya yalnızca iki hesap erişti: otomatik yedekleme sistemi ve Emma Berger. Güvenli portala sınav yüklemek güvenlik hatası değil.' },
+      { id: 'emma-berger', label: 'Emma Berger — Ekran Görüntüsünü Aldı ve Paylaştı', description: 'Sınıf temsilcisi. Pazar gecesi geç saatte meşru portal erişimini sınav dosyasını görüntülemek için kullandı. Bilinmeyen numaradan özel olarak Leyla\'ya gönderdi. Ekran görüntüsü yayıldıktan dakikalar sonra şifresini değiştirdi.', tooltip: 'Sınıf temsilcisi. Öğrenci konseyi rolünün bir parçası olarak meşru portal erişimine sahip — sınav dosyasına erişen tek öğrenci hesabı.' },
+      { id: 'leyla-ozturk', label: 'Leyla Öztürk — Grupta Paylaştı', description: '23:43\'te bilinmeyen numaradan sınav fotoğrafını özel mesaj olarak aldı. 23:47\'de WhatsApp sınıf grubuna iletti. Kendi yanıtı — "Bunu nereden aldın?" — alıcı olduğunu, kaynak olmadığını gösteriyor.', tooltip: 'Sınıftaki bir öğrenci. Sınav fotoğrafını özel mesaj olarak aldı ve sınıf grup sohbetine iletti.' },
+      { id: 'jonas-mueller', label: 'Jonas Müller — Daha İleriye İletti', description: '23:59\'da sınavı ikinci WhatsApp grubuna iletti. Sınıf grubundan üçüncü el kopya olarak aldı. 21:15\'te sınav portalına erişmeye çalıştı ve reddedildi — dosyaya doğrudan erişimi yoktu.', tooltip: 'Sınıftaki bir öğrenci. Halihazırda dolaşan fotoğrafı, sınıf sohbetinde çıkmasından 12 dakika sonra ikinci bir gruba iletti.' },
+      { id: 'herr-schneider', label: 'Herr Schneider — Sınavı Yükledi', description: '18:00\'de sınavı güvenli personel portalına yükledi. Yüklemeden sonra dosyaya yalnızca iki hesap erişti: otomatik yedekleme sistemi ve Emma Berger. Güvenli portala sınav yüklemek güvenlik hatası değil.', tooltip: 'Biyoloji öğretmeni. Sınavı standart prosedür uyarınca saat 18:00\'de güvenli personel portalına yükledi.' },
     ],
     handbookTerms: [
       { term: 'Dijital Ayak İzi', oneLiner: 'Yaptığın her dijital eylem izlenebilir kayıt bırakır — giriş zamanları, dosya erişimi, mesaj geçmişi, fotoğraf meta verisi.', analogy: 'Kardaki ayak izleri. Bıraktığını fark etmeyebilirsin ama bakan herkes tam olarak nereye gittiğini takip edebilir.', inThisCase: 'Emma\'nın 23:35\'teki portal girişi, fotoğraftaki EXIF zaman damgası 23:38 ve Leyla\'ya özel mesaj 23:43 izlenebilir zincir oluşturdu.' },
@@ -748,10 +730,10 @@ export const TR: Record<number, LevelTranslation> = {
       },
     },
     accusationOptions: [
-      { id: 'ticketking-maxevents', label: 'TicketKing_DE / MaxEvents2024 — Aynı Kişi, İki Sahte Hesap', description: 'Her iki hesabın arkasındaki operatör klonlanmış web sitesi, uydurma yorumlar, amaçlı açılmış banka hesabı ve sahte DHL takip numaraları kullanarak en az 13 kurbanu dolandırdı. IP analizi her iki hesabın aynı kişi tarafından işletildiğini kanıtlıyor.' },
-      { id: 'sandra-vogel', label: 'Sandra Vogel — Ödeme Platformu Çalışanı', description: 'Sandra Vogel bir ödeme platformunda müşteri hizmetlerinde çalışıyor. Noah\'nın ödemesi doğrudan banka transferiyle yapıldı — Sandra\'nın platformuna hiç değmedi. Sandra şikâyetten sonra proaktif olarak yardım için iletişime geçti.' },
-      { id: 'concert-organiser', label: 'Konser Organizatörü — Bilet Kıtlığını İstismar Etti', description: 'Mekan, etkinlikten üç hafta önce tüm resmi biletlerin yetkili ortaklar aracılığıyla tükendiğini doğruladı. ticketking-de.com ile bağlantıları yok. Sahte site kıtlığı istismar etti — organizatör tarafından oluşturulmadı.' },
-      { id: 'n26-employee', label: 'N26 Banka Çalışanı — Dolandırıcılığa Aracılık Etti', description: 'Alıcı banka hesabı minimum KYC ile N26\'da açıldı. N26 standart hesap açma prosedürlerini izledi. Hiçbir N26 çalışanı dolandırıcılığa dahil değildi.' },
+      { id: 'ticketking-maxevents', label: 'TicketKing_DE / MaxEvents2024 — Aynı Kişi, İki Sahte Hesap', description: 'Her iki hesabın arkasındaki operatör klonlanmış web sitesi, uydurma yorumlar, amaçlı açılmış banka hesabı ve sahte DHL takip numaraları kullanarak en az 13 kurbanu dolandırdı. IP analizi her iki hesabın aynı kişi tarafından işletildiğini kanıtlıyor.', tooltip: 'Aynı kişi tarafından işletilen iki satıcı hesabı. Klonlanmış web sitesi ve sahte takip numaraları kullanarak sahte konser bileti satmak için oluşturuldu.' },
+      { id: 'sandra-vogel', label: 'Sandra Vogel — Ödeme Platformu Çalışanı', description: 'Sandra Vogel bir ödeme platformunda müşteri hizmetlerinde çalışıyor. Noah\'nın ödemesi doğrudan banka transferiyle yapıldı — Sandra\'nın platformuna hiç değmedi. Sandra şikâyetten sonra proaktif olarak yardım için iletişime geçti.', tooltip: 'Bir ödeme platformunda müşteri hizmetleri çalışanı. Dolandırıcılık şikâyetinin ardından proaktif olarak yardım teklif etti.' },
+      { id: 'concert-organiser', label: 'Konser Organizatörü — Bilet Kıtlığını İstismar Etti', description: 'Mekan, etkinlikten üç hafta önce tüm resmi biletlerin yetkili ortaklar aracılığıyla tükendiğini doğruladı. ticketking-de.com ile bağlantıları yok. Sahte site kıtlığı istismar etti — organizatör tarafından oluşturulmadı.', tooltip: 'Konsertin resmi organizatörü. Tüm resmi biletler etkinlikten üç hafta önce yetkili ortaklar aracılığıyla tükendi.' },
+      { id: 'n26-employee', label: 'N26 Banka Çalışanı — Dolandırıcılığa Aracılık Etti', description: 'Alıcı banka hesabı minimum KYC ile N26\'da açıldı. N26 standart hesap açma prosedürlerini izledi. Hiçbir N26 çalışanı dolandırıcılığa dahil değildi.', tooltip: 'N26 dijital bankasında çalışan. Dolandırıcı, N26\'nın basitleştirilmiş hesap açma sürecini kullanarak bir alıcı hesabı açtı — çalışanların dahli yoktu.' },
     ],
     handbookTerms: [
       { term: 'Taklit Web Sitesi', oneLiner: 'Kullanıcıları güvenmeye kandırmak için meşru sitenin görsel tasarımını kopyalayan sahte web sitesi.', analogy: 'Dışarıdan ünlü markaya birebir benzeyen sahte mağaza — aynı logo, aynı renkler — ama hiçbir şey satmıyor ve paranı alıyor.', inThisCase: 'Saldırgan TicketMaster.de\'nin HTML ve CSS\'ini neredeyse birebir kopyaladı. URL\'yi kontrol etmek — güvenilir bir domain yerine ticketking-de.com — aldatmacayı ortaya çıkarırdı.' },
@@ -885,10 +867,10 @@ export const TR: Record<number, LevelTranslation> = {
       },
     },
     accusationOptions: [
-      { id: 'leon-bauer', label: 'Leon Bauer — Ses Klonlama Saldırısını Yürüttü', description: 'On yedi yaşında. VoIP hesabı aramadan üç gün önce açıldı. Alibisi çöktü. Aynı VoIP ve klonlama deseni Berlin\'de dört vakada kullanıldı. Sosyal medyadan ses verisi araştırma kapasitesine sahip.' },
-      { id: 'frank-zimmermann', label: 'Frank Zimmermann — Müzik Öğretmeni', description: 'Okul personeli değil. Öğrenci kayıtlarına veya programlara erişimi yok. Teknik kapasite kanıtlanmamış. Motivasyon görünmüyor.' },
-      { id: 'hanna-vogel', label: 'Hanna Vogel — Sınıf Öğretmeni', description: 'Cihazında ses klonlama veya VoIP yazılımı yok. Teknik geçmişi yok. Mia\'nın şikâyetinden sonra araştırmayı bildiren öğretmen kendisiydi.' },
-      { id: 'unknown-caller', label: 'Kimliği Belirsiz Uluslararası Arayan', description: 'VoIP IP adresi Doğu Avrupa\'ya çözümlüyor. Ancak IP\'ler yönlendirilebilir — bu kişinin Almanya\'dan yönettiği Doğu Avrupa sunucusu olabilir. Yerel hedefleme sistematik yerel araştırma gerektiriyor.' },
+      { id: 'leon-bauer', label: 'Leon Bauer — Ses Klonlama Saldırısını Yürüttü', description: 'On yedi yaşında. VoIP hesabı aramadan üç gün önce açıldı. Alibisi çöktü. Aynı VoIP ve klonlama deseni Berlin\'de dört vakada kullanıldı. Sosyal medyadan ses verisi araştırma kapasitesine sahip.', tooltip: 'On yedi yaşında. VoIP hesabı saldırıdan üç gün önce açıldı ve alibisi doğrulanamadı.' },
+      { id: 'frank-zimmermann', label: 'Frank Zimmermann — Müzik Öğretmeni', description: 'Okul personeli değil. Öğrenci kayıtlarına veya programlara erişimi yok. Teknik kapasite kanıtlanmamış. Motivasyon görünmüyor.', tooltip: 'Okul personeli olmayan müzik öğretmeni. Öğrenci kayıtlarına erişimi yok ve teknik kapasitesi kanıtlanmamış.' },
+      { id: 'hanna-vogel', label: 'Hanna Vogel — Sınıf Öğretmeni', description: 'Cihazında ses klonlama veya VoIP yazılımı yok. Teknik geçmişi yok. Mia\'nın şikâyetinden sonra araştırmayı bildiren öğretmen kendisiydi.', tooltip: 'Sınıf öğretmeni. Cihazında ses klonlama veya VoIP yazılımı yok. Araştırmayı başlatan öğretmen kendisiydi.' },
+      { id: 'unknown-caller', label: 'Kimliği Belirsiz Uluslararası Arayan', description: 'VoIP IP adresi Doğu Avrupa\'ya çözümlüyor. Ancak IP\'ler yönlendirilebilir — bu kişinin Almanya\'dan yönettiği Doğu Avrupa sunucusu olabilir. Yerel hedefleme sistematik yerel araştırma gerektiriyor.', tooltip: 'VoIP üzerinden arayan kimliği belirsiz kişi. IP adresi yönlendirilmiş — gerçek konumu farklı bir ülke olabilir.' },
     ],
     handbookTerms: [
       { term: 'Yapay Zeka Ses Klonlama', oneLiner: 'Birinin sesini taklit etmek için ses örneklerinden yapay zeka ses modeli oluşturma teknolojisi.', analogy: 'Birisinin imzasını kopyalamayı öğrenmek gibi — yeterli örnek ile imzası senden daha gerçek görünebilir.', inThisCase: 'Saldırgan Mia\'nın babasının TikTok videolarından ses örnekledi ve sesi sentetik olarak yeniden oluşturmayı öğrenen bir yapay zeka modeli eğitti.' },
@@ -1021,10 +1003,10 @@ export const TR: Record<number, LevelTranslation> = {
       },
     },
     accusationOptions: [
-      { id: 'markus-dreier', label: 'Markus Dreier — IT Yüklenicisi, Kimlik Avı Operasyonunu Yürüttü', description: 'Beş okuldaki sunucu odalarına fiziksel erişimi vardı. Cuma gecesi 23:47\'de sunucu odasında kayıtlı. Aynı IP dört okuldaki kimlik avı altyapısına bağlandı. Güvenlik kamerası fiziksel boyutla eşleşiyor. 847 hesap 28 dakikada ele geçirildi — otomatik arka uç gerektiriyor.' },
-      { id: 'finn-hoffmann', label: 'Finn Hoffmann — Posterleri Yerleştirdi ve Bildirdi', description: 'Finn posterleri 07:23\'te gördü ve Cumartesi 07:19\'da giriş yaptı. Giriş zaman çizelgesi birkaç dakika önce geldiğini gösteriyor — posterleri çok kısa süre önce koymuş olamazdı. Güvenlik kamerası posteri yapıştıran kişiyi 12-15 cm daha uzun gösteriyor. Finn ayrıca kendi kimlik bilgilerini girerek kurban oldu.' },
-      { id: 'student-group', label: 'Organize Öğrenci Grubu — Koordineli Eylem', description: 'Tanımlanan grup teknik kapasiteden yoksun. Beş okula fiziksel erişimleri yok. Şeffaf proxy, arka uç veritabanı veya domain altyapısını kurmak için teknik geçmişleri yok.' },
-      { id: 'external-hacker', label: 'Anonim Dış Aktör — Uzaktan Saldırı', description: 'QR sahtekârlığının fiziksel bileşeni dışarıda olmayı gerektiriyor. Posterlerin beş okula fiziksel olarak yerleştirilmesi yerel erişim öneriyor. Dış aktör sunucu odası erişim günlükleriyle uyuşmuyor.' },
+      { id: 'markus-dreier', label: 'Markus Dreier — IT Yüklenicisi, Kimlik Avı Operasyonunu Yürüttü', description: 'Beş okuldaki sunucu odalarına fiziksel erişimi vardı. Cuma gecesi 23:47\'de sunucu odasında kayıtlı. Aynı IP dört okuldaki kimlik avı altyapısına bağlandı. Güvenlik kamerası fiziksel boyutla eşleşiyor. 847 hesap 28 dakikada ele geçirildi — otomatik arka uç gerektiriyor.', tooltip: 'BT yüklenicisi. Beş okuldaki sunucu odalarına fiziksel erişimi vardı ve aynı IP dört okuldaki kimlik avı altyapısına bağlandı.' },
+      { id: 'finn-hoffmann', label: 'Finn Hoffmann — Posterleri Yerleştirdi ve Bildirdi', description: 'Finn posterleri 07:23\'te gördü ve Cumartesi 07:19\'da giriş yaptı. Giriş zaman çizelgesi birkaç dakika önce geldiğini gösteriyor — posterleri çok kısa süre önce koymuş olamazdı. Güvenlik kamerası posteri yapıştıran kişiyi 12-15 cm daha uzun gösteriyor. Finn ayrıca kendi kimlik bilgilerini girerek kurban oldu.', tooltip: 'Okuldaki bir öğrenci. Posterlerden birkaç dakika önce okula geldi ve kendi kimlik bilgilerini girerek kurbanlardan biri oldu.' },
+      { id: 'student-group', label: 'Organize Öğrenci Grubu — Koordineli Eylem', description: 'Tanımlanan grup teknik kapasiteden yoksun. Beş okula fiziksel erişimleri yok. Şeffaf proxy, arka uç veritabanı veya domain altyapısını kurmak için teknik geçmişleri yok.', tooltip: 'Belirli bir öğrenci grubu. Beş okula fiziksel erişimleri yok ve profesyonel kimlik avı altyapısı kurmak için teknik bilgileri yok.' },
+      { id: 'external-hacker', label: 'Anonim Dış Aktör — Uzaktan Saldırı', description: 'QR sahtekârlığının fiziksel bileşeni dışarıda olmayı gerektiriyor. Posterlerin beş okula fiziksel olarak yerleştirilmesi yerel erişim öneriyor. Dış aktör sunucu odası erişim günlükleriyle uyuşmuyor.', tooltip: 'Kimliği bilinmeyen dış saldırgan. Fiziksel poster yerleştirme yerel erişim gerektiriyor; uzaktan saldırı açıklamasıyla örtüşmüyor.' },
     ],
     handbookTerms: [
       { term: 'QR Kod Kimlik Avı (Quishing)', oneLiner: 'Kurbanları sahte web sitelerine yönlendiren QR kodlar içeren kimlik avı saldırısı türü.', analogy: 'Bir binanın asansörüne sahte kat rehberi yapıştırmak — gerçek göründüğü için insanlar yanlış kata gider.', inThisCase: 'Sahte posterler okul giriş sayfası gibi görünen bir siteye bağlantı veren QR kodları taşıdı. Öğrenciler okul ağlarına giriş yaptıklarını zannetti.' },

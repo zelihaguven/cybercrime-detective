@@ -52,6 +52,7 @@ const BADGE_NAMES = ['Shield', 'Star', 'Hex'];
 interface Props {
   onComplete: (detective: Detective) => void;
   onBack?: () => void;
+  fastMode?: boolean;
 }
 
 const DEFAULT_APPEARANCE: CharacterAppearance = {
@@ -61,7 +62,7 @@ const DEFAULT_APPEARANCE: CharacterAppearance = {
   outfitColor: 0,
 };
 
-export default function DetectiveCreation({ onComplete, onBack }: Props) {
+export default function DetectiveCreation({ onComplete, onBack, fastMode = false }: Props) {
   const isMobile = useIsMobile();
   const { t } = useLanguage();
   const [name, setName] = useState('');
@@ -93,6 +94,105 @@ export default function DetectiveCreation({ onComplete, onBack }: Props) {
       earnedBadges: [],
     });
   };
+
+  // ── SAMCON FAST MODE — name + outfit only ──
+  if (fastMode) {
+    return (
+      <div className="absolute inset-0 flex flex-col items-center justify-center overflow-y-auto"
+        style={{ background: 'linear-gradient(180deg, #07050A 0%, #0A0710 100%)' }}>
+        <div className="scanlines fixed inset-0 pointer-events-none opacity-20" />
+        <div
+          className="relative w-full max-w-sm mx-auto px-8 flex flex-col items-center gap-6 transition-all duration-700"
+          style={{ opacity: mounted ? 1 : 0, transform: mounted ? 'none' : 'translateY(20px)' }}
+        >
+          {/* Header */}
+          <div className="text-center">
+            <div className="font-detective text-xs tracking-[0.45em] mb-2" style={{ color: 'rgba(245,166,35,0.45)', fontSize: '0.58rem' }}>
+              CYBERCRIME INVESTIGATION UNIT
+            </div>
+            <h1 className="font-detective text-2xl" style={{ color: 'var(--text-primary)', letterSpacing: '0.06em' }}>
+              {t('createDetective')}
+            </h1>
+          </div>
+
+          {/* Character preview */}
+          <div className="relative flex justify-center">
+            <div className="absolute inset-0 pointer-events-none"
+              style={{ background: `radial-gradient(ellipse at 50% 45%, ${accent}28 0%, transparent 68%)` }} />
+            <CharacterSVG appearance={appearance} size={140} />
+          </div>
+
+          {/* Outfit color — only customization in fast mode */}
+          <div className="w-full">
+            <div className="font-detective text-xs mb-2 text-center" style={{ color: 'rgba(255,255,255,0.3)', letterSpacing: '0.2em' }}>
+              {t('outfitColor')}
+            </div>
+            <div className="flex justify-center gap-3">
+              {OUTFIT_COLORS_HEX.map((col, i) => (
+                <button
+                  key={i}
+                  onClick={() => setApp('outfitColor', i)}
+                  title={OUTFIT_NAMES[i]}
+                  style={{
+                    width: 38, height: 38, borderRadius: 4,
+                    background: col,
+                    border: appearance.outfitColor === i
+                      ? `2.5px solid ${OUTFIT_ACCENT_COLORS[i]}`
+                      : '2.5px solid rgba(255,255,255,0.1)',
+                    boxShadow: appearance.outfitColor === i ? `0 0 14px ${OUTFIT_ACCENT_COLORS[i]}70` : 'none',
+                    transition: 'all 0.18s ease',
+                    cursor: 'pointer',
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Name */}
+          <div className="w-full">
+            <label className="block font-detective text-xs tracking-widest uppercase mb-2" style={{ color: 'rgba(245,166,35,0.6)' }}>
+              {t('yourName')}
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter' && canProceed) handleBegin(); }}
+              placeholder={t('namePlaceholder')}
+              maxLength={24}
+              autoFocus
+              className="w-full px-4 py-3 font-detective text-sm tracking-wider outline-none transition-all duration-200"
+              style={{
+                background: 'rgba(255,255,255,0.03)',
+                border: '1px solid rgba(245,166,35,0.22)',
+                color: 'var(--text-primary)',
+                letterSpacing: '0.15em',
+              }}
+              onFocus={(e) => (e.target.style.borderColor = 'rgba(245,166,35,0.55)')}
+              onBlur={(e) => (e.target.style.borderColor = 'rgba(245,166,35,0.22)')}
+            />
+          </div>
+
+          {/* Begin */}
+          <button
+            onClick={handleBegin}
+            disabled={!canProceed}
+            className="w-full font-detective text-sm tracking-widest uppercase py-4 transition-all duration-300"
+            style={{
+              background: canProceed ? `${accent}12` : 'rgba(255,255,255,0.02)',
+              border: `1px solid ${canProceed ? `${accent}55` : 'rgba(255,255,255,0.07)'}`,
+              color: canProceed ? accent : 'rgba(255,255,255,0.15)',
+              cursor: canProceed ? 'pointer' : 'not-allowed',
+              letterSpacing: '0.28em',
+              boxShadow: canProceed ? `0 0 32px ${accent}14` : 'none',
+            }}
+          >
+            {t('beginInvestigation')} ›
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

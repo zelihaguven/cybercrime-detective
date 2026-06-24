@@ -6,6 +6,7 @@ import { AVATAR_COLORS } from '../data/characters';
 import { useIsMobile, useIsLandscape } from '../utils/responsive';
 import { useLanguage } from '../contexts/LanguageContext';
 import TutorialOverlay, { hasTutorialBeenSeen } from './TutorialOverlay';
+import TermText from './TermText';
 import KitchenScene from './KitchenScene';
 import GamingRoomScene from './GamingRoomScene';
 import PriyaHomeOfficeScene from './PriyaHomeOfficeScene';
@@ -30,7 +31,10 @@ export default function Scene({ level, discoveredClues, detective, onClueDiscove
   const { t } = useLanguage();
   const [activeClue, setActiveClue] = useState<Clue | null>(null);
   const [zoomed, setZoomed] = useState(false);
-  const [showHint, setShowHint] = useState(true);
+  const [showHint, setShowHint] = useState(() => {
+    try { return localStorage.getItem('ciu-scene-hint-v1') !== 'true'; }
+    catch { return true; }
+  });
   const [newPin, setNewPin] = useState<string | null>(null);
   const [detectiveComment, setDetectiveComment] = useState<string | null>(null);
   const [showMemo, setShowMemo] = useState(true);
@@ -41,11 +45,17 @@ export default function Scene({ level, discoveredClues, detective, onClueDiscove
   const found = discoveredClues.length;
   const required = level.clues.length;
 
+  const dismissHint = () => {
+    setShowHint(false);
+    try { localStorage.setItem('ciu-scene-hint-v1', 'true'); } catch {}
+  };
+
   useEffect(() => {
-    const t1 = setTimeout(() => setShowHint(false), 3500);
+    if (!showHint) return;
+    const t1 = setTimeout(dismissHint, 3500);
     const t2 = setTimeout(() => setShowMemo(false), 5000);
     return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, []);
+  }, [showHint]);
 
   const handleClueClick = (clue: Clue) => {
     setActiveClue(clue);
@@ -126,6 +136,7 @@ export default function Scene({ level, discoveredClues, detective, onClueDiscove
         onAccuse={onAccuse}
         onExitRequest={onExit ? () => setShowExitConfirm(true) : undefined}
         showHint={showHint}
+        onDismissHint={dismissHint}
         newPin={newPin}
         isMobile={isMobile}
         isLandscape={isLandscape}
@@ -323,12 +334,12 @@ function SVGHotspot({ clue, discovered, onClick, isMobile }: { clue: Clue; disco
 }
 
 function HUD({
-  level, found, required, detective, onOpenBoard, onOpenHandbook, onAccuse, onExitRequest, showHint, newPin, isMobile, isLandscape, t,
+  level, found, required, detective, onOpenBoard, onOpenHandbook, onAccuse, onExitRequest, showHint, onDismissHint, newPin, isMobile, isLandscape, t,
 }: {
   level: Level; found: number; required: number; detective?: Detective | null;
   onOpenBoard: () => void; onOpenHandbook: () => void; onAccuse: () => void;
   onExitRequest?: () => void;
-  showHint: boolean; newPin: string | null; isMobile: boolean; isLandscape: boolean;
+  showHint: boolean; onDismissHint: () => void; newPin: string | null; isMobile: boolean; isLandscape: boolean;
   t: (key: UIKey) => string;
 }) {
   const canAccuse = found >= required;
@@ -428,9 +439,25 @@ function HUD({
 
       {/* Hint */}
       {showHint && (
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 text-center pointer-events-none fade-in">
-          <div className="font-detective text-sm tracking-widest uppercase px-8 py-4" style={{ color: 'var(--text-muted)', background: 'rgba(10,8,6,0.7)', border: '1px solid rgba(245,166,35,0.15)', letterSpacing: '0.2em', fontSize: isMobile ? '0.6rem' : undefined }}>
-            {isMobile ? t('sceneTapHint') : t('sceneClickHint')}
+        <div
+          className="absolute bottom-28 left-1/2 -translate-x-1/2 z-30 text-center fade-in"
+          style={{ cursor: 'pointer' }}
+          onClick={onDismissHint}
+        >
+          <div
+            className="font-detective tracking-widest uppercase"
+            style={{
+              color: 'rgba(245,166,35,0.92)',
+              background: 'rgba(10,8,4,0.82)',
+              border: '1px solid rgba(245,166,35,0.45)',
+              padding: isMobile ? '10px 20px' : '12px 28px',
+              letterSpacing: '0.22em',
+              fontSize: isMobile ? '0.62rem' : '0.68rem',
+              boxShadow: '0 0 24px rgba(245,166,35,0.12), 0 4px 20px rgba(0,0,0,0.6)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            ✦ {isMobile ? t('sceneTapHint') : t('sceneClickHint')}
           </div>
         </div>
       )}
@@ -530,7 +557,7 @@ function ClueCard({ clue, onClose, isNew, detective, isMobile }: { clue: Clue; o
           {/* Detail */}
           <div className="px-4 py-3">
             <p className="font-sans leading-relaxed" style={{ color: 'var(--text-primary)', lineHeight: 1.75, fontSize: '0.78rem' }}>
-              {clue.detail}
+              <TermText text={clue.detail} />
             </p>
           </div>
 
@@ -581,7 +608,7 @@ function ClueCard({ clue, onClose, isNew, detective, isMobile }: { clue: Clue; o
           {/* Detail */}
           <div className="px-6 py-5">
             <p className="font-sans text-sm leading-relaxed" style={{ color: 'var(--text-primary)', lineHeight: 1.8 }}>
-              {clue.detail}
+              <TermText text={clue.detail} />
             </p>
           </div>
 
@@ -601,7 +628,7 @@ function ClueCard({ clue, onClose, isNew, detective, isMobile }: { clue: Clue; o
                     {detective ? `DET. ${detective.name.toUpperCase()}` : 'DETECTIVE'} · {t('sceneObservation')}
                   </div>
                   <p className="font-serif italic text-xs" style={{ color: 'rgba(255,255,255,0.6)', lineHeight: 1.75, fontSize: '0.74rem' }}>
-                    "{clue.detectiveComment}"
+                    "<TermText text={clue.detectiveComment} />"
                   </p>
                 </div>
               </div>

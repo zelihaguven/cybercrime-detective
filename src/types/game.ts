@@ -5,6 +5,7 @@ export type GameScreen =
   | 'detective-creation'
   | 'intro-sequence'
   | 'detective-office'
+  | 'incident-screen'
   | 'case-briefing'
   | 'scene'
   | 'accusation'
@@ -73,6 +74,11 @@ export interface HandbookTerm {
   inThisCase: string;
 }
 
+export interface LevelIncidentScreen {
+  type: 'sms' | 'chat' | 'email' | 'notification' | 'social';
+  content: Record<string, string>;
+}
+
 export interface Level {
   id: number;
   title: string;
@@ -91,7 +97,7 @@ export interface Level {
   briefing: string;
   clues: Clue[];
   bonusClues: Clue[];
-  accusationOptions: { id: string; label: string; description: string }[];
+  accusationOptions: { id: string; label: string; description: string; tooltip?: string }[];
   correctAnswer: string;
   handbookTerms: HandbookTerm[];
   successOutcome: string;
@@ -101,6 +107,7 @@ export interface Level {
   detectiveMemo: string;
   xpReward: number;
   multiplayerOnly?: boolean;
+  incidentScreen?: LevelIncidentScreen;
   de?: LevelTranslation;
 }
 
@@ -116,7 +123,7 @@ export interface LevelTranslation {
   openingDialogue: DialogueLine[];
   conclusionDialogue: DialogueLine[];
   clueTexts: Record<string, { label: string; shortDesc: string; detail: string; detectiveComment: string }>;
-  accusationOptions: { id: string; label: string; description: string }[];
+  accusationOptions: { id: string; label: string; description: string; tooltip?: string }[];
   handbookTerms: HandbookTerm[];
   successOutcome: string;
   failureOutcome: string;
@@ -132,4 +139,5 @@ export interface GameState {
   pendingXP: number;
   pendingSpecialtyBonus: number;
   pendingBadges: string[];
+  seenIncidentScreens: number[];
 }

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { GameScreen, GameState, Clue, Detective } from './types/game';
 import { LEVELS, getLevelById } from './data/levels';
 import { getRank } from './utils/detective';
@@ -23,10 +23,17 @@ import JoinRoom from './components/multiplayer/JoinRoom';
 import RoomLobby from './components/multiplayer/RoomLobby';
 import MultiplayerGame from './components/multiplayer/MultiplayerGame';
 import MultiplayerResult from './components/multiplayer/MultiplayerResult';
+import IncidentScreen from './components/IncidentScreen';
 import { getOrCreatePlayerId } from './utils/roomCode';
 
 const STORAGE_DETECTIVE = 'ciu-detective-v1';
 const STORAGE_INTRO = 'ciu-intro-v1';
+const STORAGE_SAMCON = 'ciu-samcon-v1';
+
+function isSamcon(): boolean {
+  try { return localStorage.getItem(STORAGE_SAMCON) === 'true'; }
+  catch { return false; }
+}
 
 function loadDetective(): Detective | null {
   try {
@@ -60,6 +67,7 @@ const init = (): GameState => {
     pendingXP: 0,
     pendingSpecialtyBonus: 0,
     pendingBadges: [],
+    seenIncidentScreens: [],
   };
 };
 
@@ -76,6 +84,14 @@ function AppInner() {
   const [state, setState] = useState<GameState>(init);
   const [overlay, setOverlay] = useState<'board' | 'handbook' | null>(null);
 
+  // Activate SamCon mode via ?fast=1 URL param — persists in localStorage
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('fast') === '1') {
+      try { localStorage.setItem(STORAGE_SAMCON, 'true'); } catch {}
+    }
+  }, []);
+
   // Multiplayer state
   const [mpRoomCode, setMpRoomCode] = useState<string | null>(null);
   const [mpPlayerId] = useState<string>(getOrCreatePlayerId);
@@ -91,10 +107,15 @@ function AppInner() {
     go(state.detective ? 'detective-office' : 'detective-creation');
   }, [state.detective, go]);
 
-  // Detective created → intro (first time) or office (returning)
+  // Detective created → samcon skips intro straight to scene; normal goes to intro
   const handleDetectiveCreated = useCallback((detective: Detective) => {
     saveDetective(detective);
-    setState((s) => ({ ...s, detective, screen: 'intro-sequence' }));
+    if (isSamcon()) {
+      try { localStorage.setItem(STORAGE_INTRO, 'true'); } catch {}
+      setState((s) => ({ ...s, detective, hasSeenIntro: true, screen: 'scene', currentLevel: 1, discoveredClues: [], accusationCorrect: null, pendingXP: 0 }));
+    } else {
+      setState((s) => ({ ...s, detective, screen: 'intro-sequence' }));
+    }
   }, []);
 
   const handleIntroComplete = useCallback(() => {
@@ -108,10 +129,21 @@ function AppInner() {
     setState((s) => ({ ...s, screen: 'title', detective: null, hasSeenIntro: false, currentLevel: 1, discoveredClues: [], accusationCorrect: null, pendingXP: 0 }));
   }, []);
 
-  // Office → case briefing
+  // Office → incident screen (first time) or case briefing
   const handleSelectCase = useCallback((levelId: number) => {
-    setState((s) => ({ ...s, currentLevel: levelId, screen: 'case-briefing' }));
-  }, []);
+    const lvl = getLevelById(levelId, lang);
+    const alreadySeen = state.seenIncidentScreens?.includes(levelId) ?? false;
+    if (lvl?.incidentScreen && !alreadySeen) {
+      setState((s) => ({
+        ...s,
+        currentLevel: levelId,
+        seenIncidentScreens: [...(s.seenIncidentScreens ?? []), levelId],
+        screen: 'incident-screen',
+      }));
+    } else {
+      setState((s) => ({ ...s, currentLevel: levelId, screen: 'case-briefing' }));
+    }
+  }, [lang, state.seenIncidentScreens]);
 
   // Briefing → scene
   const handleBeginInvestigation = useCallback(() => {
@@ -226,7 +258,7 @@ function AppInner() {
       </ScreenLayer>
 
       <ScreenLayer active={state.screen === 'detective-creation'}>
-        <DetectiveCreation onComplete={handleDetectiveCreated} onBack={() => go('title')} />
+        <DetectiveCreation onComplete={handleDetectiveCreated} onBack={() => go('title')} fastMode={isSamcon()} />
       </ScreenLayer>
 
       <ScreenLayer active={state.screen === 'intro-sequence'}>
@@ -242,6 +274,16 @@ function AppInner() {
             levels={translatedLevels}
             onSelectCase={handleSelectCase}
             onNewDetective={handleNewDetective}
+          />
+        )}
+      </ScreenLayer>
+
+      <ScreenLayer active={state.screen === 'incident-screen'}>
+        {level.incidentScreen && (
+          <IncidentScreen
+            incident={level.incidentScreen}
+            levelId={state.currentLevel}
+            onComplete={() => go('case-briefing')}
           />
         )}
       </ScreenLayer>

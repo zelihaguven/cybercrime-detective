@@ -11,9 +11,10 @@ interface Props {
   detectiveEmoji?: string;
   detectiveAppearance?: CharacterAppearance;
   onComplete: () => void;
+  onLineChange?: (lineIndex: number) => void;
 }
 
-export default function DialogueBox({ lines, detectiveName, detectiveEmoji, detectiveAppearance, onComplete }: Props) {
+export default function DialogueBox({ lines, detectiveName, detectiveEmoji, detectiveAppearance, onComplete, onLineChange }: Props) {
   const isMobile = useIsMobile();
   const { t } = useLanguage();
   const [lineIndex, setLineIndex] = useState(0);
@@ -29,6 +30,7 @@ export default function DialogueBox({ lines, detectiveName, detectiveEmoji, dete
   useEffect(() => {
     setCharIndex(0);
     setIsTyping(true);
+    onLineChange?.(lineIndex);
   }, [lineIndex]);
 
   useEffect(() => {
@@ -109,7 +111,14 @@ export default function DialogueBox({ lines, detectiveName, detectiveEmoji, dete
         onClick={advance}
       >
         {/* Character header */}
-        {!isNarrator && (
+        {isNarrator ? (
+          <div className="flex items-center gap-2 px-5 py-2.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', flexShrink: 0 }}>
+              📍
+            </div>
+            <span className="font-detective" style={{ color: 'rgba(255,255,255,0.22)', fontSize: '0.52rem', letterSpacing: '0.3em' }}>SCENE</span>
+          </div>
+        ) : (
           <div className="flex items-center gap-3 px-5 py-3" style={{ borderBottom: `1px solid ${accent}20` }}>
             <div
               className="w-10 h-10 flex-shrink-0 flex items-center justify-center"
@@ -133,9 +142,9 @@ export default function DialogueBox({ lines, detectiveName, detectiveEmoji, dete
         {/* Text */}
         <div className="px-5 py-4 min-h-[64px]">
           {isNarrator ? (
-            <p className="font-detective text-sm text-center" style={{ color: '#888', letterSpacing: '0.22em', lineHeight: 2 }}>
+            <p className="font-serif italic" style={{ color: 'rgba(255,255,255,0.62)', letterSpacing: '0.04em', lineHeight: 1.85, fontSize: '0.9rem' }}>
               {displayed}
-              {isTyping && <span className="animate-pulse ml-0.5" style={{ color: '#555' }}>▋</span>}
+              {isTyping && <span className="animate-pulse ml-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>▋</span>}
             </p>
           ) : (
             <p className="font-serif text-base" style={{ color: 'rgba(255,255,255,0.87)', lineHeight: 1.85 }}>

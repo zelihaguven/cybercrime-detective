@@ -24,12 +24,9 @@ export const LEVELS: Level[] = [
     detectiveMemo:
       "Hilde's kitchen. Everything's in place — except for that cold coffee and an open tablet. This is a quiet crime scene. The violence here was digital.",
     openingDialogue: [
-      { characterId: 'weber', text: 'This one came in yesterday. Hilde Bauer. 72. Retired schoolteacher in Freiburg. She lost eight hundred euros.' },
-      { characterId: 'mia', text: "The amount is small, but the method was surgical. Whoever built this campaign ran it against at least forty other victims the same week." },
-      { characterId: 'weber', text: "The kitchen is your scene, {detective}. Hilde gave us access. She wants to understand what happened to her." },
-      { characterId: 'detective', text: "What's the initial read?" },
-      { characterId: 'mia', text: "SMS-based. She got a text, clicked a link, entered her card details on a fake website. Classic pattern — but the execution was clean. Nothing obviously wrong at first glance." },
-      { characterId: 'weber', text: "That's why we're sending you in. Nothing's obvious yet. You'll need to find the trail yourself." },
+      { characterId: 'weber', text: "Hilde Bauer. Seventy-two. Lost eight hundred euros before her coffee got cold." },
+      { characterId: 'mia', text: "Forty victims, same morning. This wasn't random — someone ran a campaign." },
+      { characterId: 'weber', text: "She gave us access to her kitchen. She wants to know what happened to her." },
     ],
     conclusionDialogue: [
       { characterId: 'detective', text: "The attack vector is clear. SMS phishing. They spoofed DHL's sender ID, built a pixel-perfect clone site, and waited for someone to bite." },
@@ -174,24 +171,28 @@ export const LEVELS: Level[] = [
         label: 'Voice Call Scam (Vishing)',
         description:
           'Someone called Hilde pretending to be DHL support and verbally obtained her card details over the phone.',
+        tooltip: 'Criminals call pretending to be a trusted company (bank, delivery service) to trick you into giving personal data over the phone.',
       },
       {
         id: 'smishing',
         label: 'SMS Phishing (Smishing)',
         description:
           "The attacker sent a fraudulent SMS impersonating DHL with a link to a fake payment portal, harvesting Hilde's card details.",
+        tooltip: 'Criminals send fake text messages (SMS) with a link to a fraudulent website that steals your payment details or passwords.',
       },
       {
         id: 'malware',
         label: 'Banking Malware',
         description:
           'Malware installed on her tablet intercepted her banking app and redirected her payment to attackers.',
+        tooltip: 'Harmful software secretly installed on your device that spies on your activity, steals data, or redirects payments to attackers.',
       },
       {
         id: 'data-breach',
         label: 'Dark Web Data Breach',
         description:
           "Hilde's card details were purchased from a previous data breach and used without any interaction from her.",
+        tooltip: 'When hackers break into a company\'s servers and steal user data (passwords, card numbers), which they sell on criminal forums.',
       },
     ],
     correctAnswer: 'smishing',
@@ -244,6 +245,15 @@ export const LEVELS: Level[] = [
     failureOutcome:
       'Incorrect conclusion. Review your evidence. Hilde received no phone calls — only a text message. Her tablet showed a website, not a banking app. And the note on the fridge tells you exactly what she entered and where. Look again.',
     xpReward: 100,
+    incidentScreen: {
+      type: 'sms',
+      content: {
+        sender: 'DHL Express',
+        senderNumber: '+49 800 DHLEXPR',
+        time: '07:43',
+        message: 'Ihre Sendung #4829X wartet auf Zollgebühr. Bitte bezahlen Sie jetzt: bit.ly/dhl-zoll-de',
+      },
+    },
   },
   {
     id: 2,
@@ -266,12 +276,9 @@ export const LEVELS: Level[] = [
     detectiveMemo:
       "Luca's gaming setup. Three monitors, energy drinks, chat windows everywhere. For a teenager, this is home. Someone used that comfort against him.",
     openingDialogue: [
-      { characterId: 'weber', text: 'Fifteen years old. Discord. A link from a trusted friend. You already know how this ends.' },
-      { characterId: 'mia', text: 'His account was hijacked within seconds of clicking. The phishing kit has now been confirmed against 340 accounts across Europe.' },
-      { characterId: 'detective', text: 'Where do I start?' },
-      { characterId: 'jonas', text: "His gaming room. I've secured the device and pulled the router logs. Everything's preserved." },
-      { characterId: 'mia', text: 'Pay attention to the chat history. The account propagated the attack to his contacts before he even realized it was gone. That timing is critical.' },
-      { characterId: 'weber', text: "This is an active campaign. Same technique is running against kids in six European cities right now. What you find here helps us stop it." },
+      { characterId: 'weber', text: "Fifteen years old. His account was gone before he finished the download." },
+      { characterId: 'mia', text: "Three-forty accounts across Europe. The kit is still running." },
+      { characterId: 'weber', text: "Luca's room is exactly as he left it." },
     ],
     conclusionDialogue: [
       { characterId: 'detective', text: 'Credential phishing through a compromised friend account. Classic trust exploitation. The link was disguised as a Minecraft upgrade — low suspicion, high click rate.' },
@@ -416,24 +423,28 @@ export const LEVELS: Level[] = [
         label: 'Malware Hidden in a Game Mod',
         description:
           'Luca downloaded a Minecraft mod from an unofficial site that contained malware, which harvested his login credentials from memory.',
+        tooltip: 'Malicious code hidden inside a downloadable file (like a game mod). Once installed, it runs silently and steals passwords.',
       },
       {
         id: 'account-brute-force',
         label: 'Password Brute Force Attack',
         description:
           "An automated script tried thousands of password combinations until it found the correct one for Luca's Discord account.",
+        tooltip: 'An automated attack that tries thousands of password guesses per second until it cracks the right one.',
       },
       {
         id: 'phishing',
         label: 'Discord Phishing Link (Credential Theft)',
         description:
           "A compromised friend's account sent a fake \"free upgrade\" link. Luca entered his Discord credentials on a phishing page, handing the attacker full account access.",
+        tooltip: 'A fake link or website designed to look real, tricking you into entering your login details, which the attacker immediately captures.',
       },
       {
         id: 'sim-swap',
         label: 'SIM Card Swap',
         description:
           "Attackers convinced Luca's mobile provider to transfer his phone number to their SIM, then used SMS codes to reset his Discord password.",
+        tooltip: 'Fraud where criminals convince your phone carrier to transfer your number to their SIM card, giving them access to your verification codes.',
       },
     ],
     correctAnswer: 'phishing',
@@ -486,6 +497,17 @@ export const LEVELS: Level[] = [
     failureOutcome:
       "Incorrect deduction. Look more carefully at the evidence. Luca was not targeted by automated guessing — the attack was personal and immediate. The router log shows an outbound connection at the exact moment he clicked the link. And his friend's panic message tells you what happened next. Follow the chat.",
     xpReward: 120,
+    incidentScreen: {
+      type: 'chat',
+      content: {
+        platform: 'Discord',
+        sender: 'LucasBFF99',
+        avatarColor: '#5865F2',
+        time: '22:18',
+        context: 'gaming-lounge',
+        message: 'yo dude you NEED to check this 🎮 free minecraft java premium claim → minecraft-premium-claim.xyz',
+      },
+    },
   },
   {
     id: 3,
@@ -505,12 +527,9 @@ export const LEVELS: Level[] = [
     briefing: "Wednesday morning. Priya woke up to five breach notification emails and two unauthorized invoice downloads. Her email, Dropbox, and Figma accounts all show logins from Eastern Europe in the early hours. Investigate her home studio. Find the entry point.",
     detectiveMemo: "Creative studio, warm afternoon light still warming the morning. Everything looks perfectly normal here — sketches, color palettes, coffee, plants. But someone walked right through every digital door she had open. Find out how.",
     openingDialogue: [
-      { characterId: 'weber', text: 'Priya Sharma. 31. Freelance graphic designer in Prenzlauer Berg. Woke up to five breach notifications and two unauthorized invoice downloads.' },
-      { characterId: 'mia', text: 'She reused a password across sixteen accounts. The attackers used a credential list from the 2019 Canva breach. Classic stuffing attack.' },
-      { characterId: 'detective', text: 'What did they get?' },
-      { characterId: 'mia', text: "We're not sure yet. She had client files in Dropbox, Figma, Adobe Cloud. If they touched any of those, she could have a liability problem with her clients." },
-      { characterId: 'weber', text: "Her studio is your scene, {detective}. She's cooperative but scared. Find the entry point." },
-      { characterId: 'jonas', text: 'She said to tell you — the coffee is still on.' },
+      { characterId: 'weber', text: "Priya Sharma. Thirty-one. Woke up to five breach notifications." },
+      { characterId: 'mia', text: "2019 Canva leak. She reused passwords. Attackers ran the list six hours ago." },
+      { characterId: 'weber', text: "She doesn't know what they took yet. Neither do we." },
     ],
     conclusionDialogue: [
       { characterId: 'detective', text: "The attack chain is clear. Canva breach in 2019 exposed her credentials. Attackers ran stuffing tools. Same password opened her email, Dropbox, and Figma account." },
@@ -624,16 +643,19 @@ export const LEVELS: Level[] = [
         id: 'phishing-link',
         label: 'Phishing Link via Email',
         description: "Priya was tricked by a fake email into entering her password on a fraudulent site, giving the attacker direct access to her accounts.",
+        tooltip: 'A fraudulent link in an email leads to a fake login page — when you enter your credentials, the attacker captures them.',
       },
       {
         id: 'credential-stuffing',
         label: 'Credential Stuffing Attack',
         description: "Attackers used credentials leaked in the 2019 Canva breach to automatically test Priya's reused password across multiple accounts, gaining access to her email, Dropbox, Figma, and client files.",
+        tooltip: 'Attackers take leaked username/password pairs from one data breach and automatically try them on other services, exploiting password reuse.',
       },
       {
         id: 'insider-threat',
         label: 'Insider Threat from Client',
         description: "A client with shared folder access deliberately exfiltrated Priya's data using legitimate credentials she had granted them.",
+        tooltip: 'A security risk from someone inside an organisation — employee or contractor — who misuses their legitimate access to steal or leak data.',
       },
     ],
     correctAnswer: 'credential-stuffing',
@@ -672,6 +694,17 @@ export const LEVELS: Level[] = [
     successOutcome: "Case closed. You correctly identified the credential stuffing attack. Priya changed all credentials immediately and notified affected clients. The breach was contained before any client data was publicly exposed. Two DAX clients audited their shared assets and found no unauthorized access.",
     failureOutcome: "Without identifying credential stuffing, Priya's other reused passwords remain exposed. The attackers return two weeks later and exfiltrate her biggest client's brand assets — causing a €40,000 liability dispute and the loss of her most valuable account.",
     xpReward: 120,
+    incidentScreen: {
+      type: 'email',
+      content: {
+        from: 'security@haveibeenpwned.com',
+        to: 'priya@priyavisuals.de',
+        subject: 'Oh no — your account(s) were breached',
+        time: '06:14',
+        preview: "In total, 1 of your email addresses were found in 1 data breach and 0 pastes. Your most recent breach occurred on a site you may recognise...",
+        count: '⚠ 5 new breach notifications this week',
+      },
+    },
   },
   {
     id: 4,
@@ -691,12 +724,9 @@ export const LEVELS: Level[] = [
     briefing: "Wednesday morning, 09:47. Marcus called us in a panic. His PC shows a ransom demand. 3,847 files encrypted. POS data, supplier contracts, customer records — all locked. His backup hasn't run in 14 weeks. Investigate the back office. Find how the malware got in.",
     detectiveMemo: "Small back office, warm amber light, smell of coffee beans. And a PC screen glowing red that shouldn't be. Someone brought the attack here physically. The door to this crime scene was a USB port.",
     openingDialogue: [
-      { characterId: 'weber', text: 'Café Marcus. Berlin-Mitte. Attack discovered this morning. Owner called us at 09:52. His entire POS system is encrypted.' },
-      { characterId: 'mia', text: 'Ransomware strain is LockBit 3.0. Demand is 0.25 Bitcoin — about twelve thousand euros. Timer is running.' },
-      { characterId: 'detective', text: 'Any idea how they got in?' },
-      { characterId: 'mia', text: 'Nothing obvious from the outside. No open ports, no suspicious email traffic. Something physical, maybe.' },
-      { characterId: 'weber', text: "The scene is yours, {detective}. Marcus is waiting outside — he can't look at that screen anymore." },
-      { characterId: 'jonas', text: "He kept saying: 'I just want my recipes back.' They're in there too." },
+      { characterId: 'weber', text: "Café Marcus. Berlin-Mitte. Encrypted since nine this morning." },
+      { characterId: 'mia', text: "LockBit 3.0. Twelve thousand euros demand. Fourteen-week-old backup." },
+      { characterId: 'weber', text: "Marcus is outside. He says his recipes are in there too." },
     ],
     conclusionDialogue: [
       { characterId: 'detective', text: "USB drop. Someone left it in the seating area. Elena found it, plugged it in to check for an owner. AutoPlay did the rest." },
@@ -810,16 +840,19 @@ export const LEVELS: Level[] = [
         id: 'phishing-email',
         label: 'Phishing Email with Malicious Attachment',
         description: "Marcus or an employee opened a malicious email attachment that silently installed ransomware on the PC.",
+        tooltip: 'A fake email that looks official, with a dangerous attachment or link. Opening it silently installs malware on the device.',
       },
       {
         id: 'remote-exploit',
         label: 'Remote Desktop Protocol Exploit',
         description: "Attackers exploited an exposed RDP port to gain remote access to the PC and manually deployed the ransomware.",
+        tooltip: 'An attack that uses a security flaw in internet-facing software (like Remote Desktop) to break into a system from anywhere in the world.',
       },
       {
         id: 'ransomware-usb',
         label: 'Ransomware via USB Drop Attack',
         description: "Attackers planted an infected USB drive in the café. An employee plugged it in to help an apparent customer, triggering Windows AutoPlay which executed LockBit ransomware automatically.",
+        tooltip: 'A physical attack where an infected USB drive is left for someone to find and plug in. Once connected, it automatically runs ransomware that encrypts all files.',
       },
     ],
     correctAnswer: 'ransomware-usb',
@@ -858,6 +891,16 @@ export const LEVELS: Level[] = [
     successOutcome: "Case closed. USB drop attack confirmed. Marcus contacts BSI (Bundesamt für Sicherheit in der Informationstechnik). Forensics recovers 60% of data from shadow copies. He rebuilds and installs automated cloud backup. The café reopens within a week.",
     failureOutcome: "Without identifying the USB vector, Marcus assumes a remote breach and pays the ransom. Two weeks later, the same attackers return — they left a backdoor. He pays again. Three months later the café closes.",
     xpReward: 140,
+    incidentScreen: {
+      type: 'notification',
+      content: {
+        title: 'AutoPlay',
+        subtitle: 'USB Drive (E:)',
+        message: 'What do you want Windows to do with this drive?',
+        option: 'Run setup.exe — Published by: Supplier Tools GmbH',
+        time: '09:14',
+      },
+    },
   },
   {
     id: 5,
@@ -877,12 +920,9 @@ export const LEVELS: Level[] = [
     briefing: "Thursday morning. 82 students sit down for their Abitur biology exam. At 09:58 — two minutes after the exam starts — the entire school network goes down. The online exam platform is unreachable. Traffic analysis shows 2.4 gigabits of flood traffic. Someone paid for this. Find who and how.",
     detectiveMemo: "Emergency operations mode. Every monitor is either red or dead. The exam system shows 82 timeouts. Someone turned this school into a crisis with fifteen euros and a few clicks. The evidence is in these logs.",
     openingDialogue: [
-      { characterId: 'weber', text: 'This one is live. Gymnasium Lichtenberg. DDoS attack — ongoing. 82 students are sitting in a room unable to take their biology Abitur. The network has been down for eleven minutes.' },
-      { characterId: 'mia', text: 'Traffic analysis shows 2.4 gigabits of UDP flood. It\'s a booter service — we\'ve seen this signature before. Mirai variant botnet.' },
-      { characterId: 'detective', text: 'Someone paid for this attack?' },
-      { characterId: 'mia', text: 'For about fifteen euros, yes. These services are advertised openly. The hardest part is tracing who bought it.' },
-      { characterId: 'weber', text: "{detective}, the IT room is your scene. The logs are still running. Find the thread that leads back to the attacker." },
-      { characterId: 'jonas', text: 'Eighty-two kids are waiting. Their teachers are panicking. Let\'s move.' },
+      { characterId: 'weber', text: "Eighty-two students. Biology Abitur. Down for eleven minutes and counting." },
+      { characterId: 'mia', text: "UDP flood — 2.4 gigabits. Someone paid fifteen euros for this." },
+      { characterId: 'weber', text: "Their futures are sitting in that room. Move." },
     ],
     conclusionDialogue: [
       { characterId: 'detective', text: "GX_404. The social media post was 24 hours before the attack. They didn't even hide it well — bragging publicly about hiring a booter." },
@@ -996,16 +1036,19 @@ export const LEVELS: Level[] = [
         id: 'state-actor',
         label: 'State-Sponsored Cyber Attack',
         description: "A sophisticated state actor targeted the school to steal student records, exam data, or disrupt educational infrastructure.",
+        tooltip: 'A cyberattack planned and funded by a national government to spy on, disrupt, or steal data from another country or organisation.',
       },
       {
         id: 'ddos-booter',
         label: 'DDoS Booter Service Attack',
         description: "A student (GX_404) hired a commercial DDoS-for-hire service for €15 to flood the school network, disrupting the biology Abitur exam for 82 students.",
+        tooltip: 'A paid online service that floods a target\'s servers with fake traffic, making them crash — a DDoS attack available for hire by anyone.',
       },
       {
         id: 'network-failure',
         label: 'Internal Network Failure',
         description: "The school's aging network infrastructure collapsed under the load of 82 simultaneous online exam sessions — a failure of capacity planning, not an attack.",
+        tooltip: 'A technical breakdown where a system crashes because it wasn\'t designed to handle that level of traffic — a planning failure, not a deliberate attack.',
       },
     ],
     correctAnswer: 'ddos-booter',
@@ -1044,6 +1087,18 @@ export const LEVELS: Level[] = [
     successOutcome: "Case closed. GX_404 identified as a student in the biology class. Police involved. The booter service order traced. The school upgrades router firmware and adds upstream rate limiting. The 82 students retake the exam one week later.",
     failureOutcome: "Without identifying the booter service and threat actor, GX_404 is never caught. The 82 students must retake the exam under significant stress. Three other Berlin schools are attacked the following month by the same service.",
     xpReward: 160,
+    incidentScreen: {
+      type: 'social',
+      content: {
+        platform: 'X',
+        username: 'GX_404',
+        handle: '@gx_not_found',
+        time: '1 day ago',
+        message: 'just ordered a 15€ stresser lmao who tf needs biology anyway 💀',
+        likes: '3',
+        retweets: '0',
+      },
+    },
   },
   {
     id: 6,
@@ -1063,12 +1118,9 @@ export const LEVELS: Level[] = [
     briefing: "Late night. TechCorp AG's security team flags an anomaly at 23:32. A new account — alex.meyer — was created at 23:17 and immediately began cloning the payment module source code repository. 2.3 gigabytes of core IP exfiltrated in under 2 minutes. The IT admin who created the account says he received an email from the CEO. The CEO is in Helsinki.",
     detectiveMemo: "Late-night IT room. Three workstations, city skyline behind the windows. Somewhere in these logs is the moment someone walked through the front door with a forged key. One email. One click. Years of work, gone.",
     openingDialogue: [
-      { characterId: 'weber', text: "TechCorp AG. Source code breach. Discovered thirty minutes ago by their security team. Payment module. The kind of code that banks trust their customers' money to." },
-      { characterId: 'mia', text: "Someone created a new account at 23:17 and immediately started cloning repositories. 2.3 gigabytes of source code. Gone in under two minutes." },
-      { characterId: 'detective', text: 'How did the account get created?' },
-      { characterId: 'mia', text: "That's the question. The IT admin on duty created it manually. Says he received an email from the CEO." },
-      { characterId: 'weber', text: "The CEO is in Helsinki. He sent no such email. {detective} — the IT room is your scene. Find how this happened and close the door before they come back for more." },
-      { characterId: 'jonas', text: 'Their legal team is already on the phone. Move fast.' },
+      { characterId: 'weber', text: "TechCorp AG. Payment module source code. 2.3 gigabytes. Forty minutes ago." },
+      { characterId: 'mia', text: "New account. Twenty-three seventeen. Cloned repos in under two minutes." },
+      { characterId: 'weber', text: "The CEO is in Helsinki. He sent nothing." },
     ],
     conclusionDialogue: [
       { characterId: 'detective', text: "Spear phishing. Lookalike domain — techcorp-ag.de. The CEO was in Helsinki, publicly announced on LinkedIn. The attacker read his post and struck while he was unreachable." },
@@ -1182,16 +1234,19 @@ export const LEVELS: Level[] = [
         id: 'insider-threat',
         label: 'Insider Threat — Rogue Employee',
         description: "A current or former TechCorp employee used their legitimate access to steal the payment module source code and sell it to a competitor.",
+        tooltip: 'A security risk from someone inside an organisation who misuses their legitimate access to steal or leak sensitive data to outsiders.',
       },
       {
         id: 'supply-chain',
         label: 'Supply Chain Attack via Contractor',
         description: "A legitimate contractor account was compromised through credential theft, giving attackers persistent access to internal systems and repositories.",
+        tooltip: 'An attack that targets a supplier or contractor with weaker security, using their trusted access to reach the main target\'s systems.',
       },
       {
         id: 'spear-phishing',
         label: 'Spear Phishing — CEO Impersonation',
         description: "Attackers registered a lookalike domain and impersonated the CEO via email to trick IT staff into creating a privileged backdoor account, which was immediately used to exfiltrate 2.3 GB of payment source code.",
+        tooltip: 'A highly targeted phishing attack crafted for one specific person or company, using real personal details to make the fake message convincing.',
       },
     ],
     correctAnswer: 'spear-phishing',
@@ -1230,6 +1285,17 @@ export const LEVELS: Level[] = [
     successOutcome: "Case closed. The fake account is revoked within hours. Forensics determines exactly what was accessed. TechCorp implements multi-factor authentication and mandatory callback verification for all privileged account creation. Three European banks are notified and audit their integrations.",
     failureOutcome: "Without identifying the spear phishing vector, the 'alex.meyer' account remains active for 3 more days. The attacker exfiltrates the full codebase and sells it to a competitor. Three European banks are affected. TechCorp faces regulatory fines and a €12M liability lawsuit.",
     xpReward: 200,
+    incidentScreen: {
+      type: 'email',
+      content: {
+        from: 'ceo@techcorp-ag.de',
+        to: 'it@techcorp-ag.com',
+        subject: 'URGENT: New developer account — tonight',
+        time: '23:11',
+        preview: 'Stefan, I\'m in Helsinki at the conference. Need a new dev account created immediately — alex.meyer. Full repo access. Do it now, I\'ll explain in the morning.',
+        note: 'Real domain is techcorp-ag.com — sender used techcorp-ag.de',
+      },
+    },
   },
 
   // ── Case 7 — The Leaked Exam (multiplayer) ──────────────────────
@@ -1395,21 +1461,25 @@ export const LEVELS: Level[] = [
         id: 'emma-berger',
         label: 'Emma Berger — Took the Screenshot and Shared It',
         description: 'Class representative. Used her legitimate portal access after hours to view the exam file and photograph her screen. Sent the image privately to Leyla from an unknown number. Changed her password minutes after the screenshot spread.',
+        tooltip: 'Class representative. Had legitimate student council portal access — the only student account with permission to view the exam file.',
       },
       {
         id: 'leyla-ozturk',
         label: 'Leyla Öztürk — Posted It to the Group',
         description: "Received the exam photo as a private message from an unknown number at 23:43. Forwarded it to the WhatsApp class group at 23:47. Her own reply — 'Where did you get this?' — indicates she was a recipient, not the originator.",
+        tooltip: 'A student in the class. Received the exam photo as a private message and forwarded it to the class group chat.',
       },
       {
         id: 'jonas-mueller',
         label: 'Jonas Müller — Forwarded It Further',
         description: 'Forwarded the exam to a second WhatsApp group at 23:59. Received it as a third-party copy from the class group. Attempted to access the exam portal at 21:15 and was denied — he had no direct access to the file.',
+        tooltip: 'A student in the class. Forwarded the already-circulating photo to a second group 12 minutes after it appeared in the class chat.',
       },
       {
         id: 'herr-schneider',
         label: 'Herr Schneider — Uploaded the Exam',
         description: 'Uploaded the exam to the secure staff portal at 18:00. After the upload, the file was accessed by only two accounts: the automatic backup system and Emma Berger. Uploading an exam to a secure portal is not a security failure.',
+        tooltip: 'Biology teacher. Uploaded the exam to the secure staff portal at 18:00 following standard school procedure.',
       },
     ],
     correctAnswer: 'emma-berger',
@@ -1612,21 +1682,25 @@ export const LEVELS: Level[] = [
         id: 'ticketking-maxevents',
         label: 'TicketKing_DE / MaxEvents2024 — Same Person, Two Fake Accounts',
         description: 'The operator behind both accounts defrauded at least 13 victims using a cloned website, fabricated reviews, a purpose-built bank account, and fake DHL tracking numbers. IP analysis proves both accounts were run by the same person.',
+        tooltip: 'Two seller accounts on a marketplace, both operated by the same person to sell fake tickets using a cloned website and fabricated tracking numbers.',
       },
       {
         id: 'sandra-vogel',
         label: 'Sandra Vogel — Payment Platform Employee',
         description: "Sandra Vogel works in customer service at a payment platform. Noah's payment was made by direct bank transfer — it never touched her employer's platform. Sandra proactively reached out to help after Noah's complaint.",
+        tooltip: 'Customer service employee at a payment platform. Proactively contacted the victim to help after a fraud complaint was filed.',
       },
       {
         id: 'concert-organiser',
         label: 'The Concert Organiser — Exploited the Ticket Shortage',
         description: "The venue confirmed all official tickets sold out through authorised partners three weeks before the event. They have no connection to ticketking-de.com. The fake site exploited the shortage — it was not created by the organiser.",
+        tooltip: 'The official event venue. All legitimate tickets sold out three weeks before the event through authorised partners only.',
       },
       {
         id: 'n26-employee',
         label: 'N26 Bank Employee — Facilitated the Fraud',
         description: "The receiving bank account was opened at N26 with minimal KYC. N26 followed standard account opening procedures. No N26 employee had involvement in the fraud — the operator exploited the low-friction account opening process.",
+        tooltip: 'Employee at N26 digital bank. The fraudster exploited their easy sign-up process to open a receiving account — no N26 staff were involved in the fraud.',
       },
     ],
     correctAnswer: 'ticketking-maxevents',
@@ -1835,21 +1909,25 @@ export const LEVELS: Level[] = [
         id: 'scam-operation',
         label: 'Organised Scam Operation — AI Voice Clone from Public TikTok',
         description: 'A professional fraud group automatically scans public social media for usable voice data, clones the target\'s voice using AI, and calls the nearest family member with an urgent money request via spoofed VoIP. The same operation targeted 11 other families in Germany in 30 days.',
+        tooltip: 'A criminal group that uses AI to clone a person\'s voice from public social media, then calls their family pretending to be them in an emergency.',
       },
       {
         id: 'leon-krause',
         label: 'Leon Krause — Ex-Boyfriend with Voice Recordings',
         description: 'Mia\'s ex-boyfriend. Was confirmed at football practice during the entire call by coach records and phone activity logs. Has no technical background in AI tools. Private messages from a relationship do not provide enough voice data to train a cloning model.',
+        tooltip: "Mia's ex-boyfriend. Has some voice recordings from their relationship, but was confirmed at football practice for the entire duration of the call.",
       },
       {
         id: 'hanna-richter',
         label: 'Hanna Richter — Classmate with a Grudge',
         description: 'A classmate with a history of conflict with Mia. Has no IT or computing coursework, no recording equipment, and no technical knowledge of AI voice cloning. A personal dispute does not provide the technical means for this type of fraud.',
+        tooltip: 'A classmate with conflicts with Mia. Has no technical knowledge of AI voice cloning and no access to recording equipment.',
       },
       {
         id: 'frank-mayer',
         label: 'Frank Mayer — Family Financial Advisor',
         description: "Manages the Bauer family's investment portfolio. Has never spoken to Mia in person and has no access to her voice. Knowing a family's finances is not the same as having the means or motive to defraud them with an AI voice call.",
+        tooltip: "The family's financial advisor. Knows their finances but has never met Mia in person and has no access to her voice.",
       },
     ],
     correctAnswer: 'scam-operation',
@@ -2058,21 +2136,25 @@ export const LEVELS: Level[] = [
         id: 'external-phishing-operation',
         label: 'External Phishing Operation — Multi-School Campaign',
         description: 'A professional phishing operation placed the poster before students arrived, using a pre-built kit deployed across five schools in 72 hours. The same redirect chain, fake page, and credential harvesting script were found at all five schools. The IP block used for data collection matches four other breach reports filed the same week.',
+        tooltip: 'A professional criminal group that placed fake QR code posters across multiple schools, harvesting login credentials through a transparent proxy.',
       },
       {
         id: 'finn-hartmann',
         label: 'Finn Hartmann — First Person Seen Near the Poster',
         description: 'Finn arrived at school at 08:15 — 52 minutes after the poster was placed at 07:23. His height (163 cm) does not match the camera estimate (175–185 cm). He was one of the 12 victims, not the attacker — he scanned the QR himself and his school account was also compromised.',
+        tooltip: 'A student at the school who arrived after the poster was placed. He scanned the QR code himself and was one of the 12 victims.',
       },
       {
         id: 'it-contractor',
         label: 'Visiting IT Contractor — Had Early Building Access',
         description: 'Herr Bönig was in the server room from 07:00 to 08:45, confirmed by door access logs. The server room is on the opposite side of the building from the corridor. He had no access to the corridor during the relevant time window and no connection to the phishing infrastructure.',
+        tooltip: 'An IT professional hired to work in the server room. Had early building access but was on the opposite side of the building from the corridor.',
       },
       {
         id: 'rival-school-group',
         label: 'Rival School Group — Known Conflict',
         description: 'The rival school group has no members with IT or network skills. Their previous activities were limited to posting memes in a shared document. This operation required professional phishing infrastructure that this group demonstrably could not build or operate.',
+        tooltip: 'A student group known for online pranks, but with no technical skills to build and deploy professional phishing infrastructure.',
       },
     ],
     correctAnswer: 'external-phishing-operation',
