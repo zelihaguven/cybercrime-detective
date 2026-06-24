@@ -215,7 +215,7 @@ export default function DetectiveCreation({ onComplete, onBack, fastMode = false
               onMouseEnter={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.7)')}
               onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')}
             >
-              ← {t('back')}
+              {t('back')}
             </button>
           )}
           <div className="font-detective text-xs tracking-[0.45em] mb-2" style={{ color: 'rgba(245,166,35,0.45)' }}>
