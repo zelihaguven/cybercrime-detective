@@ -211,7 +211,7 @@ export default function DetectiveCreation({ onComplete, onBack, fastMode = false
             <button
               onClick={onBack}
               className="absolute left-0 top-0 font-detective text-xs tracking-widest"
-              style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.62rem', letterSpacing: '0.2em', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0' }}
+              style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.62rem', letterSpacing: '0.2em', background: 'none', border: 'none', cursor: 'pointer', padding: '10px 8px', minHeight: 44, display: 'flex', alignItems: 'center' }}
               onMouseEnter={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.7)')}
               onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')}
             >

@@ -369,7 +369,8 @@ function HUD({
                 letterSpacing: '0.18em',
                 fontSize: isMobile ? '0.55rem' : '0.6rem',
                 marginTop: isMobile ? 1 : 3,
-                padding: '2px 0',
+                padding: '10px 8px',
+                minHeight: 44,
                 pointerEvents: 'auto',
               }}
               onMouseEnter={(e) => (e.currentTarget.style.color = 'rgba(224,90,71,0.8)')}

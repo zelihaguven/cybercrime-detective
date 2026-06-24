@@ -126,8 +126,8 @@ export default function CaseBriefing({ level, detective, onBegin, onBack }: Prop
       {/* Back button */}
       <button
         onClick={onBack}
-        className="absolute top-6 left-6 font-detective text-xs tracking-widest uppercase transition-all duration-200"
-        style={{ color: 'rgba(255,255,255,0.3)', letterSpacing: '0.2em', fontSize: '0.6rem', zIndex: 20 }}
+        className="absolute top-4 left-4 font-detective text-xs tracking-widest uppercase transition-all duration-200"
+        style={{ color: 'rgba(255,255,255,0.3)', letterSpacing: '0.2em', fontSize: '0.6rem', zIndex: 20, padding: '10px 8px', minHeight: 44, display: 'flex', alignItems: 'center' }}
         onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent)')}
         onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')}
       >
