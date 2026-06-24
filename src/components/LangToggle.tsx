@@ -17,7 +17,8 @@ export default function LangToggle() {
           style={{
             fontSize: '0.58rem',
             letterSpacing: '0.18em',
-            padding: '4px 8px',
+            padding: '10px 10px',
+            minHeight: 44,
             border: '1px solid rgba(245,166,35,0.28)',
             borderLeft: i > 0 ? 'none' : undefined,
             background: lang === l ? 'rgba(245,166,35,0.14)' : 'rgba(10,8,6,0.72)',
