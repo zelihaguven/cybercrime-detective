@@ -33,12 +33,15 @@ export interface CharacterAppearance {
   outfitColor: number; // 0-4
 }
 
+export type DetectivePhoto = 'man1' | 'man2' | 'woman1' | 'woman2';
+
 export interface Detective {
   name: string;
   avatar: number;      // = outfitColor (0-4), kept for accent color compat
   badge: number;       // 0-2
   specialty: number;   // 0-3
-  appearance: CharacterAppearance;
+  photo?: DetectivePhoto;
+  appearance?: CharacterAppearance;
   xp: number;
   rank: DetectiveRank;
   completedCases: number[];

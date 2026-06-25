@@ -156,9 +156,11 @@ export default function CaseConclusion({ level, detective, correct, xpEarned, sp
             {/* Top: avatar + XP */}
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-3">
-                {detective.appearance
-                  ? <CharacterSVG appearance={detective.appearance} size={48}/>
-                  : <span className="text-3xl">{avatarEmoji}</span>}
+                {detective.photo
+                  ? <img src={`/characters/${detective.photo}.png`} alt={detective.name} style={{ width: 48, height: 60, objectFit: 'contain', objectPosition: 'bottom' }} />
+                  : detective.appearance
+                    ? <CharacterSVG appearance={detective.appearance} size={48}/>
+                    : <span className="text-3xl">{avatarEmoji}</span>}
                 <div>
                   <div className="font-detective text-sm" style={{ color: 'var(--text-primary)' }}>Det. {detective.name}</div>
                   <div className="font-detective text-xs" style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.58rem', letterSpacing: '0.12em' }}>{t('investigationComplete')}</div>

@@ -38,7 +38,9 @@ export default function DetectiveOffice({ detective, levels, onSelectCase, onNew
         {/* Compact header */}
         <div className="relative z-10 px-4 pt-4 pb-3" style={{ borderBottom: '1px solid rgba(245,166,35,0.09)', background: 'rgba(6,4,8,0.88)' }}>
           <div className="flex items-center gap-3">
-            {detective.appearance ? <CharacterSVG appearance={detective.appearance} size={48}/> : <span className="text-3xl">🕵️</span>}
+            {detective.photo
+              ? <img src={`/characters/${detective.photo}.png`} alt={detective.name} style={{ width: 48, height: 60, objectFit: 'contain', objectPosition: 'bottom' }} />
+              : detective.appearance ? <CharacterSVG appearance={detective.appearance} size={48}/> : <span className="text-3xl">🕵️</span>}
             <div className="flex-1 min-w-0">
               <div className="font-detective text-base" style={{ color: 'var(--text-primary)' }}>Det. {detective.name}</div>
               <div className="font-detective" style={{ color: rankColor, fontSize: '0.58rem', letterSpacing: '0.12em' }}>{detective.rank.toUpperCase()}</div>
@@ -56,7 +58,7 @@ export default function DetectiveOffice({ detective, levels, onSelectCase, onNew
           </div>
         </div>
         {/* Case grid */}
-        <div className="relative z-10 p-3 grid grid-cols-2 gap-3">
+        <div className="relative z-10 p-3 grid grid-cols-1 gap-3">
           {levels.map((level, idx) => {
             const solved = isSolved(level.id);
             const locked = isLocked(idx);
@@ -127,9 +129,11 @@ export default function DetectiveOffice({ detective, levels, onSelectCase, onNew
           {/* Detective card */}
           <div style={{ background: 'rgba(255,255,255,0.025)', border: `1px solid ${avatarColor}20`, padding: '16px', marginBottom: 24 }}>
             <div className="flex justify-center mb-2">
-              {detective.appearance
-                ? <CharacterSVG appearance={detective.appearance} size={80}/>
-                : <span className="text-4xl">🕵️</span>}
+              {detective.photo
+                ? <img src={`/characters/${detective.photo}.png`} alt={detective.name} style={{ width: 80, height: 100, objectFit: 'contain', objectPosition: 'bottom' }} />
+                : detective.appearance
+                  ? <CharacterSVG appearance={detective.appearance} size={80}/>
+                  : <span className="text-4xl">🕵️</span>}
             </div>
             <div className="text-center">
               <div className="font-detective text-sm" style={{ color: 'var(--text-primary)', letterSpacing: '0.06em' }}>

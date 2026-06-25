@@ -83,9 +83,11 @@ export default function AllCasesComplete({ detective, onComplete }: Props) {
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              {detective.appearance
-                ? <CharacterSVG appearance={detective.appearance} size={52} />
-                : <span className="text-4xl">🕵️</span>}
+              {detective.photo
+                ? <img src={`/characters/${detective.photo}.png`} alt={detective.name} style={{ width: 52, height: 65, objectFit: 'contain', objectPosition: 'bottom' }} />
+                : detective.appearance
+                  ? <CharacterSVG appearance={detective.appearance} size={52} />
+                  : <span className="text-4xl">🕵️</span>}
               <div>
                 <div className="font-detective text-xl" style={{ color: 'var(--text-primary)', letterSpacing: '0.06em' }}>
                   Det. {detective.name}

@@ -1,18 +1,11 @@
 import { useState, useEffect } from 'react';
-import type { Detective, CharacterAppearance } from '../types/game';
+import type { Detective, DetectivePhoto } from '../types/game';
 import { SPECIALTIES } from '../data/characters';
+import { OUTFIT_ACCENT_COLORS } from './CharacterSVG';
 import { useIsMobile } from '../utils/responsive';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const SPECIALTY_KEYS = ['specialty0', 'specialty1', 'specialty2', 'specialty3'] as const;
-import CharacterSVG, {
-  SKIN_COLORS,
-  HAIR_COLORS,
-  OUTFIT_COLORS_HEX,
-  OUTFIT_ACCENT_COLORS,
-  HAIR_STYLE_NAMES,
-  OUTFIT_NAMES,
-} from './CharacterSVG';
 
 function ShieldBadge({ color }: { color: string }) {
   return (
@@ -49,18 +42,18 @@ function HexBadge({ color }: { color: string }) {
 const BADGE_COMPONENTS = [ShieldBadge, StarBadge, HexBadge];
 const BADGE_NAMES = ['Shield', 'Star', 'Hex'];
 
+const PHOTO_OPTIONS: { id: DetectivePhoto; label: string; colorIndex: number }[] = [
+  { id: 'man1',   label: 'AGENT 01', colorIndex: 0 },
+  { id: 'man2',   label: 'AGENT 02', colorIndex: 1 },
+  { id: 'woman1', label: 'AGENT 03', colorIndex: 3 },
+  { id: 'woman2', label: 'AGENT 04', colorIndex: 4 },
+];
+
 interface Props {
   onComplete: (detective: Detective) => void;
   onBack?: () => void;
   fastMode?: boolean;
 }
-
-const DEFAULT_APPEARANCE: CharacterAppearance = {
-  skinTone: 2,
-  hairStyle: 1,
-  hairColor: 1,
-  outfitColor: 0,
-};
 
 export default function DetectiveCreation({ onComplete, onBack, fastMode = false }: Props) {
   const isMobile = useIsMobile();
@@ -68,26 +61,24 @@ export default function DetectiveCreation({ onComplete, onBack, fastMode = false
   const [name, setName] = useState('');
   const [badge, setBadge] = useState(0);
   const [specialty, setSpecialty] = useState(0);
-  const [appearance, setAppearance] = useState<CharacterAppearance>(DEFAULT_APPEARANCE);
+  const [photo, setPhoto] = useState<DetectivePhoto>('man1');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => { setTimeout(() => setMounted(true), 100); }, []);
 
-  const setApp = (key: keyof CharacterAppearance, val: number) =>
-    setAppearance((prev) => ({ ...prev, [key]: val }));
-
   const canProceed = name.trim().length >= 2;
-  const accent = OUTFIT_ACCENT_COLORS[appearance.outfitColor] ?? '#F5A623';
+  const colorIndex = PHOTO_OPTIONS.find(p => p.id === photo)?.colorIndex ?? 0;
+  const accent = OUTFIT_ACCENT_COLORS[colorIndex] ?? '#F5A623';
   const BadgeComp = BADGE_COMPONENTS[badge];
 
   const handleBegin = () => {
     if (!canProceed) return;
     onComplete({
       name: name.trim(),
-      avatar: appearance.outfitColor,
+      avatar: colorIndex,
       badge,
       specialty,
-      appearance,
+      photo,
       xp: 0,
       rank: 'Junior Investigator',
       completedCases: [],
@@ -95,7 +86,7 @@ export default function DetectiveCreation({ onComplete, onBack, fastMode = false
     });
   };
 
-  // ── SAMCON FAST MODE — name + outfit only ──
+  // ── FAST MODE (multiplayer / samcon) ──
   if (fastMode) {
     return (
       <div className="absolute inset-0 flex flex-col items-center justify-center overflow-y-auto"
@@ -105,7 +96,6 @@ export default function DetectiveCreation({ onComplete, onBack, fastMode = false
           className="relative w-full max-w-sm mx-auto px-8 flex flex-col items-center gap-6 transition-all duration-700"
           style={{ opacity: mounted ? 1 : 0, transform: mounted ? 'none' : 'translateY(20px)' }}
         >
-          {/* Header */}
           <div className="text-center">
             <div className="font-detective text-xs tracking-[0.45em] mb-2" style={{ color: 'rgba(245,166,35,0.45)', fontSize: '0.58rem' }}>
               CYBERCRIME INVESTIGATION UNIT
@@ -115,37 +105,44 @@ export default function DetectiveCreation({ onComplete, onBack, fastMode = false
             </h1>
           </div>
 
-          {/* Character preview */}
+          {/* Photo preview */}
           <div className="relative flex justify-center">
             <div className="absolute inset-0 pointer-events-none"
               style={{ background: `radial-gradient(ellipse at 50% 45%, ${accent}28 0%, transparent 68%)` }} />
-            <CharacterSVG appearance={appearance} size={140} />
+            <img
+              src={`/characters/${photo}.png`}
+              alt="Selected detective"
+              style={{ width: 120, height: 150, objectFit: 'contain', objectPosition: 'bottom' }}
+            />
           </div>
 
-          {/* Outfit color — only customization in fast mode */}
-          <div className="w-full">
-            <div className="font-detective text-xs mb-2 text-center" style={{ color: 'rgba(255,255,255,0.3)', letterSpacing: '0.2em' }}>
-              {t('outfitColor')}
-            </div>
-            <div className="flex justify-center gap-3">
-              {OUTFIT_COLORS_HEX.map((col, i) => (
+          {/* Photo selection */}
+          <div className="w-full grid grid-cols-4 gap-2">
+            {PHOTO_OPTIONS.map((opt) => {
+              const sel = photo === opt.id;
+              const optAccent = OUTFIT_ACCENT_COLORS[opt.colorIndex] ?? '#F5A623';
+              return (
                 <button
-                  key={i}
-                  onClick={() => setApp('outfitColor', i)}
-                  title={OUTFIT_NAMES[i]}
+                  key={opt.id}
+                  onClick={() => setPhoto(opt.id)}
+                  className="flex flex-col items-center gap-1 py-2 transition-all duration-200"
                   style={{
-                    width: 38, height: 38, borderRadius: 4,
-                    background: col,
-                    border: appearance.outfitColor === i
-                      ? `2.5px solid ${OUTFIT_ACCENT_COLORS[i]}`
-                      : '2.5px solid rgba(255,255,255,0.1)',
-                    boxShadow: appearance.outfitColor === i ? `0 0 14px ${OUTFIT_ACCENT_COLORS[i]}70` : 'none',
-                    transition: 'all 0.18s ease',
-                    cursor: 'pointer',
+                    background: sel ? `${optAccent}14` : 'rgba(255,255,255,0.02)',
+                    border: `1px solid ${sel ? `${optAccent}55` : 'rgba(255,255,255,0.07)'}`,
+                    boxShadow: sel ? `0 0 12px ${optAccent}20` : 'none',
                   }}
-                />
-              ))}
-            </div>
+                >
+                  <img
+                    src={`/characters/${opt.id}.png`}
+                    alt={opt.label}
+                    style={{ width: 40, height: 50, objectFit: 'contain', objectPosition: 'bottom' }}
+                  />
+                  <span className="font-detective" style={{ color: sel ? optAccent : 'rgba(255,255,255,0.25)', fontSize: '0.42rem', letterSpacing: '0.08em' }}>
+                    {opt.label}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Name */}
@@ -173,7 +170,6 @@ export default function DetectiveCreation({ onComplete, onBack, fastMode = false
             />
           </div>
 
-          {/* Begin */}
           <button
             onClick={handleBegin}
             disabled={!canProceed}
@@ -227,142 +223,73 @@ export default function DetectiveCreation({ onComplete, onBack, fastMode = false
         </div>
 
         <div className={isMobile ? 'grid grid-cols-1 gap-6' : 'grid grid-cols-2 gap-10'}>
-          {/* ── LEFT: Character + Appearance ── */}
+          {/* ── LEFT: Agent photo selection ── */}
           <div>
-            {/* Large character preview with glow */}
-            <div className="relative flex justify-center mb-6">
+            {/* Large photo preview */}
+            <div className="relative flex justify-center mb-6" style={{ height: isMobile ? 180 : 240 }}>
               <div
                 className="absolute inset-0 pointer-events-none"
                 style={{
-                  background: `radial-gradient(ellipse at 50% 45%, ${accent}22 0%, transparent 68%)`,
+                  background: `radial-gradient(ellipse at 50% 60%, ${accent}22 0%, transparent 68%)`,
                   transition: 'background 0.4s ease',
                 }}
               />
-              <CharacterSVG appearance={appearance} size={148} />
+              <img
+                src={`/characters/${photo}.png`}
+                alt="Selected detective"
+                style={{
+                  height: '100%',
+                  width: 'auto',
+                  objectFit: 'contain',
+                  objectPosition: 'bottom',
+                  transition: 'all 0.3s ease',
+                  filter: `drop-shadow(0 0 18px ${accent}35)`,
+                }}
+              />
             </div>
 
             {/* Section label */}
             <div className="font-detective text-xs mb-4" style={{ color: 'rgba(245,166,35,0.55)', letterSpacing: '0.35em' }}>
-              {t('appearance')}
+              SELECT AGENT
             </div>
 
-            {/* Skin tone */}
-            <div className="mb-5">
-              <div className="font-detective mb-2" style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.58rem', letterSpacing: '0.2em' }}>
-                {t('skinTone')}
-              </div>
-              <div className="flex gap-2.5">
-                {SKIN_COLORS.map((col, i) => (
+            {/* 4-photo grid */}
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              {PHOTO_OPTIONS.map((opt) => {
+                const sel = photo === opt.id;
+                const optAccent = OUTFIT_ACCENT_COLORS[opt.colorIndex] ?? '#F5A623';
+                return (
                   <button
-                    key={i}
-                    onClick={() => setApp('skinTone', i)}
-                    title={['Light', 'Medium Light', 'Medium', 'Medium Dark', 'Dark'][i]}
+                    key={opt.id}
+                    onClick={() => setPhoto(opt.id)}
+                    className="flex flex-col items-center gap-2 py-4 transition-all duration-200"
                     style={{
-                      width: 34, height: 34,
-                      borderRadius: '50%',
-                      background: col,
-                      border: appearance.skinTone === i ? '2.5px solid #fff' : '2.5px solid rgba(255,255,255,0.08)',
-                      boxShadow: appearance.skinTone === i ? `0 0 14px ${col}90` : 'none',
-                      transition: 'all 0.18s ease',
-                      flexShrink: 0,
-                      cursor: 'pointer',
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Hair style */}
-            <div className="mb-5">
-              <div className="font-detective mb-2" style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.58rem', letterSpacing: '0.2em' }}>
-                {t('hairStyle')}
-              </div>
-              <div className="flex gap-2">
-                {HAIR_STYLE_NAMES.map((label, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setApp('hairStyle', i)}
-                    className="flex-1 py-2.5 font-detective transition-all duration-200"
-                    style={{
-                      background: appearance.hairStyle === i ? 'rgba(245,166,35,0.1)' : 'rgba(255,255,255,0.02)',
-                      border: `1px solid ${appearance.hairStyle === i ? 'rgba(245,166,35,0.5)' : 'rgba(255,255,255,0.07)'}`,
-                      color: appearance.hairStyle === i ? 'var(--accent)' : 'rgba(255,255,255,0.3)',
-                      fontSize: '0.6rem',
-                      letterSpacing: '0.1em',
+                      background: sel ? `${optAccent}10` : 'rgba(255,255,255,0.02)',
+                      border: `1px solid ${sel ? `${optAccent}55` : 'rgba(255,255,255,0.07)'}`,
+                      boxShadow: sel ? `0 0 18px ${optAccent}18` : 'none',
                     }}
                   >
-                    {label.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Hair color */}
-            <div className="mb-5">
-              <div className="font-detective mb-2" style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.58rem', letterSpacing: '0.2em' }}>
-                {t('hairColor')}
-              </div>
-              <div className="flex gap-2.5">
-                {HAIR_COLORS.map((col, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setApp('hairColor', i)}
-                    title={['Blonde', 'Brown', 'Black', 'Red', 'Silver', 'Blue'][i]}
-                    style={{
-                      width: 34, height: 34,
-                      borderRadius: '50%',
-                      background: col,
-                      border: appearance.hairColor === i ? '2.5px solid #fff' : '2.5px solid rgba(255,255,255,0.1)',
-                      boxShadow: appearance.hairColor === i ? `0 0 14px ${col}90` : 'none',
-                      transition: 'all 0.18s ease',
-                      flexShrink: 0,
-                      cursor: 'pointer',
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Outfit */}
-            <div className="mb-6">
-              <div className="font-detective mb-2" style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.58rem', letterSpacing: '0.2em' }}>
-                {t('outfitColor')}
-              </div>
-              <div className="flex gap-2">
-                {OUTFIT_COLORS_HEX.map((col, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setApp('outfitColor', i)}
-                    className="flex-1 py-3 flex flex-col items-center gap-1.5 transition-all duration-200"
-                    style={{
-                      background: appearance.outfitColor === i ? `${OUTFIT_ACCENT_COLORS[i]}14` : 'rgba(255,255,255,0.02)',
-                      border: `1px solid ${appearance.outfitColor === i ? `${OUTFIT_ACCENT_COLORS[i]}55` : 'rgba(255,255,255,0.06)'}`,
-                    }}
-                  >
-                    <div
+                    <img
+                      src={`/characters/${opt.id}.png`}
+                      alt={opt.label}
                       style={{
-                        width: 22,
-                        height: 22,
-                        borderRadius: 3,
-                        background: col,
-                        border: '1px solid rgba(255,255,255,0.15)',
-                        boxShadow: appearance.outfitColor === i ? `0 0 8px ${OUTFIT_ACCENT_COLORS[i]}60` : 'none',
-                        transition: 'box-shadow 0.2s ease',
+                        width: 64,
+                        height: 80,
+                        objectFit: 'contain',
+                        objectPosition: 'bottom',
+                        filter: sel ? `drop-shadow(0 0 8px ${optAccent}60)` : 'brightness(0.6)',
+                        transition: 'filter 0.2s ease',
                       }}
                     />
                     <span
                       className="font-detective"
-                      style={{
-                        color: appearance.outfitColor === i ? OUTFIT_ACCENT_COLORS[i] : 'rgba(255,255,255,0.22)',
-                        fontSize: '0.5rem',
-                        letterSpacing: '0.1em',
-                      }}
+                      style={{ color: sel ? optAccent : 'rgba(255,255,255,0.22)', fontSize: '0.52rem', letterSpacing: '0.15em' }}
                     >
-                      {OUTFIT_NAMES[i].toUpperCase()}
+                      {opt.label}
                     </span>
                   </button>
-                ))}
-              </div>
+                );
+              })}
             </div>
 
             {/* Name input */}
@@ -377,6 +304,7 @@ export default function DetectiveCreation({ onComplete, onBack, fastMode = false
                 onKeyDown={(e) => { if (e.key === 'Enter' && canProceed) handleBegin(); }}
                 placeholder={t('namePlaceholder')}
                 maxLength={24}
+                autoFocus
                 className="w-full px-4 py-3 font-detective text-sm tracking-wider outline-none transition-all duration-200"
                 style={{
                   background: 'rgba(255,255,255,0.03)',
@@ -395,9 +323,9 @@ export default function DetectiveCreation({ onComplete, onBack, fastMode = false
             </div>
           </div>
 
-          {/* ── RIGHT: Identity + Card + Actions ── */}
+          {/* ── RIGHT: Identity + Badge + Role + Card + Button ── */}
           <div className="space-y-5">
-            {/* Specialty */}
+            {/* Role / Specialty */}
             <div>
               <label className="block font-detective text-xs tracking-widest uppercase mb-3" style={{ color: 'rgba(245,166,35,0.6)' }}>
                 {t('specialty')}
@@ -484,8 +412,12 @@ export default function DetectiveCreation({ onComplete, onBack, fastMode = false
                 {t('ciuBerlin')}
               </div>
               <div className="flex items-center gap-4">
-                <div style={{ flexShrink: 0 }}>
-                  <CharacterSVG appearance={appearance} size={58} />
+                <div style={{ flexShrink: 0, width: 46, height: 58, overflow: 'hidden' }}>
+                  <img
+                    src={`/characters/${photo}.png`}
+                    alt="Agent"
+                    style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'bottom' }}
+                  />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div
