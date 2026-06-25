@@ -320,3 +320,36 @@ body {
   border-color: rgba(245, 166, 35, 0.8);
   box-shadow: 0 0 20px rgba(245, 166, 35, 0.2);
 }
+
+/* Visual novel speaker pop animation */
+@keyframes speaker-pop {
+  0%   { transform: scale(0.92) translateY(6px); }
+  60%  { transform: scale(1.04) translateY(-3px); }
+  100% { transform: scale(1)    translateY(0px); }
+}
+.speaker-pop {
+  animation: speaker-pop 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Talking dots beneath active character */
+.talking-dots span {
+  animation: dot-bounce 1s infinite;
+  display: inline-block;
+  color: rgba(255,255,255,0.5);
+  font-size: 1.2rem;
+}
+.talking-dots span:nth-child(2) { animation-delay: 0.15s; }
+.talking-dots span:nth-child(3) { animation-delay: 0.30s; }
+@keyframes dot-bounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.3; }
+  40%            { transform: translateY(-6px); opacity: 1; }
+}
+
+/* Blinking next indicator in dialogue box */
+@keyframes blink-chevron {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+.next-chevron {
+  animation: blink-chevron 0.8s ease-in-out infinite;
+}
