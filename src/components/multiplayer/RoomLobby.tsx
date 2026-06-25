@@ -21,6 +21,8 @@ export default function RoomLobby({ roomCode, playerId, onGameStarted, onLeave }
   const isHost = myPlayer?.isHost ?? false;
   const players = room ? Object.entries(room.players ?? {}) : [];
   const playerCount = players.length;
+  const hostOnline = players.some(([, p]) => p.isHost && p.connected);
+  const canControl = isHost || !hostOnline;
 
   const copyCode = () => {
     navigator.clipboard.writeText(roomCode).then(() => {
@@ -36,7 +38,7 @@ export default function RoomLobby({ roomCode, playerId, onGameStarted, onLeave }
   }, [room?.phase, room?.status]);
 
   const handleCaseChange = (caseId: 7 | 8 | 9 | 10) => {
-    if (!isHost) return;
+    if (!canControl) return;
     setSelectedCase(roomCode, caseId);
   };
 
@@ -48,7 +50,7 @@ export default function RoomLobby({ roomCode, playerId, onGameStarted, onLeave }
   };
 
   const handleStart = () => {
-    if (!isHost || playerCount < 2 || starting) return;
+    if (!canControl || playerCount < 2 || starting) return;
     setStarting(true);
     const level = LEVELS.find((l) => l.id === (room?.selectedCase ?? 7));
     if (!level) { setStarting(false); return; }
@@ -98,8 +100,8 @@ export default function RoomLobby({ roomCode, playerId, onGameStarted, onLeave }
           </button>
         </div>
 
-        {/* Case selector (host only) */}
-        {isHost && (
+        {/* Case selector (host or acting host) */}
+        {canControl && (
           <div className="mb-5">
             <div className="font-detective text-xs mb-2" style={{ color: 'rgba(255,255,255,0.3)', letterSpacing: '0.2em', fontSize: '0.62rem' }}>{t('mpCaseSelect')}</div>
             <div className="grid grid-cols-2 gap-2">
@@ -125,7 +127,7 @@ export default function RoomLobby({ roomCode, playerId, onGameStarted, onLeave }
         )}
 
         {/* Non-host case display */}
-        {!isHost && (
+        {!canControl && (
           <div className="mb-5 px-4 py-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
             <div className="font-detective text-xs mb-1" style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.58rem', letterSpacing: '0.18em' }}>{t('mpCaseSelect')}</div>
             <div className="font-detective text-sm" style={{ color: 'rgba(245,166,35,0.7)', letterSpacing: '0.08em', fontSize: '0.7rem' }}>
@@ -179,7 +181,7 @@ export default function RoomLobby({ roomCode, playerId, onGameStarted, onLeave }
 
         {/* Actions */}
         <div className="space-y-3">
-          {isHost && (
+          {canControl && (
             <button
               onClick={handleStart}
               disabled={playerCount < 2 || starting}
@@ -195,12 +197,12 @@ export default function RoomLobby({ roomCode, playerId, onGameStarted, onLeave }
               {starting ? '...' : t('mpStartGame')}
             </button>
           )}
-          {isHost && playerCount < 2 && (
+          {canControl && playerCount < 2 && (
             <div className="text-center font-detective text-xs" style={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.6rem', letterSpacing: '0.12em' }}>
               {t('mpStartRequires')}
             </div>
           )}
-          {!isHost && (
+          {!canControl && (
             <div className="text-center font-detective text-xs py-3" style={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.62rem', letterSpacing: '0.18em' }}>
               {t('mpWaiting')}
             </div>
