@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { CHARACTERS } from '../data/characters';
 import type { CharacterAppearance, DialogueLine } from '../types/game';
 import CharacterSVG from './CharacterSVG';
@@ -21,6 +21,9 @@ export default function DialogueBox({ lines, detectiveName, detectiveEmoji, dete
   const [charIndex, setCharIndex] = useState(0);
   const [isTyping, setIsTyping] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [textVisible, setTextVisible] = useState(true);
+  const [nameplateVisible, setNameplateVisible] = useState(true);
+  const prevSpeakerRef = useRef<string | null>(null);
 
   const currentLine = lines[lineIndex];
   const fullText = currentLine.text.replace(/{detective}/g, detectiveName ?? 'Detective');
@@ -28,17 +31,35 @@ export default function DialogueBox({ lines, detectiveName, detectiveEmoji, dete
   useEffect(() => { setTimeout(() => setMounted(true), 80); }, []);
 
   useEffect(() => {
-    setCharIndex(0);
-    setIsTyping(true);
-    onLineChange?.(lineIndex);
+    const charId = currentLine.characterId;
+    const speakerChanged = prevSpeakerRef.current !== null && prevSpeakerRef.current !== charId;
+
+    if (speakerChanged) {
+      setTextVisible(false);
+      setNameplateVisible(false);
+      const textTimer = setTimeout(() => {
+        setCharIndex(0);
+        setIsTyping(true);
+        setTextVisible(true);
+        setTimeout(() => setNameplateVisible(true), 40);
+      }, 80);
+      prevSpeakerRef.current = charId;
+      onLineChange?.(lineIndex);
+      return () => clearTimeout(textTimer);
+    } else {
+      setCharIndex(0);
+      setIsTyping(true);
+      onLineChange?.(lineIndex);
+      prevSpeakerRef.current = charId;
+    }
   }, [lineIndex]);
 
   useEffect(() => {
     if (!isTyping) return;
     if (charIndex >= fullText.length) { setIsTyping(false); return; }
     const speed = currentLine.characterId === 'narrator' ? 28 : 18;
-    const t = setTimeout(() => setCharIndex((c) => c + 1), speed);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => setCharIndex((c) => c + 1), speed);
+    return () => clearTimeout(timer);
   }, [charIndex, isTyping, fullText, currentLine.characterId]);
 
   const advance = useCallback(() => {
@@ -64,7 +85,6 @@ export default function DialogueBox({ lines, detectiveName, detectiveEmoji, dete
   const charDef = CHARACTERS[charId] ?? CHARACTERS.narrator;
   const isNarrator = charId === 'narrator';
   const isDetective = charId === 'detective';
-  const displayEmoji = isDetective ? (detectiveEmoji ?? '🕵️') : charDef.emoji;
   const displayName = isDetective ? (detectiveName ? `Det. ${detectiveName}` : 'You') : charDef.name;
   const displayTitle = isDetective ? 'Detective' : charDef.title;
   const accent = charDef.accentColor;
@@ -72,6 +92,8 @@ export default function DialogueBox({ lines, detectiveName, detectiveEmoji, dete
   const displayed = fullText.slice(0, charIndex);
   const isDone = !isTyping;
   const isLast = lineIndex === lines.length - 1;
+
+  const boxHeight = isMobile ? 100 : 120;
 
   return (
     <div
@@ -84,85 +106,163 @@ export default function DialogueBox({ lines, detectiveName, detectiveEmoji, dete
         transition: 'opacity 0.4s ease',
       }}
     >
-      {/* Progress dots */}
-      <div className="flex gap-1 mb-2 pointer-events-none pl-1 flex-wrap">
-        {lines.map((_, i) => (
-          <div
-            key={i}
-            className="rounded-full transition-all duration-400"
-            style={{
-              width: i === lineIndex ? (isMobile ? 12 : 18) : (isMobile ? 4 : 5),
-              height: isMobile ? 4 : 5,
-              background: i < lineIndex ? accent : i === lineIndex ? accent : 'rgba(255,255,255,0.12)',
-              opacity: i < lineIndex ? 0.5 : 1,
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Box */}
+      {/* Main dialogue area — nameplate + box */}
       <div
-        className="pointer-events-auto cursor-pointer select-none"
-        style={{
-          background: isNarrator ? 'rgba(4,3,6,0.96)' : charDef.bgColor,
-          border: `1px solid ${accent}35`,
-          boxShadow: `0 0 60px rgba(0,0,0,0.85), 0 0 30px ${accent}12`,
-        }}
+        className="pointer-events-auto cursor-pointer select-none relative"
         onClick={advance}
       >
-        {/* Character header */}
-        {isNarrator ? (
-          <div className="flex items-center gap-2 px-5 py-2.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-            <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', flexShrink: 0 }}>
-              📍
-            </div>
-            <span className="font-detective" style={{ color: 'rgba(255,255,255,0.22)', fontSize: '0.52rem', letterSpacing: '0.3em' }}>SCENE</span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-3 px-5 py-3" style={{ borderBottom: `1px solid ${accent}20` }}>
-            <div
-              className="w-10 h-10 flex-shrink-0 flex items-center justify-center"
-              style={isDetective && detectiveAppearance ? {} : { background: `${accent}18`, border: `1px solid ${accent}35`, borderRadius: '50%' }}
+        {/* Nameplate — sits above the text box */}
+        {!isNarrator && (
+          <div
+            style={{
+              position: 'absolute',
+              top: -28,
+              left: 0,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              opacity: nameplateVisible ? 1 : 0,
+              transform: nameplateVisible ? 'translateX(0)' : 'translateX(-8px)',
+              transition: 'opacity 180ms ease, transform 180ms ease',
+              zIndex: 10,
+            }}
+          >
+            {/* Accent bar */}
+            <div style={{ width: 3, height: 22, background: accent, borderRadius: 2, flexShrink: 0 }} />
+            {/* Avatar — detective only */}
+            {isDetective && detectiveAppearance && (
+              <div style={{ flexShrink: 0 }}>
+                <CharacterSVG appearance={detectiveAppearance} size={20} />
+              </div>
+            )}
+            <span
+              className="font-detective"
+              style={{ color: accent, fontSize: isMobile ? '0.55rem' : '0.65rem', letterSpacing: '0.12em' }}
             >
-              {isDetective && detectiveAppearance
-                ? <CharacterSVG appearance={detectiveAppearance} size={40} />
-                : <span className="text-xl">{displayEmoji}</span>}
-            </div>
-            <div>
-              <div className="font-detective text-sm" style={{ color: accent, letterSpacing: '0.05em' }}>
-                {displayName}
-              </div>
-              <div className="font-detective text-xs mt-0.5" style={{ color: accent, opacity: 0.5, letterSpacing: '0.12em', fontSize: '0.6rem' }}>
-                {displayTitle.toUpperCase()}
-              </div>
-            </div>
+              {displayName}
+            </span>
+            <span
+              className="font-detective"
+              style={{ color: accent, opacity: 0.45, fontSize: '0.5rem', letterSpacing: '0.2em' }}
+            >
+              {displayTitle.toUpperCase()}
+            </span>
           </div>
         )}
 
-        {/* Text */}
-        <div className="px-5 py-4 min-h-[64px]">
-          {isNarrator ? (
-            <p className="font-serif italic" style={{ color: 'rgba(255,255,255,0.62)', letterSpacing: '0.04em', lineHeight: 1.85, fontSize: '0.9rem' }}>
-              {displayed}
-              {isTyping && <span className="animate-pulse ml-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>▋</span>}
-            </p>
-          ) : (
-            <p className="font-serif text-base" style={{ color: 'rgba(255,255,255,0.87)', lineHeight: 1.85 }}>
-              &ldquo;{displayed}
-              {isTyping && <span className="animate-pulse" style={{ color: accent, opacity: 0.7 }}>▋</span>}
-              {!isTyping && '"'}
-            </p>
-          )}
+        {/* Progress dots — inside top-right of box */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            display: 'flex',
+            gap: 3,
+            zIndex: 10,
+            pointerEvents: 'none',
+          }}
+        >
+          {lines.map((_, i) => (
+            <div
+              key={i}
+              className="rounded-full transition-all duration-400"
+              style={{
+                width: i === lineIndex ? 10 : 3,
+                height: 3,
+                background: i < lineIndex ? accent : i === lineIndex ? accent : 'rgba(255,255,255,0.12)',
+                opacity: i < lineIndex ? 0.4 : 1,
+              }}
+            />
+          ))}
         </div>
 
-        {/* Footer */}
-        <div className="px-5 py-2 flex items-center justify-between" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
-          <span className="font-detective text-xs" style={{ color: isDone ? accent : 'rgba(255,255,255,0.25)', letterSpacing: '0.18em', fontSize: '0.6rem', opacity: isDone ? 0.7 : 0.5 }}>
-            {isDone && isLast ? t('dialogueContinue') : isDone ? t('dialogueNext') : t('dialogueSkip')}
-          </span>
-          <span className="font-detective text-xs" style={{ color: 'rgba(255,255,255,0.15)', letterSpacing: '0.1em', fontSize: '0.6rem' }}>
-            {lineIndex + 1} / {lines.length}
-          </span>
+        {/* Text box */}
+        <div
+          style={{
+            background: isNarrator ? 'rgba(4,3,6,0.96)' : charDef.bgColor,
+            border: `1px solid ${accent}35`,
+            boxShadow: `0 0 60px rgba(0,0,0,0.85), 0 0 30px ${accent}12`,
+            height: boxHeight,
+            display: 'flex',
+            alignItems: 'center',
+            position: 'relative',
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              padding: isMobile ? '0 16px' : '0 20px',
+              width: '100%',
+              opacity: textVisible ? 1 : 0,
+              transition: 'opacity 80ms ease',
+            }}
+          >
+            {isNarrator ? (
+              <p
+                className="font-serif italic"
+                style={{
+                  color: 'rgba(255,255,255,0.62)',
+                  letterSpacing: '0.04em',
+                  lineHeight: 1.75,
+                  fontSize: isMobile ? '0.82rem' : '0.9rem',
+                  textAlign: 'center',
+                }}
+              >
+                {displayed}
+                {isTyping && <span className="animate-pulse ml-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>▋</span>}
+              </p>
+            ) : (
+              <p
+                className="font-serif"
+                style={{
+                  color: 'rgba(255,255,255,0.87)',
+                  lineHeight: 1.75,
+                  fontSize: isMobile ? '0.88rem' : '1rem',
+                }}
+              >
+                &ldquo;{displayed}
+                {isTyping && <span className="animate-pulse" style={{ color: accent, opacity: 0.7 }}>▋</span>}
+                {!isTyping && '"'}
+              </p>
+            )}
+          </div>
+
+          {/* Next / done indicator — bottom-right blinking chevron */}
+          {isDone && (
+            <div
+              style={{
+                position: 'absolute',
+                bottom: 8,
+                right: 10,
+                color: isLast ? accent : 'rgba(255,255,255,0.4)',
+                fontSize: '0.7rem',
+              }}
+              className="next-chevron font-detective"
+            >
+              {isLast ? (
+                <span style={{ fontSize: '0.5rem', letterSpacing: '0.15em', color: accent }}>
+                  {t('dialogueContinue')}
+                </span>
+              ) : '▼'}
+            </div>
+          )}
+
+          {/* Skip hint while typing */}
+          {isTyping && (
+            <div
+              style={{
+                position: 'absolute',
+                bottom: 8,
+                right: 10,
+                color: 'rgba(255,255,255,0.15)',
+                fontSize: '0.45rem',
+                letterSpacing: '0.15em',
+              }}
+              className="font-detective"
+            >
+              {t('dialogueSkip')}
+            </div>
+          )}
         </div>
       </div>
     </div>

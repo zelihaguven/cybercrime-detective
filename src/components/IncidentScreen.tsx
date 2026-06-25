@@ -5,12 +5,13 @@ import { useIsMobile } from '../utils/responsive';
 interface Props {
   incident: LevelIncidentScreen;
   levelId: number;
+  victimName?: string;
   onComplete: () => void;
 }
 
 const AUTO_ADVANCE_MS = 5500;
 
-export default function IncidentScreen({ incident, levelId, onComplete }: Props) {
+export default function IncidentScreen({ incident, levelId, victimName, onComplete }: Props) {
   const isMobile = useIsMobile();
   const [mounted, setMounted] = useState(false);
   const [countdown, setCountdown] = useState(Math.ceil(AUTO_ADVANCE_MS / 1000));
@@ -44,12 +45,17 @@ export default function IncidentScreen({ incident, levelId, onComplete }: Props)
       <div className="noise-overlay absolute inset-0 pointer-events-none" />
 
       {/* Header */}
-      <div className="absolute top-6 left-0 right-0 flex items-center justify-center gap-4">
-        <div style={{ height: 1, width: isMobile ? 40 : 80, background: 'rgba(200,60,50,0.4)' }} />
-        <span className="font-detective" style={{ color: 'rgba(200,60,50,0.7)', fontSize: '0.55rem', letterSpacing: '0.35em' }}>
-          RECORDED INCIDENT · CASE {String(levelId).padStart(2, '0')}
-        </span>
-        <div style={{ height: 1, width: isMobile ? 40 : 80, background: 'rgba(200,60,50,0.4)' }} />
+      <div className="absolute top-6 left-0 right-0 flex flex-col items-center gap-2">
+        <div className="flex items-center gap-4">
+          <div style={{ height: 1, width: isMobile ? 30 : 60, background: 'rgba(200,60,50,0.4)' }} />
+          <span className="font-detective" style={{ color: 'rgba(200,60,50,0.7)', fontSize: '0.55rem', letterSpacing: '0.35em' }}>
+            CASE {String(levelId).padStart(2, '0')} · INCIDENT LOG
+          </span>
+          <div style={{ height: 1, width: isMobile ? 30 : 60, background: 'rgba(200,60,50,0.4)' }} />
+        </div>
+        <p className="font-serif italic" style={{ color: 'rgba(255,255,255,0.28)', fontSize: isMobile ? '0.68rem' : '0.72rem' }}>
+          {victimName ? `This is what ${victimName} received.` : 'This is what the victim received.'}
+        </p>
       </div>
 
       {/* Device mockup */}
@@ -62,12 +68,12 @@ export default function IncidentScreen({ incident, levelId, onComplete }: Props)
       </div>
 
       {/* Footer */}
-      <div className="absolute bottom-8 flex items-center gap-6">
-        <span className="font-detective" style={{ color: 'rgba(255,255,255,0.22)', fontSize: '0.52rem', letterSpacing: '0.25em' }}>
-          CLICK TO CONTINUE
+      <div className="absolute bottom-8 flex flex-col items-center gap-2">
+        <span className="font-detective" style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.58rem', letterSpacing: '0.28em' }}>
+          CLICK ANYWHERE TO BEGIN INVESTIGATION
         </span>
-        <span className="font-detective" style={{ color: 'rgba(200,60,50,0.5)', fontSize: '0.52rem', letterSpacing: '0.2em' }}>
-          {countdown}s
+        <span className="font-detective" style={{ color: 'rgba(200,60,50,0.4)', fontSize: '0.48rem', letterSpacing: '0.2em' }}>
+          auto-advancing in {countdown}s
         </span>
       </div>
     </div>
